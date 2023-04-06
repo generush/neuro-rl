@@ -355,8 +355,11 @@ chx = Embeddings(
 logging.info('Finished computing chx embedding')
 
 
+n_steps = obs.data.raw.shape[0]
+
+
+
 # Generate random data for x, y, and z coordinates
-n_points = 100
 x = obs.embeddings['pca'].x_embd[:,0]
 y = obs.embeddings['pca'].x_embd[:,1]
 z = obs.embeddings['pca'].x_embd[:,2]
@@ -366,7 +369,7 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 # Plot the 3D scatter plot
-ax.scatter(x, y, z, c=z, marker='o')
+scattter = ax.scatter(x, y, z, c=z, marker='o')
 
 # Set labels for the axes
 ax.set_xlabel('X Label')
@@ -374,7 +377,38 @@ ax.set_ylabel('Y Label')
 ax.set_zlabel('Z Label')
 
 # Add lines connecting the points
-for i in range(n_points-1):
+for i in range(n_steps-1):
+    ax.plot([x[i], x[i+1]], [y[i], y[i+1]], [z[i], z[i+1]], c='gray')
+
+# Add a color bar to the plot
+cbar = fig.colorbar(scatter)
+cbar.set_label('Z Value')
+
+# Show the plot
+plt.show()
+
+
+
+
+# Generate random data for x, y, and z coordinates
+x = obs.embeddings['lle'].x_embd[:,0]
+y = obs.embeddings['lle'].x_embd[:,1]
+z = obs.embeddings['lle'].x_embd[:,2]
+
+# Create a 3D figure and axes
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+# Plot the 3D scatter plot
+scattter = ax.scatter(x, y, z, c=z, marker='o')
+
+# Set labels for the axes
+ax.set_xlabel('X Label')
+ax.set_ylabel('Y Label')
+ax.set_zlabel('Z Label')
+
+# Add lines connecting the points
+for i in range(n_steps-1):
     ax.plot([x[i], x[i+1]], [y[i], y[i+1]], [z[i], z[i+1]], c='gray')
 
 # Add a color bar to the plot
@@ -388,140 +422,8 @@ plt.show()
 
 
 
-import matplotlib.pyplot as plt
-
-# Generate random data for x, y, and z coordinates
-n_points = 100
-x = act.embeddings['pca'].x_embd[:,0]
-y = act.embeddings['pca'].x_embd[:,1]
-z = act.embeddings['pca'].x_embd[:,2]
-
-# Create a 3D figure and axes
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-
-# Plot the 3D scatter plot
-ax.scatter(x, y, z, c=z, marker='o')
-
-# Set labels for the axes
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
-
-# Show the plot
-plt.show()
 
 
-
-
-
-import matplotlib.pyplot as plt
-
-# Generate random data for x, y, and z coordinates
-n_points = 100
-x = acx.embeddings['pca'].x_embd[:,0]
-y = acx.embeddings['pca'].x_embd[:,1]
-z = acx.embeddings['pca'].x_embd[:,2]
-
-# Create a 3D figure and axes
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-
-# Plot the 3D scatter plot
-ax.scatter(x, y, z, c=z, marker='o')
-
-# Set labels for the axes
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
-
-# Show the plot
-plt.show()
-
-
-
-import matplotlib.pyplot as plt
-
-# Generate random data for x, y, and z coordinates
-n_points = 100
-x = obs.embeddings['pca'].x_embd[:,0]
-y = obs.embeddings['pca'].x_embd[:,1]
-z = obs.embeddings['pca'].x_embd[:,2]
-
-# Create a 3D figure and axes
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-
-# Plot the 3D scatter plot
-ax.scatter(x, y, z, c=z, marker='o')
-
-# Set labels for the axes
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
-
-# Show the plot
-plt.show()
-
-
-
-import matplotlib.pyplot as plt
-
-# Generate random data for x, y, and z coordinates
-n_points = 100
-x = ccx.embeddings['pca'].x_embd[:,0]
-y = ccx.embeddings['pca'].x_embd[:,1]
-z = ccx.embeddings['pca'].x_embd[:,2]
-
-# Create a 3D figure and axes
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-
-# Plot the 3D scatter plot
-ax.scatter(x, y, z, c=z, marker='o')
-
-# Set labels for the axes
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
-
-# Show the plot
-plt.show()
-
-
-
-import matplotlib.pyplot as plt
-
-# Generate random data for x, y, and z coordinates
-n_points = 100
-x = chx.embeddings['pca'].x_embd[:,0]
-y = chx.embeddings['pca'].x_embd[:,1]
-z = chx.embeddings['pca'].x_embd[:,2]
-
-# Create a 3D figure and axes
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-
-# Plot the 3D scatter plot
-ax.scatter(x, y, z, c=z, marker='o')
-
-# Set labels for the axes
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
-
-# Show the plot
-plt.show()
-
-
-
-
-
-
-
-
-
-n_steps = obs.data.raw.shape[0]
 
 # This was helpful
 # https://stackoverflow.com/questions/69647738/dash-output-multiple-graph-based-on-users-graph-choice
