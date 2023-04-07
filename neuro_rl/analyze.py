@@ -270,6 +270,79 @@ class Embeddings:
 #     tsne: Embedding = None
 #     umap: Embedding = None
 
+
+
+# import dash
+# import dash_core_components as dcc
+# import dash_html_components as html
+# from plotly.subplots import make_subplots
+# import plotly.graph_objs as go
+# import pandas as pd
+
+# external_stylesheets = [dbc.themes.BOOTSTRAP]
+
+# app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+# # Define the data sources
+# data_sources = {
+#     'Source 1': pd.DataFrame({
+#         'x': [1, 2, 3, 4],
+#         'y': [10, 20, 30, 40]
+#     }),
+#     'Source 2': pd.DataFrame({
+#         'x': [5, 6, 7, 8],
+#         'y': [50, 60, 70, 80]
+#     }),
+#     'Source 3': pd.DataFrame({
+#         'x': [9, 10, 11, 12],
+#         'y': [90, 100, 110, 120]
+#     })
+# }
+
+# # Define the variables to plot
+# variables = ['x', 'y']
+
+# def create_scatter_plot(data, x_variable_name, y_variable_name):
+#     fig = make_subplots()
+#     fig.add_trace(go.Scatter(x=data[x_variable_name], y=data[y_variable_name], mode='markers'))
+#     fig.update_layout(title=f"Scatter Plot of {x_variable_name} vs {y_variable_name}")
+#     return fig
+
+# # Define a function to generate the layout for each scatter plot
+# def generate_scatter_plot_layout(name: str, data: np.array):
+#     layout = html.Div([
+#         dcc.Graph(
+#             id=f'scatter-plot-{name}',
+#             figure=create_scatter_plot(data, 'x', 'y')
+#         )
+#     ], className=f'col-sm-{12 // num_cols}')
+#     return layout
+
+# # Define the layout
+# num_cols = 4  # Specify the number of columns
+# num_rows = 3  # Specify the number of rows
+# scatter_plots = [
+#     generate_scatter_plot_layout('obs', obs.embeddings['pca'].x_embd[:,0]),
+#     generate_scatter_plot_layout('Source 2'),
+#     generate_scatter_plot_layout('Source 3')
+# ] * ((num_rows * num_cols) // 3)
+# scatter_plot_grid = [
+#     html.Div(
+#         [scatter_plots[i * num_cols + j] for j in range(num_cols)],
+#         className='row'
+#     )
+#     for i in range(num_rows)
+# ]
+# app.layout = html.Div(scatter_plot_grid, className='container-fluid')
+
+# app.run_server(debug=False)
+
+
+
+
+
+
+
 obs = Embeddings(
     data=Data(process_data('obs')),
     embeddings={
@@ -298,131 +371,248 @@ act = Embeddings(
 )
 logging.info('Finished computing act embedding')
 
-acx = Embeddings(
-    data=Data(process_data('acx')),
-    embeddings={
-        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-        'mds': MDSEmbedding(MultiDimensionalScalingEmbedding()),
-        'iso': ISOMAPEmbedding(sklearn.manifold.Isomap(n_components=DIMS, n_neighbors=40)),
-        'lle': LLEEmbedding(sklearn.manifold.LocallyLinearEmbedding(n_components=DIMS, n_neighbors=60, method='modified')),
-        'lem': LEMEmbedding(sklearn.manifold.SpectralEmbedding(n_components=DIMS, affinity='nearest_neighbors', n_neighbors=60)),
-        'tsne': TSNEEmbedding(sklearn.manifold.TSNE(n_components=3, metric='euclidean', perplexity=90, random_state=42)),
-        'umap': UMAPEmbedding(umap.UMAP(n_components=DIMS, metric='cosine', n_neighbors=70, random_state=42))
-    }
-)
-logging.info('Finished computing acx embedding')
+# acx = Embeddings(
+#     data=Data(process_data('acx')),
+#     embeddings={
+#         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+#         'mds': MDSEmbedding(MultiDimensionalScalingEmbedding()),
+#         'iso': ISOMAPEmbedding(sklearn.manifold.Isomap(n_components=DIMS, n_neighbors=40)),
+#         'lle': LLEEmbedding(sklearn.manifold.LocallyLinearEmbedding(n_components=DIMS, n_neighbors=60, method='modified')),
+#         'lem': LEMEmbedding(sklearn.manifold.SpectralEmbedding(n_components=DIMS, affinity='nearest_neighbors', n_neighbors=60)),
+#         'tsne': TSNEEmbedding(sklearn.manifold.TSNE(n_components=3, metric='euclidean', perplexity=90, random_state=42)),
+#         'umap': UMAPEmbedding(umap.UMAP(n_components=DIMS, metric='cosine', n_neighbors=70, random_state=42))
+#     }
+# )
+# logging.info('Finished computing acx embedding')
 
-ahx = Embeddings(
-    data=Data(process_data('ahx')),
-    embeddings={
-        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-        'mds': MDSEmbedding(MultiDimensionalScalingEmbedding()),
-        'iso': ISOMAPEmbedding(sklearn.manifold.Isomap(n_components=DIMS, n_neighbors=40)),
-        'lle': LLEEmbedding(sklearn.manifold.LocallyLinearEmbedding(n_components=DIMS, n_neighbors=60, method='modified')),
-        'lem': LEMEmbedding(sklearn.manifold.SpectralEmbedding(n_components=DIMS, affinity='nearest_neighbors', n_neighbors=60)),
-        'tsne': TSNEEmbedding(sklearn.manifold.TSNE(n_components=3, metric='euclidean', perplexity=90, random_state=42)),
-        'umap': UMAPEmbedding(umap.UMAP(n_components=DIMS, metric='cosine', n_neighbors=70, random_state=42))
-    }
-)
-logging.info('Finished computing ahx embedding')
+# ahx = Embeddings(
+#     data=Data(process_data('ahx')),
+#     embeddings={
+#         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+#         'mds': MDSEmbedding(MultiDimensionalScalingEmbedding()),
+#         'iso': ISOMAPEmbedding(sklearn.manifold.Isomap(n_components=DIMS, n_neighbors=40)),
+#         'lle': LLEEmbedding(sklearn.manifold.LocallyLinearEmbedding(n_components=DIMS, n_neighbors=60, method='modified')),
+#         'lem': LEMEmbedding(sklearn.manifold.SpectralEmbedding(n_components=DIMS, affinity='nearest_neighbors', n_neighbors=60)),
+#         'tsne': TSNEEmbedding(sklearn.manifold.TSNE(n_components=3, metric='euclidean', perplexity=90, random_state=42)),
+#         'umap': UMAPEmbedding(umap.UMAP(n_components=DIMS, metric='cosine', n_neighbors=70, random_state=42))
+#     }
+# )
+# logging.info('Finished computing ahx embedding')
 
-ccx = Embeddings(
-    data=Data(process_data('ccx')),
-    embeddings={
-        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-        'mds': MDSEmbedding(MultiDimensionalScalingEmbedding()),
-        'iso': ISOMAPEmbedding(sklearn.manifold.Isomap(n_components=DIMS, n_neighbors=40)),
-        'lle': LLEEmbedding(sklearn.manifold.LocallyLinearEmbedding(n_components=DIMS, n_neighbors=60, method='modified')),
-        'lem': LEMEmbedding(sklearn.manifold.SpectralEmbedding(n_components=DIMS, affinity='nearest_neighbors', n_neighbors=60)),
-        'tsne': TSNEEmbedding(sklearn.manifold.TSNE(n_components=3, metric='euclidean', perplexity=90, random_state=42)),
-        'umap': UMAPEmbedding(umap.UMAP(n_components=DIMS, metric='cosine', n_neighbors=70, random_state=42))
-    }
-)
-logging.info('Finished computing ccx embedding')
+# ccx = Embeddings(
+#     data=Data(process_data('ccx')),
+#     embeddings={
+#         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+#         'mds': MDSEmbedding(MultiDimensionalScalingEmbedding()),
+#         'iso': ISOMAPEmbedding(sklearn.manifold.Isomap(n_components=DIMS, n_neighbors=40)),
+#         'lle': LLEEmbedding(sklearn.manifold.LocallyLinearEmbedding(n_components=DIMS, n_neighbors=60, method='modified')),
+#         'lem': LEMEmbedding(sklearn.manifold.SpectralEmbedding(n_components=DIMS, affinity='nearest_neighbors', n_neighbors=60)),
+#         'tsne': TSNEEmbedding(sklearn.manifold.TSNE(n_components=3, metric='euclidean', perplexity=90, random_state=42)),
+#         'umap': UMAPEmbedding(umap.UMAP(n_components=DIMS, metric='cosine', n_neighbors=70, random_state=42))
+#     }
+# )
+# logging.info('Finished computing ccx embedding')
 
-chx = Embeddings(
-    data=Data(process_data('chx')),
-    embeddings={
-        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-        'mds': MDSEmbedding(MultiDimensionalScalingEmbedding()),
-        'iso': ISOMAPEmbedding(sklearn.manifold.Isomap(n_components=DIMS, n_neighbors=40)),
-        'lle': LLEEmbedding(sklearn.manifold.LocallyLinearEmbedding(n_components=DIMS, n_neighbors=60, method='modified')),
-        'lem': LEMEmbedding(sklearn.manifold.SpectralEmbedding(n_components=DIMS, affinity='nearest_neighbors', n_neighbors=60)),
-        'tsne': TSNEEmbedding(sklearn.manifold.TSNE(n_components=3, metric='euclidean', perplexity=90, random_state=42)),
-        'umap': UMAPEmbedding(umap.UMAP(n_components=DIMS, metric='cosine', n_neighbors=70, random_state=42))
-    }
-)
-logging.info('Finished computing chx embedding')
+# chx = Embeddings(
+#     data=Data(process_data('chx')),
+#     embeddings={
+#         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+#         'mds': MDSEmbedding(MultiDimensionalScalingEmbedding()),
+#         'iso': ISOMAPEmbedding(sklearn.manifold.Isomap(n_components=DIMS, n_neighbors=40)),
+#         'lle': LLEEmbedding(sklearn.manifold.LocallyLinearEmbedding(n_components=DIMS, n_neighbors=60, method='modified')),
+#         'lem': LEMEmbedding(sklearn.manifold.SpectralEmbedding(n_components=DIMS, affinity='nearest_neighbors', n_neighbors=60)),
+#         'tsne': TSNEEmbedding(sklearn.manifold.TSNE(n_components=3, metric='euclidean', perplexity=90, random_state=42)),
+#         'umap': UMAPEmbedding(umap.UMAP(n_components=DIMS, metric='cosine', n_neighbors=70, random_state=42))
+#     }
+# )
+# logging.info('Finished computing chx embedding')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 n_steps = obs.data.raw.shape[0]
 
 
 
-# Generate random data for x, y, and z coordinates
-x = obs.embeddings['pca'].x_embd[:,0]
-y = obs.embeddings['pca'].x_embd[:,1]
-z = obs.embeddings['pca'].x_embd[:,2]
 
-# Create a 3D figure and axes
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+# # Generate random data for x, y, and z coordinates
+# x = obs.embeddings['pca'].x_embd[:,0]
+# y = obs.embeddings['pca'].x_embd[:,1]
+# z = obs.embeddings['pca'].x_embd[:,2]
 
-# Plot the 3D scatter plot
-scattter = ax.scatter(x, y, z, c=z, marker='o')
+# # Create a 3D figure and axes
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
 
-# Set labels for the axes
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
+# # Plot the 3D scatter plot
+# scattter = ax.scatter(x, y, z, c=z, marker='o')
 
-# Add lines connecting the points
-for i in range(n_steps-1):
-    ax.plot([x[i], x[i+1]], [y[i], y[i+1]], [z[i], z[i+1]], c='gray')
+# # Set labels for the axes
+# ax.set_xlabel('X Label')
+# ax.set_ylabel('Y Label')
+# ax.set_zlabel('Z Label')
 
-# Add a color bar to the plot
-cbar = fig.colorbar(scatter)
-cbar.set_label('Z Value')
+# # Add lines connecting the points
+# for i in range(n_steps-1):
+#     ax.plot([x[i], x[i+1]], [y[i], y[i+1]], [z[i], z[i+1]], c='gray')
 
-# Show the plot
-plt.show()
+# # Add a color bar to the plot
+# cbar = fig.colorbar(scatter)
+# cbar.set_label('Z Value')
 
-
-
-
-# Generate random data for x, y, and z coordinates
-x = obs.embeddings['lle'].x_embd[:,0]
-y = obs.embeddings['lle'].x_embd[:,1]
-z = obs.embeddings['lle'].x_embd[:,2]
-
-# Create a 3D figure and axes
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-
-# Plot the 3D scatter plot
-scattter = ax.scatter(x, y, z, c=z, marker='o')
-
-# Set labels for the axes
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
-
-# Add lines connecting the points
-for i in range(n_steps-1):
-    ax.plot([x[i], x[i+1]], [y[i], y[i+1]], [z[i], z[i+1]], c='gray')
-
-# Add a color bar to the plot
-cbar = fig.colorbar(scatter)
-cbar.set_label('Z Value')
-
-# Show the plot
-plt.show()
+# # Show the plot
+# plt.show()
 
 
 
 
+# # Generate random data for x, y, and z coordinates
+# x = obs.embeddings['lle'].x_embd[:,0]
+# y = obs.embeddings['lle'].x_embd[:,1]
+# z = obs.embeddings['lle'].x_embd[:,2]
+
+# # Create a 3D figure and axes
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+
+# # Plot the 3D scatter plot
+# scattter = ax.scatter(x, y, z, c=z, marker='o')
+
+# # Set labels for the axes
+# ax.set_xlabel('X Label')
+# ax.set_ylabel('Y Label')
+# ax.set_zlabel('Z Label')
+
+# # Add lines connecting the points
+# for i in range(n_steps-1):
+#     ax.plot([x[i], x[i+1]], [y[i], y[i+1]], [z[i], z[i+1]], c='gray')
+
+# # Add a color bar to the plot
+# cbar = fig.colorbar(scatter)
+# cbar.set_label('Z Value')
+
+# # Show the plot
+# plt.show()
 
 
+
+
+# import dash
+# from dash import dcc, html
+# from plotly.subplots import make_subplots
+# import plotly.graph_objs as go
+# import pandas as pd
+
+# app = dash.Dash(__name__)
+
+# # Define the data sources
+# data_sources = {
+#     'Source 1': pd.DataFrame({
+#         'x': [1, 2, 3, 4],
+#         'y': [10, 20, 30, 40]
+#     }),
+#     'Source 2': pd.DataFrame({
+#         'x': [5, 6, 7, 8],
+#         'y': [50, 60, 70, 80]
+#     }),
+#     'Source 3': pd.DataFrame({
+#         'x': [9, 10, 11, 12],
+#         'y': [90, 100, 110, 120]
+#     })
+# }
+
+# # Define the variables to plot
+# variables = ['x', 'y']
+
+# def create_scatter_plot(data, x_variable_name, y_variable_name):
+#     fig = make_subplots()
+#     fig.add_trace(go.Scatter(x=data[x_variable_name], y=data[y_variable_name], mode='markers'))
+#     fig.update_layout(title=f"Scatter Plot of {x_variable_name} vs {y_variable_name}")
+#     return fig
+
+# # Define a function to generate the layout for each scatter plot
+# def generate_scatter_plot_layout(data_source_name):
+#     data = data_sources[data_source_name]
+#     layout = html.Div([
+#         dcc.Graph(
+#             id=f'scatter-plot-{data_source_name}',
+#             figure=create_scatter_plot(data, 'x', 'y')
+#         )
+#     ], className='six columns')
+#     return layout
+
+# # Define the layout
+# app.layout = html.Div([
+#     html.Div(id='scatter-plots', children=[
+#         generate_scatter_plot_layout('Source 1'),
+#         generate_scatter_plot_layout('Source 1'),
+#         generate_scatter_plot_layout('Source 1'),
+#         generate_scatter_plot_layout('Source 1'),
+#         generate_scatter_plot_layout('Source 2'),
+#         generate_scatter_plot_layout('Source 2'),
+#         generate_scatter_plot_layout('Source 2'),
+#         generate_scatter_plot_layout('Source 2'),
+#         generate_scatter_plot_layout('Source 3'),
+#         generate_scatter_plot_layout('Source 3'),
+#         generate_scatter_plot_layout('Source 3'),
+#         generate_scatter_plot_layout('Source 3')
+#     ])
+# ])
+# app.run_server(debug=False)
+
+
+
+
+a = [
+    html.P("Time window width:"),
+    dcc.Slider(
+        id='time-window-slider',
+        min=0,
+        max=n_steps,
+        step=1,
+        value=n_steps,
+        marks=None,
+        tooltip={"placement": "bottom", "always_visible": True},
+    ),
+]
+
+b = [
+    html.P("Time start:"),
+    dcc.Slider(
+        id='time-start-slider',
+        min=0,
+        max=n_steps,
+        step=1,
+        value=0,
+        marks=None,
+        tooltip={"placement": "bottom", "always_visible": True},
+    ),
+]
 
 
 # This was helpful
@@ -438,37 +628,11 @@ app.layout = html.Div(
         dbc.Row(
             [
                 dbc.Col(
-                    html.Div(
-                        [
-                            html.P("Time window width:"),
-                            dcc.Slider(
-                                id='time-window-slider',
-                                min=0,
-                                max=n_steps,
-                                step=1,
-                                value=n_steps,
-                                marks=None,
-                                tooltip={"placement": "bottom", "always_visible": True},
-                            ),
-                        ],
-                    ),
+                    html.Div(a),
                     align="center",
                 ),
                 dbc.Col(
-                    html.Div(
-                        [
-                            html.P("Time start:"),
-                            dcc.Slider(
-                                id='time-start-slider',
-                                min=0,
-                                max=n_steps,
-                                step=1,
-                                value=0,
-                                marks=None,
-                                tooltip={"placement": "bottom", "always_visible": True},
-                            ),
-                        ],
-                    ),
+                    html.Div(b),
                     align="center",
                 ),
             ],
@@ -481,12 +645,12 @@ app.layout = html.Div(
                 dbc.Col(
                     html.Div(
                         [
-                            dcc.Dropdown(id='x-axis-dropdown-obs-pc', options=pd.DataFrame(obs.embeddings[0].x_embd).columns.values, value=pd.DataFrame(obs.embeddings[0].x_embd).columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='y-axis-dropdown-obs-pc', options=pd.DataFrame(obs.embeddings[0].x_embd).columns.values, value=pd.DataFrame(obs.embeddings[0].x_embd).columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='z-axis-dropdown-obs-pc', options=pd.DataFrame(obs.embeddings[0].x_embd).columns.values, value=pd.DataFrame(obs.embeddings[0].x_embd).columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+                            dcc.Dropdown(id='x-axis-dropdown-obs-pc', options=pd.DataFrame(obs.embeddings['pca'].x_embd).columns.values, value=pd.DataFrame(obs.embeddings['pca'].x_embd).columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+                            dcc.Dropdown(id='y-axis-dropdown-obs-pc', options=pd.DataFrame(obs.embeddings['pca'].x_embd).columns.values, value=pd.DataFrame(obs.embeddings['pca'].x_embd).columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+                            dcc.Dropdown(id='z-axis-dropdown-obs-pc', options=pd.DataFrame(obs.embeddings['pca'].x_embd).columns.values, value=pd.DataFrame(obs.embeddings['pca'].x_embd).columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
                             html.Div(
                                 [
-                                    dcc.Graph(id="scatter3d-graph-obs-pc"),
+                                    dcc.Graph(id="scatter3d-graph-obs-pc")
                                 ],
                             ),
                         ],
@@ -496,12 +660,12 @@ app.layout = html.Div(
                 dbc.Col(
                     html.Div(
                         [
-                            dcc.Dropdown(id='x-axis-dropdown-obs-cln', options=data['obs']['cln'].columns.values, value=data['obs']['cln'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='y-axis-dropdown-obs-cln', options=data['obs']['cln'].columns.values, value=data['obs']['cln'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='z-axis-dropdown-obs-cln', options=data['obs']['cln'].columns.values, value=data['obs']['cln'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+                            dcc.Dropdown(id='x-axis-dropdown-obs-raw', options=pd.DataFrame(obs.data.raw).columns.values, value=pd.DataFrame(obs.data.raw).columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+                            dcc.Dropdown(id='y-axis-dropdown-obs-raw', options=pd.DataFrame(obs.data.raw).columns.values, value=pd.DataFrame(obs.data.raw).columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+                            dcc.Dropdown(id='z-axis-dropdown-obs-raw', options=pd.DataFrame(obs.data.raw).columns.values, value=pd.DataFrame(obs.data.raw).columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
                             html.Div(
                                 [
-                                    dcc.Graph(id="scatter3d-graph-obs-cln"),
+                                    dcc.Graph(id="scatter3d-graph-obs-raw"),
                                 ],
                             ),
                         ],
@@ -511,9 +675,9 @@ app.layout = html.Div(
                 dbc.Col(
                     html.Div(
                         [
-                            dcc.Dropdown(id='x-axis-dropdown-act-pc', options=data['act']['pc'].columns.values, value=data['act']['pc'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='y-axis-dropdown-act-pc', options=data['act']['pc'].columns.values, value=data['act']['pc'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='z-axis-dropdown-act-pc', options=data['act']['pc'].columns.values, value=data['act']['pc'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+                            dcc.Dropdown(id='x-axis-dropdown-act-pc', options=pd.DataFrame(act.embeddings['pca'].x_embd).columns.values, value=pd.DataFrame(act.embeddings['pca'].x_embd).columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+                            dcc.Dropdown(id='y-axis-dropdown-act-pc', options=pd.DataFrame(act.embeddings['pca'].x_embd).columns.values, value=pd.DataFrame(act.embeddings['pca'].x_embd).columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+                            dcc.Dropdown(id='z-axis-dropdown-act-pc', options=pd.DataFrame(act.embeddings['pca'].x_embd).columns.values, value=pd.DataFrame(act.embeddings['pca'].x_embd).columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
                             html.Div(
                                 [
                                     dcc.Graph(id="scatter3d-graph-act-pc"),
@@ -526,12 +690,12 @@ app.layout = html.Div(
                 dbc.Col(
                     html.Div(
                         [
-                            dcc.Dropdown(id='x-axis-dropdown-act-cln', options=data['act']['cln'].columns.values, value=data['act']['cln'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='y-axis-dropdown-act-cln', options=data['act']['cln'].columns.values, value=data['act']['cln'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='z-axis-dropdown-act-cln', options=data['act']['cln'].columns.values, value=data['act']['cln'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+                            dcc.Dropdown(id='x-axis-dropdown-act-raw', options=pd.DataFrame(obs.data.raw).columns.values, value=pd.DataFrame(obs.data.raw).columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+                            dcc.Dropdown(id='y-axis-dropdown-act-raw', options=pd.DataFrame(obs.data.raw).columns.values, value=pd.DataFrame(obs.data.raw).columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+                            dcc.Dropdown(id='z-axis-dropdown-act-raw', options=pd.DataFrame(obs.data.raw).columns.values, value=pd.DataFrame(obs.data.raw).columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
                             html.Div(
                                 [
-                                    dcc.Graph(id="scatter3d-graph-act-cln"),
+                                    dcc.Graph(id="scatter3d-graph-act-raw"),
                                 ],
                             ),
                         ],
@@ -540,141 +704,141 @@ app.layout = html.Div(
                 ),
             ],
         ),
-        dbc.Row(
-            [
-                dbc.Col(
-                    html.Div(
-                        [
-                            dcc.Dropdown(id='x-axis-dropdown-acx-pc', options=data['acx']['pc'].columns.values, value=data['acx']['pc'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='y-axis-dropdown-acx-pc', options=data['acx']['pc'].columns.values, value=data['acx']['pc'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='z-axis-dropdown-acx-pc', options=data['acx']['pc'].columns.values, value=data['acx']['pc'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            html.Div(
-                                [
-                                    dcc.Graph(id="scatter3d-graph-acx-pc"),
-                                ],
-                            ),
-                        ],
-                    ),
-                    align="center",
-                ),
-                dbc.Col(
-                    html.Div(
-                        [
-                            dcc.Dropdown(id='x-axis-dropdown-acx-cln', options=data['acx']['cln'].columns.values, value=data['acx']['cln'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='y-axis-dropdown-acx-cln', options=data['acx']['cln'].columns.values, value=data['acx']['cln'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='z-axis-dropdown-acx-cln', options=data['acx']['cln'].columns.values, value=data['acx']['cln'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            html.Div(
-                                [
-                                    dcc.Graph(id="scatter3d-graph-acx-cln"),
-                                ],
-                            ),
-                        ],
-                    ),
-                    align="center",
-                ),
-                dbc.Col(
-                    html.Div(
-                        [
-                            dcc.Dropdown(id='x-axis-dropdown-ahx-pc', options=data['ahx']['pc'].columns.values, value=data['ahx']['pc'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='y-axis-dropdown-ahx-pc', options=data['ahx']['pc'].columns.values, value=data['ahx']['pc'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='z-axis-dropdown-ahx-pc', options=data['ahx']['pc'].columns.values, value=data['ahx']['pc'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            html.Div(
-                                [
-                                    dcc.Graph(id="scatter3d-graph-ahx-pc"),
-                                ],
-                            ),
-                        ],
-                    ),
-                    align="center",
-                ),
-                dbc.Col(
-                    html.Div(
-                        [
-                            dcc.Dropdown(id='x-axis-dropdown-ahx-cln', options=data['ahx']['cln'].columns.values, value=data['ahx']['cln'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='y-axis-dropdown-ahx-cln', options=data['ahx']['cln'].columns.values, value=data['ahx']['cln'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='z-axis-dropdown-ahx-cln', options=data['ahx']['cln'].columns.values, value=data['ahx']['cln'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            html.Div(
-                                [
-                                    dcc.Graph(id="scatter3d-graph-ahx-cln"),
-                                ],
-                            ),
-                        ],
-                    ),
-                    align="center",
-                ),
-            ],
-        ),
-        dbc.Row(
-            [
-                dbc.Col(
-                    html.Div(
-                        [
-                            dcc.Dropdown(id='x-axis-dropdown-ccx-pc', options=data['ccx']['pc'].columns.values, value=data['ccx']['pc'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='y-axis-dropdown-ccx-pc', options=data['ccx']['pc'].columns.values, value=data['ccx']['pc'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='z-axis-dropdown-ccx-pc', options=data['ccx']['pc'].columns.values, value=data['ccx']['pc'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            html.Div(
-                                [
-                                    dcc.Graph(id="scatter3d-graph-ccx-pc"),
-                                ],
-                            ),
-                        ],
-                    ),
-                    align="center",
-                ),
-                dbc.Col(
-                    html.Div(
-                        [
-                            dcc.Dropdown(id='x-axis-dropdown-ccx-cln', options=data['ccx']['cln'].columns.values, value=data['ccx']['cln'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='y-axis-dropdown-ccx-cln', options=data['ccx']['cln'].columns.values, value=data['ccx']['cln'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='z-axis-dropdown-ccx-cln', options=data['ccx']['cln'].columns.values, value=data['ccx']['cln'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            html.Div(
-                                [
-                                    dcc.Graph(id="scatter3d-graph-ccx-cln"),
-                                ],
-                            ),
-                        ],
-                    ),
-                    align="center",
-                ),
-                dbc.Col(
-                    html.Div(
-                        [
-                            dcc.Dropdown(id='x-axis-dropdown-chx-pc', options=data['chx']['pc'].columns.values, value=data['chx']['pc'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='y-axis-dropdown-chx-pc', options=data['chx']['pc'].columns.values, value=data['chx']['pc'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='z-axis-dropdown-chx-pc', options=data['chx']['pc'].columns.values, value=data['chx']['pc'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            html.Div(
-                                [
-                                    dcc.Graph(id="scatter3d-graph-chx-pc"),
-                                ],
-                            ),
-                        ],
-                    ),
-                    align="center",
-                ),
-                dbc.Col(
-                    html.Div(
-                        [
-                            dcc.Dropdown(id='x-axis-dropdown-chx-cln', options=data['chx']['cln'].columns.values, value=data['chx']['cln'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='y-axis-dropdown-chx-cln', options=data['chx']['cln'].columns.values, value=data['chx']['cln'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            dcc.Dropdown(id='z-axis-dropdown-chx-cln', options=data['chx']['cln'].columns.values, value=data['chx']['cln'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
-                            html.Div(
-                                [
-                                    dcc.Graph(id="scatter3d-graph-chx-cln"),
-                                ],
-                            ),
-                        ],
-                    ),
-                    align="center",
-                ),
-            ],
-        ),
+        # dbc.Row(
+        #     [
+        #         dbc.Col(
+        #             html.Div(
+        #                 [
+        #                     dcc.Dropdown(id='x-axis-dropdown-acx-pc', options=data['acx']['pc'].columns.values, value=data['acx']['pc'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='y-axis-dropdown-acx-pc', options=data['acx']['pc'].columns.values, value=data['acx']['pc'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='z-axis-dropdown-acx-pc', options=data['acx']['pc'].columns.values, value=data['acx']['pc'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     html.Div(
+        #                         [
+        #                             dcc.Graph(id="scatter3d-graph-acx-pc"),
+        #                         ],
+        #                     ),
+        #                 ],
+        #             ),
+        #             align="center",
+        #         ),
+        #         dbc.Col(
+        #             html.Div(
+        #                 [
+        #                     dcc.Dropdown(id='x-axis-dropdown-acx-cln', options=data['acx']['cln'].columns.values, value=data['acx']['cln'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='y-axis-dropdown-acx-cln', options=data['acx']['cln'].columns.values, value=data['acx']['cln'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='z-axis-dropdown-acx-cln', options=data['acx']['cln'].columns.values, value=data['acx']['cln'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     html.Div(
+        #                         [
+        #                             dcc.Graph(id="scatter3d-graph-acx-cln"),
+        #                         ],
+        #                     ),
+        #                 ],
+        #             ),
+        #             align="center",
+        #         ),
+        #         dbc.Col(
+        #             html.Div(
+        #                 [
+        #                     dcc.Dropdown(id='x-axis-dropdown-ahx-pc', options=data['ahx']['pc'].columns.values, value=data['ahx']['pc'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='y-axis-dropdown-ahx-pc', options=data['ahx']['pc'].columns.values, value=data['ahx']['pc'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='z-axis-dropdown-ahx-pc', options=data['ahx']['pc'].columns.values, value=data['ahx']['pc'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     html.Div(
+        #                         [
+        #                             dcc.Graph(id="scatter3d-graph-ahx-pc"),
+        #                         ],
+        #                     ),
+        #                 ],
+        #             ),
+        #             align="center",
+        #         ),
+        #         dbc.Col(
+        #             html.Div(
+        #                 [
+        #                     dcc.Dropdown(id='x-axis-dropdown-ahx-cln', options=data['ahx']['cln'].columns.values, value=data['ahx']['cln'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='y-axis-dropdown-ahx-cln', options=data['ahx']['cln'].columns.values, value=data['ahx']['cln'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='z-axis-dropdown-ahx-cln', options=data['ahx']['cln'].columns.values, value=data['ahx']['cln'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     html.Div(
+        #                         [
+        #                             dcc.Graph(id="scatter3d-graph-ahx-cln"),
+        #                         ],
+        #                     ),
+        #                 ],
+        #             ),
+        #             align="center",
+        #         ),
+        #     ],
+        # ),
+        # dbc.Row(
+        #     [
+        #         dbc.Col(
+        #             html.Div(
+        #                 [
+        #                     dcc.Dropdown(id='x-axis-dropdown-ccx-pc', options=data['ccx']['pc'].columns.values, value=data['ccx']['pc'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='y-axis-dropdown-ccx-pc', options=data['ccx']['pc'].columns.values, value=data['ccx']['pc'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='z-axis-dropdown-ccx-pc', options=data['ccx']['pc'].columns.values, value=data['ccx']['pc'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     html.Div(
+        #                         [
+        #                             dcc.Graph(id="scatter3d-graph-ccx-pc"),
+        #                         ],
+        #                     ),
+        #                 ],
+        #             ),
+        #             align="center",
+        #         ),
+        #         dbc.Col(
+        #             html.Div(
+        #                 [
+        #                     dcc.Dropdown(id='x-axis-dropdown-ccx-cln', options=data['ccx']['cln'].columns.values, value=data['ccx']['cln'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='y-axis-dropdown-ccx-cln', options=data['ccx']['cln'].columns.values, value=data['ccx']['cln'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='z-axis-dropdown-ccx-cln', options=data['ccx']['cln'].columns.values, value=data['ccx']['cln'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     html.Div(
+        #                         [
+        #                             dcc.Graph(id="scatter3d-graph-ccx-cln"),
+        #                         ],
+        #                     ),
+        #                 ],
+        #             ),
+        #             align="center",
+        #         ),
+        #         dbc.Col(
+        #             html.Div(
+        #                 [
+        #                     dcc.Dropdown(id='x-axis-dropdown-chx-pc', options=data['chx']['pc'].columns.values, value=data['chx']['pc'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='y-axis-dropdown-chx-pc', options=data['chx']['pc'].columns.values, value=data['chx']['pc'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='z-axis-dropdown-chx-pc', options=data['chx']['pc'].columns.values, value=data['chx']['pc'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     html.Div(
+        #                         [
+        #                             dcc.Graph(id="scatter3d-graph-chx-pc"),
+        #                         ],
+        #                     ),
+        #                 ],
+        #             ),
+        #             align="center",
+        #         ),
+        #         dbc.Col(
+        #             html.Div(
+        #                 [
+        #                     dcc.Dropdown(id='x-axis-dropdown-chx-cln', options=data['chx']['cln'].columns.values, value=data['chx']['cln'].columns.values[0], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='y-axis-dropdown-chx-cln', options=data['chx']['cln'].columns.values, value=data['chx']['cln'].columns.values[1], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     dcc.Dropdown(id='z-axis-dropdown-chx-cln', options=data['chx']['cln'].columns.values, value=data['chx']['cln'].columns.values[2], style={'display': 'inline-block', 'font-size': '10px', 'padding-left': 20, 'padding-right': 20}),
+        #                     html.Div(
+        #                         [
+        #                             dcc.Graph(id="scatter3d-graph-chx-cln"),
+        #                         ],
+        #                     ),
+        #                 ],
+        #             ),
+        #             align="center",
+        #         ),
+        #     ],
+        # ),
     ],
 )
 
 def plot_fig(data, title, twidth, t0, dropdown_x, dropdown_y, dropdown_z):
     
-    idx = data.index
-    mask = (idx > t0) & (idx < t0 + twidth)
+    idx = np.array(range(np.shape(data)[0]))
+    mask = (idx > t0) & (idx <= t0 + twidth)
 
     # All points (grey markers)
     figa = px.scatter_3d(
@@ -694,7 +858,7 @@ def plot_fig(data, title, twidth, t0, dropdown_x, dropdown_y, dropdown_z):
         x=dropdown_x,
         y=dropdown_y,
         z=dropdown_z,
-        color=data[mask].index,
+        color=idx[mask],
         color_continuous_scale='Blues',
     )
     figb.update_traces(
@@ -761,7 +925,20 @@ def plot_fig(data, title, twidth, t0, dropdown_x, dropdown_y, dropdown_z):
     )
 
     return fig
-    
+
+# def generate_output_input(name: str):
+#     a = (Output("scatter3d-graph-" + name, "figure"),
+#         [
+#             Input("x-axis-dropdown-" + name, "value"),
+#             Input("y-axis-dropdown-" + name, "value"),
+#             Input("z-axis-dropdown-" + name, "value")
+#         ]
+#     )
+#     return a
+
+
+# @app.callback(generate_output_input('obs-pc'))
+
 # obs-pc
 @app.callback(
     Output("scatter3d-graph-obs-pc", "figure"),
@@ -775,22 +952,22 @@ def plot_fig(data, title, twidth, t0, dropdown_x, dropdown_y, dropdown_z):
 )
 
 def update_fig_obs_pc(twidth, t0, ddx, ddy, ddz):
-    return plot_fig(data['obs']['pc'], 'obs-pc', twidth, t0, ddx, ddy, ddz)
+    return plot_fig(obs.embeddings['pca'].x_embd, 'obs-pc', twidth, t0, ddx, ddy, ddz)
 
 # obs-cln
 @app.callback(
-    Output("scatter3d-graph-obs-cln", "figure"),
+    Output("scatter3d-graph-obs-raw", "figure"),
     [
         Input("time-window-slider", "value"),
         Input("time-start-slider", "value"),
-        Input("x-axis-dropdown-obs-cln", "value"),
-        Input("y-axis-dropdown-obs-cln", "value"),
-        Input("z-axis-dropdown-obs-cln", "value"),
+        Input("x-axis-dropdown-obs-raw", "value"),
+        Input("y-axis-dropdown-obs-raw", "value"),
+        Input("z-axis-dropdown-obs-raw", "value"),
     ]
 )
 
 def update_fig_obs_cln(twidth, t0, ddx, ddy, ddz):
-    return plot_fig(data['obs']['cln'], 'obs', twidth, t0, ddx, ddy, ddz)
+    return plot_fig(obs.data.raw, 'obs', twidth, t0, ddx, ddy, ddz)
 
 # act-pc
 @app.callback(
@@ -805,141 +982,141 @@ def update_fig_obs_cln(twidth, t0, ddx, ddy, ddz):
 )
 
 def update_fig_act_pc(twidth, t0, ddx, ddy, ddz):
-    return plot_fig(data['act']['pc'], 'act-pc', twidth, t0, ddx, ddy, ddz)
+    return plot_fig(act.embeddings['pca'].x_embd, 'act-pc', twidth, t0, ddx, ddy, ddz)
 
 # act-cln
 @app.callback(
-    Output("scatter3d-graph-act-cln", "figure"),
+    Output("scatter3d-graph-act-raw", "figure"),
     [
         Input("time-window-slider", "value"),
         Input("time-start-slider", "value"),
-        Input("x-axis-dropdown-act-cln", "value"),
-        Input("y-axis-dropdown-act-cln", "value"),
-        Input("z-axis-dropdown-act-cln", "value"),
+        Input("x-axis-dropdown-act-raw", "value"),
+        Input("y-axis-dropdown-act-raw", "value"),
+        Input("z-axis-dropdown-act-raw", "value"),
     ]
 )
 
 def update_fig_act_cln(twidth, t0, ddx, ddy, ddz):
-    return plot_fig(data['act']['cln'], 'act', twidth, t0, ddx, ddy, ddz)
+    return plot_fig(act.data.raw, 'act', twidth, t0, ddx, ddy, ddz)
 
-# acx-pc
-@app.callback(
-    Output("scatter3d-graph-acx-pc", "figure"),
-    [
-        Input("time-window-slider", "value"),
-        Input("time-start-slider", "value"),
-        Input("x-axis-dropdown-acx-pc", "value"),
-        Input("y-axis-dropdown-acx-pc", "value"),
-        Input("z-axis-dropdown-acx-pc", "value"),
-    ]
-)
+# # acx-pc
+# @app.callback(
+#     Output("scatter3d-graph-acx-pc", "figure"),
+#     [
+#         Input("time-window-slider", "value"),
+#         Input("time-start-slider", "value"),
+#         Input("x-axis-dropdown-acx-pc", "value"),
+#         Input("y-axis-dropdown-acx-pc", "value"),
+#         Input("z-axis-dropdown-acx-pc", "value"),
+#     ]
+# )
 
-def update_fig_acx_pc(twidth, t0, ddx, ddy, ddz):
-    return plot_fig(data['acx']['pc'], 'acx-pc,', twidth, t0, ddx, ddy, ddz)
+# def update_fig_acx_pc(twidth, t0, ddx, ddy, ddz):
+#     return plot_fig(data['acx']['pc'], 'acx-pc,', twidth, t0, ddx, ddy, ddz)
 
-# acx-cln
-@app.callback(
-    Output("scatter3d-graph-acx-cln", "figure"),
-    [
-        Input("time-window-slider", "value"),
-        Input("time-start-slider", "value"),
-        Input("x-axis-dropdown-acx-cln", "value"),
-        Input("y-axis-dropdown-acx-cln", "value"),
-        Input("z-axis-dropdown-acx-cln", "value"),
-    ]
-)
+# # acx-cln
+# @app.callback(
+#     Output("scatter3d-graph-acx-cln", "figure"),
+#     [
+#         Input("time-window-slider", "value"),
+#         Input("time-start-slider", "value"),
+#         Input("x-axis-dropdown-acx-cln", "value"),
+#         Input("y-axis-dropdown-acx-cln", "value"),
+#         Input("z-axis-dropdown-acx-cln", "value"),
+#     ]
+# )
 
-def update_fig_acx_cln(twidth, t0, ddx, ddy, ddz):
-    return plot_fig(data['acx']['cln'], 'acx', twidth, t0, ddx, ddy, ddz)
+# def update_fig_acx_cln(twidth, t0, ddx, ddy, ddz):
+#     return plot_fig(data['acx']['cln'], 'acx', twidth, t0, ddx, ddy, ddz)
 
-# ahx-pc
-@app.callback(
-    Output("scatter3d-graph-ahx-pc", "figure"),
-    [
-        Input("time-window-slider", "value"),
-        Input("time-start-slider", "value"),
-        Input("x-axis-dropdown-ahx-pc", "value"),
-        Input("y-axis-dropdown-ahx-pc", "value"),
-        Input("z-axis-dropdown-ahx-pc", "value"),
-    ]
-)
+# # ahx-pc
+# @app.callback(
+#     Output("scatter3d-graph-ahx-pc", "figure"),
+#     [
+#         Input("time-window-slider", "value"),
+#         Input("time-start-slider", "value"),
+#         Input("x-axis-dropdown-ahx-pc", "value"),
+#         Input("y-axis-dropdown-ahx-pc", "value"),
+#         Input("z-axis-dropdown-ahx-pc", "value"),
+#     ]
+# )
 
-def update_fig_ahx_pc(twidth, t0, ddx, ddy, ddz):
-    return plot_fig(data['ahx']['pc'], 'ahx-pc', twidth, t0, ddx, ddy, ddz)
+# def update_fig_ahx_pc(twidth, t0, ddx, ddy, ddz):
+#     return plot_fig(data['ahx']['pc'], 'ahx-pc', twidth, t0, ddx, ddy, ddz)
 
-# ahx-cln
-@app.callback(
-    Output("scatter3d-graph-ahx-cln", "figure"),
-    [
-        Input("time-window-slider", "value"),
-        Input("time-start-slider", "value"),
-        Input("x-axis-dropdown-ahx-cln", "value"),
-        Input("y-axis-dropdown-ahx-cln", "value"),
-        Input("z-axis-dropdown-ahx-cln", "value"),
-    ]
-)
+# # ahx-cln
+# @app.callback(
+#     Output("scatter3d-graph-ahx-cln", "figure"),
+#     [
+#         Input("time-window-slider", "value"),
+#         Input("time-start-slider", "value"),
+#         Input("x-axis-dropdown-ahx-cln", "value"),
+#         Input("y-axis-dropdown-ahx-cln", "value"),
+#         Input("z-axis-dropdown-ahx-cln", "value"),
+#     ]
+# )
 
-def update_fig_ahx_cln(twidth, t0, ddx, ddy, ddz):
-    return plot_fig(data['ahx']['cln'], 'ahx', twidth, t0, ddx, ddy, ddz)
+# def update_fig_ahx_cln(twidth, t0, ddx, ddy, ddz):
+#     return plot_fig(data['ahx']['cln'], 'ahx', twidth, t0, ddx, ddy, ddz)
 
-# ccx-pc
-@app.callback(
-    Output("scatter3d-graph-ccx-pc", "figure"),
-    [
-        Input("time-window-slider", "value"),
-        Input("time-start-slider", "value"),
-        Input("x-axis-dropdown-ccx-pc", "value"),
-        Input("y-axis-dropdown-ccx-pc", "value"),
-        Input("z-axis-dropdown-ccx-pc", "value"),
-    ]
-)
+# # ccx-pc
+# @app.callback(
+#     Output("scatter3d-graph-ccx-pc", "figure"),
+#     [
+#         Input("time-window-slider", "value"),
+#         Input("time-start-slider", "value"),
+#         Input("x-axis-dropdown-ccx-pc", "value"),
+#         Input("y-axis-dropdown-ccx-pc", "value"),
+#         Input("z-axis-dropdown-ccx-pc", "value"),
+#     ]
+# )
 
-def update_fig_ccx_pc(twidth, t0, ddx, ddy, ddz):
-    return plot_fig(data['ccx']['pc'], 'ccx-pc', twidth, t0, ddx, ddy, ddz)
+# def update_fig_ccx_pc(twidth, t0, ddx, ddy, ddz):
+#     return plot_fig(data['ccx']['pc'], 'ccx-pc', twidth, t0, ddx, ddy, ddz)
 
-# ccx-cln
-@app.callback(
-    Output("scatter3d-graph-ccx-cln", "figure"),
-    [
-        Input("time-window-slider", "value"),
-        Input("time-start-slider", "value"),
-        Input("x-axis-dropdown-ccx-cln", "value"),
-        Input("y-axis-dropdown-ccx-cln", "value"),
-        Input("z-axis-dropdown-ccx-cln", "value"),
-    ]
-)
+# # ccx-cln
+# @app.callback(
+#     Output("scatter3d-graph-ccx-cln", "figure"),
+#     [
+#         Input("time-window-slider", "value"),
+#         Input("time-start-slider", "value"),
+#         Input("x-axis-dropdown-ccx-cln", "value"),
+#         Input("y-axis-dropdown-ccx-cln", "value"),
+#         Input("z-axis-dropdown-ccx-cln", "value"),
+#     ]
+# )
 
-def update_fig_ccx_cln(twidth, t0, ddx, ddy, ddz):
-    return plot_fig(data['ccx']['cln'], 'ccx', twidth, t0, ddx, ddy, ddz)
+# def update_fig_ccx_cln(twidth, t0, ddx, ddy, ddz):
+#     return plot_fig(data['ccx']['cln'], 'ccx', twidth, t0, ddx, ddy, ddz)
 
-# chx-pc
-@app.callback(
-    Output("scatter3d-graph-chx-pc", "figure"),
-    [
-        Input("time-window-slider", "value"),
-        Input("time-start-slider", "value"),
-        Input("x-axis-dropdown-chx-pc", "value"),
-        Input("y-axis-dropdown-chx-pc", "value"),
-        Input("z-axis-dropdown-chx-pc", "value"),
-    ]
-)
+# # chx-pc
+# @app.callback(
+#     Output("scatter3d-graph-chx-pc", "figure"),
+#     [
+#         Input("time-window-slider", "value"),
+#         Input("time-start-slider", "value"),
+#         Input("x-axis-dropdown-chx-pc", "value"),
+#         Input("y-axis-dropdown-chx-pc", "value"),
+#         Input("z-axis-dropdown-chx-pc", "value"),
+#     ]
+# )
 
-def update_fig_chx_pc(twidth, t0, ddx, ddy, ddz):
-    return plot_fig(data['chx']['pc'], 'chx-pc', twidth, t0, ddx, ddy, ddz)
+# def update_fig_chx_pc(twidth, t0, ddx, ddy, ddz):
+#     return plot_fig(data['chx']['pc'], 'chx-pc', twidth, t0, ddx, ddy, ddz)
 
-# chx-cln
-@app.callback(
-    Output("scatter3d-graph-chx-cln", "figure"),
-    [
-        Input("time-window-slider", "value"),
-        Input("time-start-slider", "value"),
-        Input("x-axis-dropdown-chx-cln", "value"),
-        Input("y-axis-dropdown-chx-cln", "value"),
-        Input("z-axis-dropdown-chx-cln", "value"),
-    ]
-)
+# # chx-cln
+# @app.callback(
+#     Output("scatter3d-graph-chx-cln", "figure"),
+#     [
+#         Input("time-window-slider", "value"),
+#         Input("time-start-slider", "value"),
+#         Input("x-axis-dropdown-chx-cln", "value"),
+#         Input("y-axis-dropdown-chx-cln", "value"),
+#         Input("z-axis-dropdown-chx-cln", "value"),
+#     ]
+# )
 
-def update_fig_chx_cln(twidth, t0, ddx, ddy, ddz):
-    return plot_fig(data['chx']['cln'], 'chx', twidth, t0, ddx, ddy, ddz)
+# def update_fig_chx_cln(twidth, t0, ddx, ddy, ddz):
+#     return plot_fig(data['chx']['cln'], 'chx', twidth, t0, ddx, ddy, ddz)
 
 app.run_server(debug=False)
