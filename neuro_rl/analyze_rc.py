@@ -139,7 +139,7 @@ from dash import Dash, Input, Output, dcc, html
 # DATA_PATH = '/home/gene/code/rl_neural_dynamics/IsaacGymEnvs/isaacgymenvs/videos/AnymalTerrain_2023-03-14_17-28-09/'
 # DATA_PATH = '/home/gene/code/rl_neural_dynamics/IsaacGymEnvs/isaacgymenvs/videos/ShadowHandAsymmLSTM_2023-03-14_16-19-22/'
 
-DATA_PATH = '/home/gene/code/neuro-rl/IsaacGymEnvs/isaacgymenvs/shadowhand/'
+DATA_PATH = '/home/gene/code/neuro-rl/IsaacGymEnvs/isaacgymenvs/shadowhand_2023_03_11_1279/'
 
 def process_data(dic: str):
     # read csv file        
@@ -148,6 +148,11 @@ def process_data(dic: str):
     clean_data = raw_data.loc[~(raw_data==0).all(axis=1)]
     clean_data.columns = clean_data.columns.astype(str)
     return clean_data
+
+def format_df(data: np.array):
+    df = pd.DataFrame(data)
+    df.columns = df.columns.astype(str)
+    return df
 
 @dataclass
 class Data:
@@ -177,7 +182,7 @@ class PCAEmbedding(Embedding):
     x_embd: pd.DataFrame = field(init=False)
 
     def fit_transform(self, x: Data) -> np.array:
-        self.x_embd = pd.DataFrame(self.embedding.fit_transform(x.raw))
+        self.x_embd = format_df(self.embedding.fit_transform(x.raw))
 
     @property
     def var(self) -> np.array:
@@ -195,7 +200,7 @@ class MDSEmbedding(Embedding):
 
     def fit_transform(self, x: Data) -> None:
         x1 = self.embedding.fit_transform(x.cos)
-        self.x_embed = pd.DataFrame(x1 / np.max(x1))
+        self.x_embed = format_df(x1 / np.max(x1))
 
 @dataclass
 class ISOMAPEmbedding(Embedding):
@@ -205,7 +210,7 @@ class ISOMAPEmbedding(Embedding):
 
     def fit_transform(self, x: Data) -> None:
         x1 = self.embedding.fit_transform(x.cos)
-        self.x_embd = pd.DataFrame(x1 / np.max(x1))
+        self.x_embd = format_df(x1 / np.max(x1))
 
 @dataclass
 class LLEEmbedding(Embedding):
@@ -215,7 +220,7 @@ class LLEEmbedding(Embedding):
 
     def fit_transform(self, x: Data) -> None:
         x1 = self.embedding.fit_transform(x.cos)
-        self.x_embd = pd.DataFrame(x1 / np.max(x1))
+        self.x_embd = format_df(x1 / np.max(x1))
 
 @dataclass
 class LEMEmbedding(Embedding):
@@ -225,7 +230,7 @@ class LEMEmbedding(Embedding):
 
     def fit_transform(self, x: Data) -> None:
         x1 = self.embedding.fit_transform(x.cos)
-        self.x_embd = pd.DataFrame(x1 / np.max(x1))
+        self.x_embd = format_df(x1 / np.max(x1))
 
 @dataclass
 class TSNEEmbedding(Embedding):
@@ -235,7 +240,7 @@ class TSNEEmbedding(Embedding):
 
     def fit_transform(self, x: Data) -> None:
         x1 = self.embedding.fit_transform(x.raw)
-        self.x_embd = pd.DataFrame(x1 / np.max(x1))
+        self.x_embd = format_df(x1 / np.max(x1))
 
 def center_scale(x: np.array) -> np.array:
     xc = x - np.mean(x)
@@ -248,9 +253,9 @@ class UMAPEmbedding(Embedding):
     x_embd: pd.DataFrame = field(init=False)
 
     def fit_transform(self, x: Data) -> None:
-        self.x_embd = pd.DataFrame(center_scale(self.embedding.fit_transform(x.raw)))
+        self.x_embd = format_df(center_scale(self.embedding.fit_transform(x.raw)))
 
-DIMS = 5
+DIMS = None # 5
 
 @dataclass
 class Embeddings:
@@ -261,61 +266,61 @@ class Embeddings:
         for key in self.embeddings:
             self.embeddings[key].fit_transform(self.data)
 
-obs = Embeddings(
-    data=Data(process_data('obs')),
-    embeddings={
-        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-        'mds': MDSEmbedding(MultiDimensionalScalingEmbedding()),
-        'iso': ISOMAPEmbedding(sklearn.manifold.Isomap(n_components=DIMS, n_neighbors=40)),
-        'lle': LLEEmbedding(sklearn.manifold.LocallyLinearEmbedding(n_components=DIMS, n_neighbors=60, method='modified')),
-        'lem': LEMEmbedding(sklearn.manifold.SpectralEmbedding(n_components=DIMS, affinity='nearest_neighbors', n_neighbors=60)),
-        'tsne': TSNEEmbedding(sklearn.manifold.TSNE(n_components=3, metric='euclidean', perplexity=90, random_state=42)),
-        'umap': UMAPEmbedding(umap.UMAP(n_components=DIMS, metric='cosine', n_neighbors=70, random_state=42))
-    }
-)
-
-
 # obs = Embeddings(
 #     data=Data(process_data('obs')),
 #     embeddings={
 #         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+#         'mds': MDSEmbedding(MultiDimensionalScalingEmbedding()),
+#         'iso': ISOMAPEmbedding(sklearn.manifold.Isomap(n_components=DIMS, n_neighbors=40)),
+#         'lle': LLEEmbedding(sklearn.manifold.LocallyLinearEmbedding(n_components=DIMS, n_neighbors=60, method='modified')),
+#         'lem': LEMEmbedding(sklearn.manifold.SpectralEmbedding(n_components=DIMS, affinity='nearest_neighbors', n_neighbors=60)),
+#         'tsne': TSNEEmbedding(sklearn.manifold.TSNE(n_components=3, metric='euclidean', perplexity=90, random_state=42)),
+#         'umap': UMAPEmbedding(umap.UMAP(n_components=DIMS, metric='cosine', n_neighbors=70, random_state=42))
 #     }
 # )
 
-# act = Embeddings(
-#     data=Data(process_data('act')),
-#     embeddings={
-#         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-#     }
-# )
 
-# acx = Embeddings(
-#     data=Data(process_data('acx')),
-#     embeddings={
-#         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-#     }
-# )
+obs = Embeddings(
+    data=Data(process_data('obs')),
+    embeddings={
+        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+    }
+)
 
-# ahx = Embeddings(
-#     data=Data(process_data('ahx')),
-#     embeddings={
-#         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-#     }
-# )
+act = Embeddings(
+    data=Data(process_data('act')),
+    embeddings={
+        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+    }
+)
 
-# ccx = Embeddings(
-#     data=Data(process_data('ccx')),
-#     embeddings={
-#         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-#     }
-# )
+acx = Embeddings(
+    data=Data(process_data('acx')),
+    embeddings={
+        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+    }
+)
 
-# chx = Embeddings(
-#     data=Data(process_data('chx')),
-#     embeddings={
-#         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-#     }
-# )
+ahx = Embeddings(
+    data=Data(process_data('ahx')),
+    embeddings={
+        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+    }
+)
+
+ccx = Embeddings(
+    data=Data(process_data('ccx')),
+    embeddings={
+        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+    }
+)
+
+chx = Embeddings(
+    data=Data(process_data('chx')),
+    embeddings={
+        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+    }
+)
 
 
 
@@ -326,7 +331,7 @@ n_steps = obs.data.raw.shape[0]
 def generate_dropdown(id: str, value: Any):
     return dcc.Dropdown(
         id = id,
-        options = [0, 1, 2],
+        options = ['0', '1', '2'],
         value = value,
         style = {
             'display': 'inline-block',
@@ -346,39 +351,39 @@ def generate_graph(id: str):
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 
-# PLOT_IDS = OrderedDict(
-#     [
-#         ('obs-pc', obs.embeddings['pca'].x_embd),
-#         ('obs-raw', obs.data.raw),
-#         ('act-pc', act.embeddings['pca'].x_embd),
-#         ('act-raw', act.data.raw),
-#         ('acx-pc', acx.embeddings['pca'].x_embd),
-#         ('acx-raw', acx.data.raw),
-#         ('ahx-pc', ahx.embeddings['pca'].x_embd),
-#         ('ahx-raw', ahx.data.raw),
-#         ('ccx-pc', ccx.embeddings['pca'].x_embd),
-#         ('ccx-raw', ccx.data.raw),
-#         ('chx-pc', chx.embeddings['pca'].x_embd),
-#         ('chx-raw', chx.data.raw)
-#     ]
-# )
-
 PLOT_IDS = OrderedDict(
     [
-        ('obs-pca', obs.embeddings['pca'].x_embd),
-        ('obs-raw1', obs.data.raw),
-        ('obs-iso', obs.embeddings['iso'].x_embd),
-        ('obs-raw2', obs.data.raw),
-        ('obs-lle', obs.embeddings['lle'].x_embd),
-        ('obs-raw3', obs.data.raw),
-        ('obs-lem', obs.embeddings['lem'].x_embd),
-        ('obs-raw4', obs.data.raw),
-        ('obs-tsne', obs.embeddings['tsne'].x_embd),
-        ('obs-raw5', obs.data.raw),
-        ('obs-umap', obs.embeddings['umap'].x_embd),
-        ('obs-raw6', obs.data.raw),
+        ('obs-pc', obs.embeddings['pca'].x_embd),
+        ('obs-raw', obs.data.raw),
+        ('act-pc', act.embeddings['pca'].x_embd),
+        ('act-raw', act.data.raw),
+        ('acx-pc', acx.embeddings['pca'].x_embd),
+        ('acx-raw', acx.data.raw),
+        ('ahx-pc', ahx.embeddings['pca'].x_embd),
+        ('ahx-raw', ahx.data.raw),
+        ('ccx-pc', ccx.embeddings['pca'].x_embd),
+        ('ccx-raw', ccx.data.raw),
+        ('chx-pc', chx.embeddings['pca'].x_embd),
+        ('chx-raw', chx.data.raw)
     ]
 )
+
+# PLOT_IDS = OrderedDict(
+#     [
+#         ('obs-pca', obs.embeddings['pca'].x_embd),
+#         ('obs-raw1', obs.data.raw),
+#         ('obs-iso', obs.embeddings['iso'].x_embd),
+#         ('obs-raw2', obs.data.raw),
+#         ('obs-lle', obs.embeddings['lle'].x_embd),
+#         ('obs-raw3', obs.data.raw),
+#         ('obs-lem', obs.embeddings['lem'].x_embd),
+#         ('obs-raw4', obs.data.raw),
+#         ('obs-tsne', obs.embeddings['tsne'].x_embd),
+#         ('obs-raw5', obs.data.raw),
+#         ('obs-umap', obs.embeddings['umap'].x_embd),
+#         ('obs-raw6', obs.data.raw),
+#     ]
+# )
 
 NUM_ROWS = 3
 NUM_COLS = 4
@@ -394,7 +399,7 @@ slider_layout = html.Div(
                         dcc.Slider(
                             id='time-window-slider',
                             min=0,
-                            max=50, #n_steps,
+                            max=n_steps,
                             step=1,
                             value=n_steps,
                             marks=None,
@@ -438,9 +443,9 @@ for i in range(NUM_ROWS):
         col = [
             html.Div(
                 [
-                    generate_dropdown('ddx' + '-' + str(idx), 0),
-                    generate_dropdown('ddy' + '-' + str(idx), 1),
-                    generate_dropdown('ddz' + '-' + str(idx), 2),
+                    generate_dropdown('ddx' + '-' + str(idx), '0'),
+                    generate_dropdown('ddy' + '-' + str(idx), '1'),
+                    generate_dropdown('ddz' + '-' + str(idx), '2'),
                 ],
             ),
             html.Div(
