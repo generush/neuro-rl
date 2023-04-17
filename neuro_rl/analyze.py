@@ -138,7 +138,7 @@ from dash import Dash, Input, Output, dcc, html
 # DATA_PATH = '/home/gene/code/rl_neural_dynamics/IsaacGymEnvs/isaacgymenvs/videos/AnymalTerrain_2023-03-14_17-28-09/'
 # DATA_PATH = '/home/gene/code/rl_neural_dynamics/IsaacGymEnvs/isaacgymenvs/videos/ShadowHandAsymmLSTM_2023-03-14_16-19-22/'
 
-DATA_PATH = '/home/gene/code/neuro-rl/IsaacGymEnvs/isaacgymenvs/'
+DATA_PATH = '/home/gene/code/neuro-rl/IsaacGymEnvs/isaacgymenvs/shadowhand/'
 
 def process_data(dic: str):
     # read csv file        
@@ -1120,3 +1120,5 @@ def update_fig_act_cln(twidth, t0, ddx, ddy, ddz):
 #     return plot_fig(data['chx']['cln'], 'chx', twidth, t0, ddx, ddy, ddz)
 
 app.run_server(debug=False)
+# app.run_server(debug=True, use_reloader=False)
+
