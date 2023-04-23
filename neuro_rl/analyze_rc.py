@@ -1,14 +1,11 @@
 # https://plotly.com/python/3d-scatter-plots/
 import logging
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import Dict, Union, Any
 from collections import OrderedDict
 
 import dash_bootstrap_components as dbc
 from dash import Dash, Input, Output, dcc, html
 
-from utils.data_processing import process_data, format_df
+from utils.data_processing import process_data
 from plotting.generation import generate_dropdown, generate_graph
 from plotting.plot import plot_scatter3_ti_tf
 from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
@@ -26,7 +23,8 @@ import sklearn.metrics
 # DATA_PATH = '/home/gene/code/neuro-rl/IsaacGymEnvs/isaacgymenvs/anymalterrain_2023_04_17_00/'
 # DATA_PATH = '/home/gene/code/neuro-rl/IsaacGymEnvs/isaacgymenvs/anymalterrain_2023_04_17_01/'
 # DATA_PATH = '/home/gene/code/neuro-rl/IsaacGymEnvs/isaacgymenvs/anymalterrain_2023_04_17_AGENT_17_44/'
-DATA_PATH = '/home/gene/code/neuro-rl/IsaacGymEnvs/isaacgymenvs/'
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data_AnymalTerrain_Flat_t0_t1000/'
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/'
 
 
 DIMS = None # 5
@@ -46,42 +44,42 @@ DIMS = None # 5
 
 
 obs = Embeddings(
-data=Data(process_data(DATA_PATH + 'obs' + '.csv')),
+    data=Data(process_data(DATA_PATH + '*-OBS' + '.parquet')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
     }
 )
 
 act = Embeddings(
-    data=Data(process_data(DATA_PATH + 'act' + '.csv')),
+    data=Data(process_data(DATA_PATH + '*-ACT' + '.parquet')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
     }
 )
 
 acx = Embeddings(
-    data=Data(process_data(DATA_PATH + 'acx' + '.csv')),
+    data=Data(process_data(DATA_PATH + '*-ACX' + '.parquet')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
     }
 )
 
 ahx = Embeddings(
-    data=Data(process_data(DATA_PATH + 'ahx' + '.csv')),
+    data=Data(process_data(DATA_PATH + '*-AHX' + '.parquet')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
     }
 )
 
 ccx = Embeddings(
-    data=Data(process_data(DATA_PATH + 'ccx' + '.csv')),
+    data=Data(process_data(DATA_PATH + '*-CCX' + '.parquet')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
     }
 )
 
 chx = Embeddings(
-    data=Data(process_data(DATA_PATH + 'chx' + '.csv')),
+    data=Data(process_data(DATA_PATH + '*-CHX' + '.parquet')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
     }
@@ -91,7 +89,7 @@ chx = Embeddings(
 
 logging.info('Finished computing obs embedding')
 
-n_steps = acx.data.raw.shape[0]
+n_steps = acx.data.raw.compute().shape[0]
 
 # https://community.plotly.com/t/dash-bootstrap-components-grid-system-not-working/30957
 
@@ -101,17 +99,17 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 PLOT_IDS = OrderedDict(
     [
         ('obs-pc', obs.embeddings['pca'].x_embd),
-        ('obs-raw', obs.data.raw),
+        # ('obs-raw', obs.data.raw.compute()),
         ('act-pc', act.embeddings['pca'].x_embd),
-        ('act-raw', act.data.raw),
+        # ('act-raw', act.data.raw.compute()),
         ('acx-pc', acx.embeddings['pca'].x_embd),
-        ('acx-raw', acx.data.raw),
+        # ('acx-raw', acx.data.raw.compute()),
         ('ahx-pc', ahx.embeddings['pca'].x_embd),
-        ('ahx-raw', ahx.data.raw),
+        # ('ahx-raw', ahx.data.raw.compute()),
         ('ccx-pc', ccx.embeddings['pca'].x_embd),
-        ('ccx-raw', ccx.data.raw),
+        # ('ccx-raw', ccx.data.raw.compute()),
         ('chx-pc', chx.embeddings['pca'].x_embd),
-        ('chx-raw', chx.data.raw)
+        # ('chx-raw', chx.data.raw.compute())
     ]
 )
 

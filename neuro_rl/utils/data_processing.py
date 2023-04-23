@@ -1,14 +1,10 @@
 
 import pandas as pd
 import numpy as np
+import dask.dataframe as dd
 
 def process_data(file: str):
-    # read csv file        
-    raw_data = pd.read_csv(file)
-    # remove extra rows of zeros
-    clean_data = raw_data.loc[~(raw_data==0).all(axis=1)]
-    clean_data.columns = clean_data.columns.astype(str)
-    return clean_data
+    return dd.read_parquet(file)
 
 def format_df(data: np.array):
     df = pd.DataFrame(data)

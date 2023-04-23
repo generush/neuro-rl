@@ -1,13 +1,13 @@
 
-action_01, action_01
-action_02, action_02
-action_03, action_03
-action_04, action_04
-action_05, action_05
-action_06, action_06
-action_07, action_07
-action_08, action_08
-action_09, action_09
-action_10, action_10
-action_11, action_11
-action_12, action_12
+action_01, action_LF_HAA
+action_02, action_LF_HFE
+action_03, action_LF_KFE
+action_04, action_LH_HAA
+action_05, action_LH_HFE
+action_06, action_LH_KFE
+action_07, action_RF_HAA
+action_08, action_RF_HFE
+action_09, action_RF_KFE
+action_10, action_RH_HAA
+action_11, action_RH_HFE
+action_12, action_RH_KFE

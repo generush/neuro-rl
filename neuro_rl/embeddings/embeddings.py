@@ -13,10 +13,10 @@ from utils.data_processing import process_data, format_df
 @dataclass
 class Data:
     raw: pd.DataFrame
-    cos: pd.DataFrame = field(init=False)
+    # cos: pd.DataFrame = field(init=False)
 
-    def __post_init__(self):
-        self.cos = pd.DataFrame(sklearn.metrics.pairwise.cosine_distances(self.raw))
+    # def __post_init__(self):
+        # self.cos = pd.DataFriame(sklearn.metrics.pairwise.cosine_distances(self.raw.compute()))
 
 @dataclass
 class MultiDimensionalScalingEmbedding:
