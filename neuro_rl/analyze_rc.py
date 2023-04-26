@@ -57,22 +57,8 @@ act = Embeddings(
     }
 )
 
-acx = Embeddings(
-    data=Data(process_data(DATA_PATH + '*-ACX' + '.parquet')),
-    embeddings={
-        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-    }
-)
-
 ahx = Embeddings(
     data=Data(process_data(DATA_PATH + '*-AHX' + '.parquet')),
-    embeddings={
-        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-    }
-)
-
-ccx = Embeddings(
-    data=Data(process_data(DATA_PATH + '*-CCX' + '.parquet')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
     }
@@ -85,11 +71,12 @@ chx = Embeddings(
     }
 )
 
-
+import pandas as pd
+pd.DataFrame(ahx.embeddings['pca'].embedding.components_).to_csv('ahx_pc_components.csv', index=False)
 
 logging.info('Finished computing obs embedding')
 
-n_steps = acx.data.raw.compute().shape[0]
+n_steps = ahx.data.raw.compute().shape[0]
 
 # https://community.plotly.com/t/dash-bootstrap-components-grid-system-not-working/30957
 
@@ -102,12 +89,8 @@ PLOT_IDS = OrderedDict(
         # ('obs-raw', obs.data.raw.compute()),
         ('act-pc', act.embeddings['pca'].x_embd),
         # ('act-raw', act.data.raw.compute()),
-        ('acx-pc', acx.embeddings['pca'].x_embd),
-        # ('acx-raw', acx.data.raw.compute()),
         ('ahx-pc', ahx.embeddings['pca'].x_embd),
         # ('ahx-raw', ahx.data.raw.compute()),
-        ('ccx-pc', ccx.embeddings['pca'].x_embd),
-        # ('ccx-raw', ccx.data.raw.compute()),
         ('chx-pc', chx.embeddings['pca'].x_embd),
         # ('chx-raw', chx.data.raw.compute())
     ]
