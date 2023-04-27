@@ -44,28 +44,28 @@ DIMS = None # 5
 
 
 obs = Embeddings(
-    data=Data(process_data(DATA_PATH + '*-OBS' + '.parquet')),
+    data=Data(process_data(DATA_PATH + '*-OBS' + '.csv')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
     }
 )
 
 act = Embeddings(
-    data=Data(process_data(DATA_PATH + '*-ACT' + '.parquet')),
+    data=Data(process_data(DATA_PATH + '*-ACT' + '.csv')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
     }
 )
 
 ahx = Embeddings(
-    data=Data(process_data(DATA_PATH + '*-AHX' + '.parquet')),
+    data=Data(process_data(DATA_PATH + '*-AHX' + '.csv')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
     }
 )
 
 chx = Embeddings(
-    data=Data(process_data(DATA_PATH + '*-CHX' + '.parquet')),
+    data=Data(process_data(DATA_PATH + '*-CHX' + '.csv')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
     }
