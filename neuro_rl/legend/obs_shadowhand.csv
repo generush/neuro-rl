@@ -1,22 +1,22 @@
-fingertip01,contact_01
-fingertip02,contact_02
-fingertip03,contact_03
-fingertip04,contact_04
-fingertip05,contact_05
-fingertip06,contact_06
-fingertip07,contact_07
-fingertip08,contact_08
-fingertip09,contact_09
-fingertip10,contact_10
-fingertip11,contact_11
-fingertip12,contact_12
-fingertip13,contact_13
-fingertip14,contact_14
-fingertip15,contact_15
-objectpos1,position_x
-objectpos2,position_y
-objectpos3,position_z
-objectorient1,quaternion_x
-objectorient2,quaternion_y
-objectorient3,quaternion_z
-objectorient4,quaternion_w
+ff_distal_position_x,     indxf_x
+ff_distal_position_y,     indxf_y
+ff_distal_position_z,     indxf_z
+mf_distal_position_x,     midlf_x
+mf_distal_position_y,     midlf_y
+mf_distal_position_z,     midlf_z
+rf_distal_position_x,     ringf_x
+rf_distal_position_y,     ringf_y
+rf_distal_position_z,     ringf_z
+lf_distal_position_x,     pinky_x
+lf_distal_position_y,     pinky_y
+lf_distal_position_z,     pinky_z
+th_distal_position_x,     thumb_x
+th_distal_position_y,     thumb_y
+th_distal_position_z,     thumb_z
+object_position_x,      object_x
+object_position_y,      object_y
+object_position_z,      object_z
+object_orientation_qx,  object_qx
+object_orientation_qy,  object_qy
+object_orientation_qz,  object_qz
+object_orientation_qw,  object_qw
