@@ -86,13 +86,13 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 PLOT_IDS = OrderedDict(
     [
         ('obs-pc', obs.embeddings['pca'].x_embd),
-        # ('obs-raw', obs.data.raw.compute()),
+        ('obs-raw', obs.data.raw.compute()),
         ('act-pc', act.embeddings['pca'].x_embd),
-        # ('act-raw', act.data.raw.compute()),
+        ('act-raw', act.data.raw.compute()),
         ('ahx-pc', ahx.embeddings['pca'].x_embd),
-        # ('ahx-raw', ahx.data.raw.compute()),
+        ('ahx-raw', ahx.data.raw.compute()),
         ('chx-pc', chx.embeddings['pca'].x_embd),
-        # ('chx-raw', chx.data.raw.compute())
+        ('chx-raw', chx.data.raw.compute())
     ]
 )
 
@@ -113,7 +113,7 @@ PLOT_IDS = OrderedDict(
 #     ]
 # )
 
-NUM_ROWS = 3
+NUM_ROWS = 2
 NUM_COLS = 4
 
 # Define the slider layout
@@ -171,9 +171,9 @@ for i in range(NUM_ROWS):
         col = [
             html.Div(
                 [
-                    generate_dropdown('ddx' + '-' + str(idx), '0'),
-                    generate_dropdown('ddy' + '-' + str(idx), '1'),
-                    generate_dropdown('ddz' + '-' + str(idx), '2'),
+                    generate_dropdown('ddx' + '-' + str(idx), '0', list(PLOT_IDS.values())[i*NUM_ROWS + j].columns.values),
+                    generate_dropdown('ddy' + '-' + str(idx), '1', list(PLOT_IDS.values())[i*NUM_ROWS + j].columns.values),
+                    generate_dropdown('ddz' + '-' + str(idx), '2', list(PLOT_IDS.values())[i*NUM_ROWS + j].columns.values),
                 ],
             ),
             html.Div(

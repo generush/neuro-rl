@@ -1,10 +1,10 @@
 from dash import dcc
 from typing import Any
 
-def generate_dropdown(id: str, value: Any):
+def generate_dropdown(id: str, value: Any, options: Any):
     return dcc.Dropdown(
         id = id,
-        options = ['0', '1', '2'],
+        options = options,
         value = value,
         style = {
             'display': 'inline-block',
