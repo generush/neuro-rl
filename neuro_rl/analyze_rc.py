@@ -42,33 +42,38 @@ DIMS = None # 5
 #     }
 # )
 
+dt = 0.005
 
 obs = Embeddings(
     data=Data(process_data(DATA_PATH + '*-OBS' + '.csv')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-    }
+    },
+    dt=dt
 )
 
 act = Embeddings(
     data=Data(process_data(DATA_PATH + '*-ACT' + '.csv')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-    }
+    },
+    dt=dt
 )
 
 ahx = Embeddings(
     data=Data(process_data(DATA_PATH + '*-AHX' + '.csv')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-    }
+    },
+    dt=dt
 )
 
 chx = Embeddings(
     data=Data(process_data(DATA_PATH + '*-CHX' + '.csv')),
     embeddings={
         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-    }
+    },
+    dt=dt
 )
 
 import pandas as pd
@@ -81,7 +86,6 @@ n_steps = ahx.data.raw.compute().shape[0]
 # https://community.plotly.com/t/dash-bootstrap-components-grid-system-not-working/30957
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
-
 
 PLOT_IDS = OrderedDict(
     [
@@ -168,12 +172,14 @@ idx = 0
 for i in range(NUM_ROWS):
     row = []
     for j in range(NUM_COLS):
+        dd_options = list(PLOT_IDS.values())[i*NUM_ROWS + j].columns.values
         col = [
             html.Div(
                 [
-                    generate_dropdown('ddx' + '-' + str(idx), '0', list(PLOT_IDS.values())[i*NUM_ROWS + j].columns.values),
-                    generate_dropdown('ddy' + '-' + str(idx), '1', list(PLOT_IDS.values())[i*NUM_ROWS + j].columns.values),
-                    generate_dropdown('ddz' + '-' + str(idx), '2', list(PLOT_IDS.values())[i*NUM_ROWS + j].columns.values),
+                    generate_dropdown('ddx' + '-' + str(idx), '0', dd_options),
+                    generate_dropdown('ddy' + '-' + str(idx), '1', dd_options),
+                    generate_dropdown('ddz' + '-' + str(idx), '2', dd_options),
+                    generate_dropdown('ddc' + '-' + str(idx), '2', dd_options),
                 ],
             ),
             html.Div(
@@ -204,7 +210,7 @@ app.layout = html.Div(
         html.Div(grid_layout, className='container-fluid')
     ]
 )
-def rangeslider_tocalendar(idx, data, title):
+def rangeslider_tocalendar(idx, data, name):
     @app.callback(
         Output('scatter3d-graph' + '-' + str(idx), "figure"),
         [
@@ -212,12 +218,13 @@ def rangeslider_tocalendar(idx, data, title):
             Input("time-start-slider", "value"),
             Input('ddx' + '-' + str(idx), 'value'),
             Input('ddy' + '-' + str(idx), 'value'),
-            Input('ddz' + '-' + str(idx), 'value')
+            Input('ddz' + '-' + str(idx), 'value'),
+            Input('ddc' + '-' + str(idx), 'value')
         ]
     )
 
-    def repeated_callback(twidth, t0, ddx, ddy, ddz):
-        return plot_scatter3_ti_tf(data, title, twidth, t0, ddx, ddy, ddz)
+    def repeated_callback(twidth, t0, ddx, ddy, ddz, ddc):
+        return plot_scatter3_ti_tf(data, name, twidth, t0, ddx, ddy, ddz, ddc)
 
 for i, (key, value) in enumerate(PLOT_IDS.items()):
     rangeslider_tocalendar(i, value, key)

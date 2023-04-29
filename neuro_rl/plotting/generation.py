@@ -9,8 +9,8 @@ def generate_dropdown(id: str, value: Any, options: Any):
         style = {
             'display': 'inline-block',
             'font-size': '10px',
-            'padding-left': 20,
-            'padding-right': 20
+            'padding-left': 5,
+            'padding-right': 5
         }
     )
 

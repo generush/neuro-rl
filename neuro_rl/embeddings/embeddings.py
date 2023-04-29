@@ -9,6 +9,7 @@ import sklearn.metrics
 import umap
 
 from utils.data_processing import process_data, format_df
+from utils.geometry import compute_tangling
 
 @dataclass
 class Data:
@@ -29,16 +30,24 @@ class Embedding(ABC):
     """Abstract base class for embedding"""
 
     @abstractmethod
-    def fit_transform(self, x):
+    def fit_transform(self, x) -> None:
         """fit and transform data using embedding"""
+
+    @abstractmethod
+    def append_tangling(self, dt: float) -> None:
+        """computes tangling and adds it the dataset"""
 
 @dataclass
 class PCAEmbedding(Embedding):
     embedding: sklearn.decomposition.PCA
     x_embd: pd.DataFrame = field(init=False)
+    tangling: pd.DataFrame = field(init=False)
 
-    def fit_transform(self, x: Data) -> np.array:
+    def fit_transform(self, x: Data) -> None:
         self.x_embd = format_df(self.embedding.fit_transform(x.raw))
+
+    def append_tangling(self, dt: float) -> None:
+        self.x_embd['tangling'] = compute_tangling(self.x_embd.to_numpy(), dt)
 
     @property
     def var(self) -> np.array:
@@ -117,7 +126,9 @@ DIMS = None # 5
 class Embeddings:
     data: Data
     embeddings: Dict[str, Union[PCAEmbedding, MDSEmbedding, ISOMAPEmbedding, LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding]]
+    dt: float = 0.005
 
     def __post_init__(self):
         for key in self.embeddings:
             self.embeddings[key].fit_transform(self.data)
+            self.embeddings[key].append_tangling(self.dt)
