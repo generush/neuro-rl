@@ -1,13 +1,12 @@
-
-action_01, action_LF_HAA
-action_02, action_LF_HFE
-action_03, action_LF_KFE
-action_04, action_LH_HAA
-action_05, action_LH_HFE
-action_06, action_LH_KFE
-action_07, action_RF_HAA
-action_08, action_RF_HFE
-action_09, action_RF_KFE
-action_10, action_RH_HAA
-action_11, action_RH_HFE
-action_12, action_RH_KFE
+ACT_00_LF_HAA,torque_LF_HAA
+ACT_01_LF_HFE,torque_LF_HFE
+ACT_02_LF_KFE,torque_LF_KFE
+ACT_03_LH_HAA,torque_LH_HAA
+ACT_04_LH_HFE,torque_LH_HFE
+ACT_05_LH_KFE,torque_LH_KFE
+ACT_06_RF_HAA,torque_RF_HAA
+ACT_07_RF_HFE,torque_RF_HFE
+ACT_08_RF_KFE,torque_RF_KFE
+ACT_09_RH_HAA,torque_RH_HAA
+ACT_10_RH_HFE,torque_RH_HFE
+ACT_11_RH_KFE,torque_RH_KFE

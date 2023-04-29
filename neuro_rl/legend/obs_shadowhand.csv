@@ -1,22 +1,22 @@
-ff_distal_position_x,     indxf_x
-ff_distal_position_y,     indxf_y
-ff_distal_position_z,     indxf_z
-mf_distal_position_x,     midlf_x
-mf_distal_position_y,     midlf_y
-mf_distal_position_z,     midlf_z
-rf_distal_position_x,     ringf_x
-rf_distal_position_y,     ringf_y
-rf_distal_position_z,     ringf_z
-lf_distal_position_x,     pinky_x
-lf_distal_position_y,     pinky_y
-lf_distal_position_z,     pinky_z
-th_distal_position_x,     thumb_x
-th_distal_position_y,     thumb_y
-th_distal_position_z,     thumb_z
-object_position_x,      object_x
-object_position_y,      object_y
-object_position_z,      object_z
-object_orientation_qx,  object_qx
-object_orientation_qy,  object_qy
-object_orientation_qz,  object_qz
-object_orientation_qw,  object_qw
+OBS_000_ff_x,indxf_distal_position_x
+OBS_001_ff_y,indxf_distal_position_y
+OBS_002_ff_z,indxf_distal_position_z
+OBS_003_mf_x,midlf_distal_position_x
+OBS_004_mf_y,midlf_distal_position_y
+OBS_005_mf_z,midlf_distal_position_z
+OBS_006_rf_x,ringf_distal_position_x
+OBS_007_rf_y,ringf_distal_position_y
+OBS_008_rf_z,ringf_distal_position_z
+OBS_009_lf_x,pinky_distal_position_x
+OBS_010_lf_y,pinky_distal_position_y
+OBS_011_lf_z,pinky_distal_position_z
+OBS_012_th_x,thumb_distal_position_x
+OBS_013_th_y,thumb_distal_position_y
+OBS_014_th_z,thumb_distal_position_z
+OBS_015_obj_x,object_position_x
+OBS_016_obj_y,object_position_y
+OBS_017_obj_z,object_position_z
+OBS_018_obj_qx,object_orientation_qx
+OBS_019_obj_qy,object_orientation_qy
+OBS_020_obj_qz,object_orientation_qz
+OBS_021_obj_qw,object_orientation_qw

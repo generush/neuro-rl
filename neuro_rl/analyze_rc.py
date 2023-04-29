@@ -5,6 +5,8 @@ from collections import OrderedDict
 import dash_bootstrap_components as dbc
 from dash import Dash, Input, Output, dcc, html
 
+import pandas as pd
+
 from utils.data_processing import process_data
 from plotting.generation import generate_dropdown, generate_graph
 from plotting.plot import plot_scatter3_ti_tf
@@ -44,44 +46,46 @@ DIMS = None # 5
 
 dt = 0.005
 
-obs = Embeddings(
-    data=Data(process_data(DATA_PATH + '*-OBS' + '.csv')),
-    embeddings={
-        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-    },
-    dt=dt
-)
 
-act = Embeddings(
-    data=Data(process_data(DATA_PATH + '*-ACT' + '.csv')),
-    embeddings={
-        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-    },
-    dt=dt
-)
+data = process_data(DATA_PATH + '*-CONDITION' + '.csv')
 
-ahx = Embeddings(
-    data=Data(process_data(DATA_PATH + '*-AHX' + '.csv')),
-    embeddings={
-        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-    },
-    dt=dt
-)
+# obs = Embeddings(
+#     data=Data(process_data(DATA_PATH + '*-OBS' + '.csv')),
+#     embeddings={
+#         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+#     },
+#     dt=dt
+# )
 
-chx = Embeddings(
-    data=Data(process_data(DATA_PATH + '*-CHX' + '.csv')),
-    embeddings={
-        'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
-    },
-    dt=dt
-)
+# act = Embeddings(
+#     data=Data(process_data(DATA_PATH + '*-ACT' + '.csv')),
+#     embeddings={
+#         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+#     },
+#     dt=dt
+# )
 
-import pandas as pd
-pd.DataFrame(ahx.embeddings['pca'].embedding.components_).to_csv('ahx_pc_components.csv', index=False)
+# ahx = Embeddings(
+#     data=Data(process_data(DATA_PATH + '*-AHX' + '.csv')),
+#     embeddings={
+#         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+#     },
+#     dt=dt
+# )
 
-logging.info('Finished computing obs embedding')
+# chx = Embeddings(
+#     data=Data(process_data(DATA_PATH + '*-CHX' + '.csv')),
+#     embeddings={
+#         'pca': PCAEmbedding(sklearn.decomposition.PCA(n_components=DIMS)),
+#     },
+#     dt=dt
+# )
 
-n_steps = ahx.data.raw.compute().shape[0]
+# pd.DataFrame(ahx.embeddings['pca'].embedding.components_).to_csv('ahx_pc_components.csv', index=False)
+
+# logging.info('Finished computing obs embedding')
+
+n_steps = data.compute().shape[0] # ahx.data.raw.compute().shape[0]
 
 # https://community.plotly.com/t/dash-bootstrap-components-grid-system-not-working/30957
 
@@ -89,14 +93,14 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 PLOT_IDS = OrderedDict(
     [
-        ('obs-pc', obs.embeddings['pca'].x_embd),
-        ('obs-raw', obs.data.raw.compute()),
-        ('act-pc', act.embeddings['pca'].x_embd),
-        ('act-raw', act.data.raw.compute()),
-        ('ahx-pc', ahx.embeddings['pca'].x_embd),
-        ('ahx-raw', ahx.data.raw.compute()),
-        ('chx-pc', chx.embeddings['pca'].x_embd),
-        ('chx-raw', chx.data.raw.compute())
+        # ('obs-pc', obs.embeddings['pca'].x_embd),
+        ('obs-raw', data.loc[:,data.columns.str.contains('OBS')].compute()),
+        # # ('act-pc', act.embeddings['pca'].x_embd),
+        ('act-raw', data.loc[:,data.columns.str.contains('ACT')].compute()),
+        # # ('ahx-pc', ahx.embeddings['pca'].x_embd),
+        ('ahx-raw', data.loc[:,data.columns.str.contains('AHX')].compute()),
+        # # ('chx-pc', chx.embeddings['pca'].x_embd),
+        ('chx-raw', data.loc[:,data.columns.str.contains('CCX')].compute())
     ]
 )
 
@@ -117,7 +121,7 @@ PLOT_IDS = OrderedDict(
 #     ]
 # )
 
-NUM_ROWS = 2
+NUM_ROWS = 1
 NUM_COLS = 4
 
 # Define the slider layout
