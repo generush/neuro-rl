@@ -5,6 +5,7 @@ from collections import OrderedDict
 import dash_bootstrap_components as dbc
 from dash import Dash, Input, Output, dcc, html
 
+import numpy as np
 import pandas as pd
 
 from utils.data_processing import process_data
@@ -91,18 +92,23 @@ n_steps = data.compute().shape[0] # ahx.data.raw.compute().shape[0]
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-PLOT_IDS = OrderedDict(
-    [
-        # ('obs-pc', obs.embeddings['pca'].x_embd),
-        ('obs-raw', data.loc[:,data.columns.str.contains('OBS')].compute()),
-        # # ('act-pc', act.embeddings['pca'].x_embd),
-        ('act-raw', data.loc[:,data.columns.str.contains('ACT')].compute()),
-        # # ('ahx-pc', ahx.embeddings['pca'].x_embd),
-        ('ahx-raw', data.loc[:,data.columns.str.contains('AHX')].compute()),
-        # # ('chx-pc', chx.embeddings['pca'].x_embd),
-        ('chx-raw', data.loc[:,data.columns.str.contains('CCX')].compute())
-    ]
-)
+# obs = data.loc[:,data.columns.str.contains('OBS')].compute()
+# act = data.loc[:,data.columns.str.contains('ACT')].compute()
+# ahx = data.loc[:,data.columns.str.contains('AHX')].compute()
+# chx = data.loc[:,data.columns.str.contains('CHX')].compute()
+
+# PLOT_IDS = OrderedDict(
+#     [
+#         ('obs-raw', obs),
+#         # ('obs-pc', obs.embeddings['pca'].x_embd),
+#         ('act-raw', act),
+#         # ('act-pc', act.embeddings['pca'].x_embd),
+#         ('ahx-raw', ahx),
+#         # # ('ahx-pc', ahx.embeddings['pca'].x_embd),
+#         ('chx-raw', chx),
+#         # # ('chx-pc', chx.embeddings['pca'].x_embd)
+#     ]
+# )
 
 # PLOT_IDS = OrderedDict(
 #     [
@@ -170,20 +176,59 @@ slider_layout = html.Div(
     )
 )
 
+NUM_PLOTS = 4
+PLOT_NAMES = np.zeros((NUM_PLOTS), dtype=object)
+PLOT_NAMES[0] = 'OBS-RAW'
+PLOT_NAMES[1] = 'ACT-RAW'
+PLOT_NAMES[2] = 'AHX-RAW'
+PLOT_NAMES[3] = 'CHX-RAW'
+
+dd_options = data.columns.values
+
+dd_defaults = np.zeros((NUM_PLOTS,4), dtype=object)
+dd_defaults[0] = ['OBS_000_u', 'OBS_001_v', 'OBS_005_r', 'OBS_011_r_star']
+dd_defaults[1] = ['ACT_000_LF_HAA', 'ACT_001_LF_HFE', 'ACT_002_LF_KFE', 'ACT_002_LF_KFE']
+dd_defaults[2] = ['AHX_000', 'AHX_001', 'AHX_002', 'AHX_002']
+dd_defaults[3] = ['CHX_000', 'CHX_001', 'CHX_002', 'CHX_002']
+
 # Define the layout as a grid with M rows and N columns
 grid_layout = []
 idx = 0
 for i in range(NUM_ROWS):
     row = []
     for j in range(NUM_COLS):
-        dd_options = list(PLOT_IDS.values())[i*NUM_ROWS + j].columns.values
+        k = i*NUM_ROWS + j
         col = [
             html.Div(
                 [
-                    generate_dropdown('ddx' + '-' + str(idx), '0', dd_options),
-                    generate_dropdown('ddy' + '-' + str(idx), '1', dd_options),
-                    generate_dropdown('ddz' + '-' + str(idx), '2', dd_options),
-                    generate_dropdown('ddc' + '-' + str(idx), '2', dd_options),
+                    html.Div(
+                        [
+                            html.P("x:"),
+                            generate_dropdown('ddx' + '-' + str(idx), dd_defaults[k,0], dd_options),
+                        ],
+                        style=dict(display='flex')
+                    ),
+                    html.Div(
+                        [
+                            html.P("y:"),
+                            generate_dropdown('ddy' + '-' + str(idx), dd_defaults[k,1], dd_options),
+                        ],
+                        style=dict(display='flex')
+                    ),
+                    html.Div(
+                        [
+                            html.P("z:"),
+                            generate_dropdown('ddz' + '-' + str(idx), dd_defaults[k,2], dd_options),
+                        ],
+                        style=dict(display='flex')
+                    ),
+                    html.Div(
+                        [
+                            html.P("c:"),
+                            generate_dropdown('ddc' + '-' + str(idx), dd_defaults[k,3], dd_options),
+                        ],
+                        style=dict(display='flex')
+                    ),
                 ],
             ),
             html.Div(
@@ -214,7 +259,7 @@ app.layout = html.Div(
         html.Div(grid_layout, className='container-fluid')
     ]
 )
-def rangeslider_tocalendar(idx, data, name):
+def single_callback(idx, plot_name, plot_data):
     @app.callback(
         Output('scatter3d-graph' + '-' + str(idx), "figure"),
         [
@@ -228,10 +273,10 @@ def rangeslider_tocalendar(idx, data, name):
     )
 
     def repeated_callback(twidth, t0, ddx, ddy, ddz, ddc):
-        return plot_scatter3_ti_tf(data, name, twidth, t0, ddx, ddy, ddz, ddc)
+        return plot_scatter3_ti_tf(plot_name, plot_data, twidth, t0, ddx, ddy, ddz, ddc)
 
-for i, (key, value) in enumerate(PLOT_IDS.items()):
-    rangeslider_tocalendar(i, value, key)
+for idx, name in enumerate(PLOT_NAMES):
+    single_callback(idx, name, data.compute())
 
 app.run_server(debug=False)
 # app.run_server(debug=True, use_reloader=False)
