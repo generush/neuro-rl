@@ -8,7 +8,6 @@ from dash import Dash, Input, Output, dcc, html
 import numpy as np
 import pandas as pd
 
-from utils.data_processing import process_data
 from plotting.generation import generate_dropdown, generate_graph
 from plotting.plot import plot_scatter3_ti_tf
 from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
@@ -32,12 +31,18 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 import itertools
 import numpy as np
 
-def compute_tangling(X: np.array, dt: float):
+def compute_tangling(X: np.array, t: np.array):
+    
+    dt = t[1] - t[0]
+
+    t_diff = np.diff(t, axis=0)
+    t_diff = np.insert(t_diff, 0, t_diff[0], axis=0)
     
     # compute derivatives of X
     X_dot = np.diff(X, axis=0) / dt
-    X_dot = np.insert(X_dot, 0, (X[0,:] - X[-1,:] ) / dt, 0)
-
+    X_dot = np.insert(X_dot, 0, X_dot[0,:], axis=0)
+    X_dot[np.where(t_diff < 0)[0],:] = X_dot[np.where(t_diff < 0)[0] + 1,:]
+ 
     # compute constant, prevents denominator from shrinking to zero
     epsilon = 0.1 * np.var(X)
 
@@ -83,31 +88,28 @@ def import_tangling(path: str):
 
 N_COMPONENTS = 10
 
-dt = 0.005
-
 # load DataFrame
-data = process_data(DATA_PATH + 'RAW_DATA' + '.csv')
+file = DATA_PATH + 'RAW_DATA' + '.csv'
+data = pd.read_csv(file, index_col=0)
 
 DATASETS = [
-    # 'OBS',
-    # 'ACT',
+    'OBS',
+    'ACT',
     'AHX',
-    # 'CHX'
+    'CHX'
 ]
 
 for idx, data_type in enumerate(DATASETS):
 
     # select data for PCA analysis
-    filt_data = data.loc[:,data.columns.str.contains(data_type + '_RAW')].compute()
+    filt_data = data.loc[:,data.columns.str.contains(data_type + '_RAW')]
+    time = data.loc[:,data.columns.str.contains('TIME')]
 
     # computa pca
-    pca, pc_df = compute_tangling(filt_data, N_COMPONENTS, COLUMNS)
+    tangling = compute_tangling(filt_data.to_numpy(), time.to_numpy())
 
-    # export PCA object
-    export_tangling(pca, DATA_PATH + data_type +'_PCA' + '.pkl')
+    tangling_df = pd.DataFrame(tangling, columns = [data_type + '_TANGLING'])
 
     # export DataFrame
-    pc_df.insert(loc=0, column='TIME', value=data['TIME'].compute())
-    pc_df.set_index('TIME', inplace=True)
-    pc_df.to_csv(DATA_PATH + data_type + '_PC_DATA' + '.csv')
+    tangling_df.to_csv(DATA_PATH + data_type + '_TANGLING_DATA' + '.csv')
 

@@ -61,7 +61,8 @@ N_COMPONENTS = 10
 dt = 0.005
 
 # load DataFrame
-data = process_data(DATA_PATH + 'RAW_DATA' + '.csv')
+# data = process_data(DATA_PATH + 'RAW_DATA' + '.csv')
+data = pd.read_csv(DATA_PATH + 'RAW_DATA' + '.csv', index_col=0)
 
 DATASETS = [
     'OBS',
@@ -73,7 +74,7 @@ DATASETS = [
 for idx, data_type in enumerate(DATASETS):
 
     # select data for PCA analysis
-    filt_data = data.loc[:,data.columns.str.contains(data_type + '_RAW')].compute()
+    filt_data = data.loc[:,data.columns.str.contains(data_type + '_RAW')]
 
     # get number of dimensions of DataFrame
     N_DIMENSIONS = len(filt_data.columns)
@@ -88,7 +89,5 @@ for idx, data_type in enumerate(DATASETS):
     export_pca(pca, DATA_PATH + data_type +'_PCA' + '.pkl')
 
     # export DataFrame
-    pc_df.insert(loc=0, column='TIME', value=data['TIME'].compute())
-    pc_df.set_index('TIME', inplace=True)
     pc_df.to_csv(DATA_PATH + data_type + '_PC_DATA' + '.csv')
 
