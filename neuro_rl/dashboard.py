@@ -8,7 +8,7 @@ from dash import Dash, Input, Output, dcc, html
 import numpy as np
 import pandas as pd
 
-from utils.data_processing import process_data
+from utils.data_processing import process_data_to_pd
 from plotting.generation import generate_dropdown, generate_graph
 from plotting.plot import plot_scatter3_ti_tf
 from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
@@ -48,7 +48,10 @@ DIMS = None # 5
 dt = 0.005
 
 
-data = process_data(DATA_PATH + '*-CONDITION' + '.csv')
+data = process_data_to_pd(DATA_PATH)
+
+
+
 
 # obs = Embeddings(
 #     data=Data(process_data(DATA_PATH + '*-OBS' + '.csv')),
@@ -86,7 +89,7 @@ data = process_data(DATA_PATH + '*-CONDITION' + '.csv')
 
 # logging.info('Finished computing obs embedding')
 
-n_steps = data.compute().shape[0] # ahx.data.raw.compute().shape[0]
+n_steps = data.shape[0] # ahx.data.raw.compute().shape[0]
 
 # https://community.plotly.com/t/dash-bootstrap-components-grid-system-not-working/30957
 
@@ -127,7 +130,7 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 #     ]
 # )
 
-NUM_ROWS = 1
+NUM_ROWS = 2
 NUM_COLS = 4
 
 # Define the slider layout
@@ -176,20 +179,29 @@ slider_layout = html.Div(
     )
 )
 
-NUM_PLOTS = 4
+NUM_PLOTS = 8
 PLOT_NAMES = np.zeros((NUM_PLOTS), dtype=object)
 PLOT_NAMES[0] = 'OBS-RAW'
 PLOT_NAMES[1] = 'ACT-RAW'
 PLOT_NAMES[2] = 'AHX-RAW'
 PLOT_NAMES[3] = 'CHX-RAW'
+PLOT_NAMES[4] = 'OBS-PC'
+PLOT_NAMES[5] = 'ACT-PC'
+PLOT_NAMES[6] = 'AHX-PC'
+PLOT_NAMES[7] = 'CHX-PC'
 
 dd_options = data.columns.values
 
 dd_defaults = np.zeros((NUM_PLOTS,4), dtype=object)
-dd_defaults[0] = ['OBS_000_u', 'OBS_001_v', 'OBS_005_r', 'OBS_011_r_star']
-dd_defaults[1] = ['ACT_000_LF_HAA', 'ACT_001_LF_HFE', 'ACT_002_LF_KFE', 'ACT_002_LF_KFE']
-dd_defaults[2] = ['AHX_000', 'AHX_001', 'AHX_002', 'AHX_002']
-dd_defaults[3] = ['CHX_000', 'CHX_001', 'CHX_002', 'CHX_002']
+dd_defaults[0] = ['OBS_RAW_000_u', 'OBS_RAW_001_v', 'OBS_RAW_005_r', 'OBS_RAW_011_r_star']
+dd_defaults[1] = ['ACT_RAW_000_LF_HAA', 'ACT_RAW_001_LF_HFE', 'ACT_RAW_002_LF_KFE', 'ACT_RAW_002_LF_KFE']
+dd_defaults[2] = ['AHX_RAW_000', 'AHX_RAW_001', 'AHX_RAW_002', 'AHX_RAW_002']
+dd_defaults[3] = ['CHX_RAW_000', 'CHX_RAW_001', 'CHX_RAW_002', 'CHX_RAW_002']
+
+dd_defaults[4] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'OBS_PC_002']
+dd_defaults[5] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'ACT_PC_002']
+dd_defaults[6] = ['AHX_PC_000', 'AHX_PC_001', 'AHX_PC_002', 'AHX_PC_002']
+dd_defaults[7] = ['CHX_PC_000', 'CHX_PC_001', 'CHX_PC_002', 'CHX_PC_002']
 
 # Define the layout as a grid with M rows and N columns
 grid_layout = []
@@ -197,7 +209,7 @@ idx = 0
 for i in range(NUM_ROWS):
     row = []
     for j in range(NUM_COLS):
-        k = i*NUM_ROWS + j
+        k = i*NUM_COLS + j
         col = [
             html.Div(
                 [
@@ -276,7 +288,7 @@ def single_callback(idx, plot_name, plot_data):
         return plot_scatter3_ti_tf(plot_name, plot_data, twidth, t0, ddx, ddy, ddz, ddc)
 
 for idx, name in enumerate(PLOT_NAMES):
-    single_callback(idx, name, data.compute())
+    single_callback(idx, name, data)
 
 app.run_server(debug=False)
 # app.run_server(debug=True, use_reloader=False)

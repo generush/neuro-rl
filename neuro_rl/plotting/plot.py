@@ -5,7 +5,6 @@ import plotly.graph_objects as go
 
 def plot_scatter3_ti_tf(title, data, twidth, t0, x, y, z, c):
     
-
     idx = np.array(range(np.shape(data)[0]))
     mask = (idx > t0) & (idx <= t0 + twidth)
 
@@ -28,7 +27,7 @@ def plot_scatter3_ti_tf(title, data, twidth, t0, x, y, z, c):
         y=y,
         z=z,
         color=c,
-        color_continuous_scale='Blues',
+        # color_continuous_scale='Blues',
     )
     figb.update_traces(
         marker=dict(size=3),
