@@ -61,15 +61,23 @@ N_COMPONENTS = 10
 dt = 0.005
 
 # load DataFrame
-# data = process_data(DATA_PATH + 'RAW_DATA' + '.csv')
-data = pd.read_csv(DATA_PATH + 'RAW_DATA' + '.csv', index_col=0)
+data = process_data(DATA_PATH + 'RAW_DATA' + '.csv')
+
+# data1 = pd.read_csv(DATA_PATH + 'RAW_DATA_1' + '.csv', index_col=0)
+# data2 = pd.read_csv(DATA_PATH + 'RAW_DATA_2' + '.csv', index_col=0)
+# data2['CONDITION'] = 7 + data2['CONDITION']
+# data = data1.append(data2, ignore_index = True)
+# data.to_csv('RAW_DATA_COMBINED' + '.csv')
 
 DATASETS = [
     'OBS',
     'ACT',
-    'AHX',
-    'CHX'
-]
+    'ALSTM_HX',
+    'ALSTM_CX',
+    'CLSTM_HX',
+    'CLSTM_CX',
+    'AGRU_HX',
+    'CGRU_HX']
 
 for idx, data_type in enumerate(DATASETS):
 
@@ -82,12 +90,14 @@ for idx, data_type in enumerate(DATASETS):
     # create column name
     COLUMNS = np.char.mod(data_type + '_PC_%03d', np.arange(N_COMPONENTS))
 
-    # computa pca
-    pca, pc_df = compute_pca(filt_data, N_COMPONENTS, COLUMNS)
+    if N_DIMENSIONS > 0:
 
-    # export PCA object
-    export_pca(pca, DATA_PATH + data_type +'_PCA' + '.pkl')
+        # computa pca
+        pca, pc_df = compute_pca(filt_data, N_COMPONENTS, COLUMNS)
 
-    # export DataFrame
-    pc_df.to_csv(DATA_PATH + data_type + '_PC_DATA' + '.csv')
+        # export PCA object
+        export_pca(pca, DATA_PATH + data_type +'_PCA' + '.pkl')
+
+        # export DataFrame
+        pc_df.to_csv(DATA_PATH + data_type + '_PC_DATA' + '.csv')
 

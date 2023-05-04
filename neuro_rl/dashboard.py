@@ -49,7 +49,6 @@ dt = 0.005
 
 
 data = process_data_to_pd(DATA_PATH)
-data['TIME'] = data.index
 
 
 
@@ -184,25 +183,38 @@ NUM_PLOTS = 8
 PLOT_NAMES = np.zeros((NUM_PLOTS), dtype=object)
 PLOT_NAMES[0] = 'OBS-RAW'
 PLOT_NAMES[1] = 'ACT-RAW'
-PLOT_NAMES[2] = 'AHX-RAW'
-PLOT_NAMES[3] = 'CHX-RAW'
-PLOT_NAMES[4] = 'OBS-PC'
-PLOT_NAMES[5] = 'ACT-PC'
-PLOT_NAMES[6] = 'AHX-PC'
-PLOT_NAMES[7] = 'CHX-PC'
+PLOT_NAMES[2] = 'OBS-PC'
+PLOT_NAMES[3] = 'ACT-PC'
+PLOT_NAMES[4] = 'ALSTM_HX-PC'
+PLOT_NAMES[5] = 'ALSTM_CX-PC'
+PLOT_NAMES[6] = 'CLSTM_HX-PC'
+PLOT_NAMES[7] = 'CLSTM_CX-PC'
+# PLOT_NAMES[8] = 'AGRU_HX-PC'
+# PLOT_NAMES[9] = 'CGRU_HX-PC'
+
 
 dd_options = data.columns.values
 
 dd_defaults = np.zeros((NUM_PLOTS,4), dtype=object)
+# dd_defaults[0] = ['OBS_RAW_018_obj_qx', 'OBS_RAW_019_obj_qy', 'OBS_RAW_020_obj_qz', 'CONDITION']
+# dd_defaults[1] = ['ACT_RAW_000_WRJ1', 'ACT_RAW_001_WRJ0', 'ACT_RAW_002_FFJ3', 'CONDITION']
+# dd_defaults[2] = ['AHX_RAW_000', 'AHX_RAW_001', 'AHX_RAW_002', 'CONDITION']
+# dd_defaults[3] = ['CHX_RAW_000', 'CHX_RAW_001', 'CHX_RAW_002', 'CONDITION']
+
+# dd_defaults[4] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'CONDITION']
+# dd_defaults[5] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'CONDITION']
+# dd_defaults[6] = ['AHX_PC_000', 'AHX_PC_001', 'AHX_PC_002', 'CONDITION']
+# dd_defaults[7] = ['CHX_PC_000', 'CHX_PC_001', 'CHX_PC_002', 'CONDITION']
+
 dd_defaults[0] = ['OBS_RAW_000_u', 'OBS_RAW_001_v', 'OBS_RAW_005_r', 'OBS_RAW_011_r_star']
 dd_defaults[1] = ['ACT_RAW_000_LF_HAA', 'ACT_RAW_001_LF_HFE', 'ACT_RAW_002_LF_KFE', 'ACT_RAW_002_LF_KFE']
-dd_defaults[2] = ['AHX_RAW_000', 'AHX_RAW_001', 'AHX_RAW_002', 'AHX_RAW_002']
-dd_defaults[3] = ['CHX_RAW_000', 'CHX_RAW_001', 'CHX_RAW_002', 'CHX_RAW_002']
+dd_defaults[2] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'CONDITION']
+dd_defaults[3] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'CONDITION']
 
-dd_defaults[4] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'OBS_TANGLING']
-dd_defaults[5] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'ACT_TANGLING']
-dd_defaults[6] = ['AHX_PC_000', 'AHX_PC_001', 'AHX_PC_002', 'AHX_TANGLING']
-dd_defaults[7] = ['CHX_PC_000', 'CHX_PC_001', 'CHX_PC_002', 'CHX_TANGLING']
+dd_defaults[4] = ['ALSTM_HX_PC_000', 'ALSTM_HX_PC_001', 'ALSTM_HX_PC_002', 'CONDITION']
+dd_defaults[5] = ['ALSTM_CX_PC_000', 'ALSTM_CX_PC_001', 'ALSTM_CX_PC_002', 'CONDITION']
+dd_defaults[6] = ['CLSTM_HX_PC_000', 'CLSTM_HX_PC_001', 'CLSTM_HX_PC_002', 'CONDITION']
+dd_defaults[7] = ['CLSTM_CX_PC_000', 'CLSTM_CX_PC_001', 'CLSTM_CX_PC_002', 'CONDITION']
 
 # Define the layout as a grid with M rows and N columns
 grid_layout = []

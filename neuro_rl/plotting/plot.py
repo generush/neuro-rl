@@ -5,20 +5,21 @@ import plotly.graph_objects as go
 
 def plot_scatter3_ti_tf(title, data, twidth, t0, x, y, z, c):
     
-    idx = np.array(range(np.shape(data)[0]))
+    # TODO TO DO: remove hard coding of 1/dt here
+    idx = np.array(data['TIME'] * 60, dtype=int)
     mask = (idx > t0) & (idx <= t0 + twidth)
 
     # All points (grey markers)
-    figa = px.scatter_3d(
-        data,
-        x=x,
-        y=y,
-        z=z,
-        opacity=0.33,
-    )
-    figa.update_traces(
-        marker=dict(size=2, color='gray'),
-    )
+    # figa = px.scatter_3d(
+    #     data,
+    #     x=x,
+    #     y=y,
+    #     z=z,
+    #     opacity=0.33,
+    # )
+    # figa.update_traces(
+    #     marker=dict(size=2, color='gray'),
+    # )
 
     # Selected points (colored markers)
     figb = px.scatter_3d(
@@ -51,7 +52,9 @@ def plot_scatter3_ti_tf(title, data, twidth, t0, x, y, z, c):
     # https://stackoverflow.com/questions/65124833/plotly-how-to-combine-scatter-and-line-plots-using-plotly-express
     # https://stackoverflow.com/questions/52863305/plotly-scatter3d-how-can-i-force-3d-axes-to-have-the-same-scale-aspect-ratio
     layout = go.Layout(scene=dict(aspectmode='data'))
-    fig = go.Figure(data=figa.data + figb.data, layout=layout)
+    # fig = go.Figure(data=figa.data + figb.data, layout=layout)
+    fig = go.Figure(data=figb.data, layout=layout)
+
     
     go.scatter3d.projection.X.show = True
     go.scatter3d.projection.Y.show = True
