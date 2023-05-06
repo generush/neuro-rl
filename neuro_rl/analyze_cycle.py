@@ -32,19 +32,17 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 # load DataFrame
 df = pd.read_csv(DATA_PATH + 'RAW_DATA_ALL' + '.csv', index_col=0)
 
-# this value is zero (first time step of swing phase)
+# this entry is the first time step of swing phase (this FOOT_FORCE_002 = zero)
 mask_swingf = df['FOOT_FORCES_002'] == 0
 
-# last value was greater than zero (last time step of stance phase)
+# the prior entry is the last time step of stance phase (the previous FOOT_FORCE_002 > 0)
 mask_swing0 = (df['FOOT_FORCES_002'] > 0).shift()
 
-# new condition
+# first time step entry of new condition
 mask_new = df['CONDITION'].diff()
-
 
 # create dataframe one all ones
 mask_ones = df['CONDITION'] >= 0
-
 
 # compute the cycle id (when starting swing phase or when new test)
 df.insert(loc=0, column='CYCLE_NUM', value=(mask_swingf & mask_swing0 | mask_new).cumsum())
@@ -52,55 +50,41 @@ df.insert(loc=0, column='CYCLE_NUM', value=(mask_swingf & mask_swing0 | mask_new
 # time step index per cycle
 df.insert(loc=1, column='CYCLE_TIME', value=mask_ones.groupby(df['CYCLE_NUM']).cumsum() - 1)
 
-
 # get the cycle length, for each cycle
-grouped_df2 = df.groupby(['CYCLE_NUM'])['CYCLE_TIME'].max() + 1 # add one b/c index zero: period = index + 1
-df = pd.merge(df, grouped_df2, on=['CYCLE_NUM'], how='left')
+cyc_len_df = df.groupby(['CYCLE_NUM'])['CYCLE_TIME'].max() + 1 # add one b/c index zero: period = index + 1
+df = pd.merge(df, cyc_len_df, on=['CYCLE_NUM'], how='left')
 df = df.rename(columns={'CYCLE_TIME_x': 'CYCLE_TIME'})
 df = df.rename(columns={'CYCLE_TIME_y': 'CYCLE_PERIOD'})
 
 # get the most common cycle length for each set of u,v commands
-grouped_df = df.groupby(['CYCLE_NUM', 'OBS_RAW_009_u_star', 'OBS_RAW_010_v_star'])['CYCLE_PERIOD'].max().reset_index().groupby(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star'])['CYCLE_PERIOD'].apply(lambda x: x.mode())
+mode_df = df.groupby(['CYCLE_NUM', 'OBS_RAW_009_u_star', 'OBS_RAW_010_v_star'])['CYCLE_PERIOD'].max().reset_index().groupby(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star'])['CYCLE_PERIOD'].apply(lambda x: x.mode())
 
 # merge the grouped DataFrame with the original DataFrame to add the new column
-new_df = pd.merge(df, grouped_df, on=['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star'], how='left')
-new_df = new_df.rename(columns={'CYCLE_PERIOD_x': 'CYCLE_PERIOD'})
-new_df = new_df.rename(columns={'CYCLE_PERIOD_y': 'Mode_of_Max_Value'})
+df = pd.merge(df, mode_df, on=['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star'], how='left')
+df = df.rename(columns={'CYCLE_PERIOD_x': 'CYCLE_PERIOD'})
+df = df.rename(columns={'CYCLE_PERIOD_y': 'Mode_of_Max_Value'})
 
 # create a new DataFrame that only includes data that matches the mode of the maximum value
-filtered_df = new_df[new_df['CYCLE_PERIOD'] == new_df['Mode_of_Max_Value']]
-
-filtered_df.to_csv('filt.csv')
+filtered_df = df[df['CYCLE_PERIOD'] == df['Mode_of_Max_Value']]
 
 # average cycles based on the u,v commands
 avg_df = filtered_df.groupby(['CYCLE_TIME', 'OBS_RAW_009_u_star', 'OBS_RAW_010_v_star']).mean().reset_index()
-avg_df.to_csv('avg.csv')
+
+# sort by condition and then by time
+avg_sorted_df = avg_df.sort_values(['CONDITION', 'CYCLE_TIME'], ascending=[True, True]).reset_index(drop=True)
 
 # delete unnecessary columns
-avg_df = avg_df.drop('TIME', axis=1)
-avg_df = avg_df.drop('CONDITION', axis=1)
-avg_df = avg_df.drop('CYCLE_NUM', axis=1)
-avg_df = avg_df.drop('CYCLE_PERIOD', axis=1)
-avg_df = avg_df.drop('Mode_of_Max_Value', axis=1)
-avg_df = avg_df.drop('FOOT_FORCES_000', axis=1)
-avg_df = avg_df.drop('FOOT_FORCES_001', axis=1)
-avg_df = avg_df.drop('FOOT_FORCES_002', axis=1)
-avg_df = avg_df.drop('FOOT_FORCES_003', axis=1)
+avg_sorted_df = avg_sorted_df.drop('TIME', axis=1)
+avg_sorted_df = avg_sorted_df.drop('CYCLE_NUM', axis=1)
+# avg_sorted_df = avg_sorted_df.drop('CYCLE_PERIOD', axis=1)
+avg_sorted_df = avg_sorted_df.drop('Mode_of_Max_Value', axis=1)
+# avg_sorted_df = avg_sorted_df.drop('FOOT_FORCES_000', axis=1)
+# avg_sorted_df = avg_sorted_df.drop('FOOT_FORCES_001', axis=1)
+# avg_sorted_df = avg_sorted_df.drop('FOOT_FORCES_002', axis=1)
+# avg_sorted_df = avg_sorted_df.drop('FOOT_FORCES_003', axis=1)
 
 # recompute actual time based on cycle_time
-avg_df.insert(loc=0, column='TIME', value=avg_df['CYCLE_TIME'] * 0.004)
-avg_df.to_csv('avg_format.csv')
-
-
-# sort data by condition
-sorted_df = avg_df.sort_values(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'TIME'], ascending=[True, True, True])
-
-# create conidtion column: boolean mask indicating where column values change from one row to the next
-mask = (sorted_df['OBS_RAW_009_u_star'] != sorted_df['OBS_RAW_009_u_star'].shift()) | (sorted_df['OBS_RAW_010_v_star'] != sorted_df['OBS_RAW_010_v_star'].shift())
-
-# add condition column back in
-sorted_df.insert(loc=0, column='CONDITION', value=mask.cumsum() - 1)
-
-sorted_df.to_csv('avg_sorted.csv')
+avg_sorted_df.insert(loc=0, column='TIME', value=avg_sorted_df['CYCLE_TIME'] * 0.004)
+avg_sorted_df.to_csv(DATA_PATH + 'RAW_DATA' + '.csv')
 
 print('hi')
