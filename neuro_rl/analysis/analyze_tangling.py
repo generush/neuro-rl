@@ -8,6 +8,8 @@ from dash import Dash, Input, Output, dcc, html
 import numpy as np
 import pandas as pd
 
+from typing import List
+
 from plotting.generation import generate_dropdown, generate_graph
 from plotting.plot import plot_scatter3_ti_tf
 from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
@@ -85,31 +87,26 @@ def export_tangling(pca: sklearn.decomposition.PCA, path: str):
 def import_tangling(path: str):
     return pk.load(open(path,'rb'))
 
+def analyze_tangling(path: str, data_names: List[str]):
 
-N_COMPONENTS = 10
+    N_COMPONENTS = 10
 
-# load DataFrame
-file = DATA_PATH + 'RAW_DATA' + '.csv'
-data = pd.read_csv(file, index_col=0)
+    # load DataFrame
+    data = pd.read_csv(path + 'RAW_DATA' + '.csv', index_col=0)
 
-DATASETS = [
-    'OBS',
-    'ACT',
-    'AHX',
-    'CHX'
-]
+    for idx, data_type in enumerate(data_names):
 
-for idx, data_type in enumerate(DATASETS):
+        # select data for PCA analysis
+        filt_data = data.loc[:,data.columns.str.contains(data_type + '_RAW')].values
+        time = data['TIME'].values
 
-    # select data for PCA analysis
-    filt_data = data.loc[:,data.columns.str.contains(data_type + '_RAW')]
-    time = data.loc[:,data.columns.str.contains('TIME')]
+        if filt_data.shape[1] > 0:
+                
+            # computa pca
+            tangling = compute_tangling(filt_data, time)
 
-    # computa pca
-    tangling = compute_tangling(filt_data.to_numpy(), time.to_numpy())
+            tangling_df = pd.DataFrame(tangling, columns = [data_type + '_TANGLING'])
 
-    tangling_df = pd.DataFrame(tangling, columns = [data_type + '_TANGLING'])
-
-    # export DataFrame
-    tangling_df.to_csv(DATA_PATH + data_type + '_TANGLING_DATA' + '.csv')
+            # export DataFrame
+            tangling_df.to_csv(path + data_type + '_TANGLING_DATA' + '.csv')
 

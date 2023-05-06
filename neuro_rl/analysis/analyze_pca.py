@@ -5,6 +5,8 @@ from collections import OrderedDict
 import dash_bootstrap_components as dbc
 from dash import Dash, Input, Output, dcc, html
 
+from typing import List
+
 import numpy as np
 import pandas as pd
 
@@ -55,49 +57,40 @@ def export_pca(pca: sklearn.decomposition.PCA, path: str):
 def import_pca(path: str):
     return pk.load(open(path,'rb'))
 
+def analyze_pca(path: str, data_names: List[str]):
 
-N_COMPONENTS = 10
+    N_COMPONENTS = 10
 
-dt = 0.005
+    dt = 0.005
 
-# load DataFrame
-data = process_data(DATA_PATH + 'RAW_DATA' + '.csv')
+    # load DataFrame
+    data = process_data(path + 'RAW_DATA' + '.csv')
 
-# data1 = pd.read_csv(DATA_PATH + 'RAW_DATA_1' + '.csv', index_col=0)
-# data2 = pd.read_csv(DATA_PATH + 'RAW_DATA_2' + '.csv', index_col=0)
-# data2['CONDITION'] = 7 + data2['CONDITION']
-# data = data1.append(data2, ignore_index = True)
-# data.to_csv('RAW_DATA_COMBINED' + '.csv')
+    # data1 = pd.read_csv(DATA_PATH + 'RAW_DATA_1' + '.csv', index_col=0)
+    # data2 = pd.read_csv(DATA_PATH + 'RAW_DATA_2' + '.csv', index_col=0)
+    # data2['CONDITION'] = 7 + data2['CONDITION']
+    # data = data1.append(data2, ignore_index = True)
+    # data.to_csv('RAW_DATA_COMBINED' + '.csv')
 
-DATASETS = [
-    'OBS',
-    'ACT',
-    'ALSTM_HX',
-    'ALSTM_CX',
-    'CLSTM_HX',
-    'CLSTM_CX',
-    'AGRU_HX',
-    'CGRU_HX']
+    for idx, data_type in enumerate(data_names):
 
-for idx, data_type in enumerate(DATASETS):
+        # select data for PCA analysis (only raw data)
+        filt_data = data.loc[:,data.columns.str.contains(data_type + '_RAW')]
 
-    # select data for PCA analysis
-    filt_data = data.loc[:,data.columns.str.contains(data_type + '_RAW')]
+        # get number of dimensions of DataFrame
+        N_DIMENSIONS = len(filt_data.columns)
 
-    # get number of dimensions of DataFrame
-    N_DIMENSIONS = len(filt_data.columns)
+        # create column name
+        COLUMNS = np.char.mod(data_type + '_PC_%03d', np.arange(N_COMPONENTS))
 
-    # create column name
-    COLUMNS = np.char.mod(data_type + '_PC_%03d', np.arange(N_COMPONENTS))
+        if N_DIMENSIONS > 0:
 
-    if N_DIMENSIONS > 0:
+            # computa pca
+            pca, pc_df = compute_pca(filt_data, N_COMPONENTS, COLUMNS)
 
-        # computa pca
-        pca, pc_df = compute_pca(filt_data, N_COMPONENTS, COLUMNS)
+            # export PCA object
+            export_pca(pca, path + data_type +'_PCA' + '.pkl')
 
-        # export PCA object
-        export_pca(pca, DATA_PATH + data_type +'_PCA' + '.pkl')
-
-        # export DataFrame
-        pc_df.to_csv(DATA_PATH + data_type + '_PC_DATA' + '.csv')
+            # export DataFrame
+            pc_df.to_csv(path + data_type + '_PC_DATA' + '.csv')
 
