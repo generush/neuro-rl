@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 def plot_scatter3_ti_tf(title, data, twidth, t0, x, y, z, c):
     
     # TODO TO DO: remove hard coding of 1/dt here
-    idx = np.array(data['TIME'] * 60, dtype=int)
+    idx = np.array(data['TIME'] * 250, dtype=int)
     mask = (idx > t0) & (idx <= t0 + twidth)
 
     # All points (grey markers)
