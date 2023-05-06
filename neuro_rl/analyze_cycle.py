@@ -30,7 +30,7 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/'
 
 # load DataFrame
-df = pd.read_csv(DATA_PATH + 'RAW_DATA' + '.csv')
+df = pd.read_csv(DATA_PATH + 'RAW_DATA_ALL' + '.csv', index_col=0)
 
 # this value is zero (first time step of swing phase)
 mask_swingf = df['FOOT_FORCES_002'] == 0
@@ -64,12 +64,43 @@ grouped_df = df.groupby(['CYCLE_NUM', 'OBS_RAW_009_u_star', 'OBS_RAW_010_v_star'
 
 # merge the grouped DataFrame with the original DataFrame to add the new column
 new_df = pd.merge(df, grouped_df, on=['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star'], how='left')
-
-# rename the new column
 new_df = new_df.rename(columns={'CYCLE_PERIOD_x': 'CYCLE_PERIOD'})
 new_df = new_df.rename(columns={'CYCLE_PERIOD_y': 'Mode_of_Max_Value'})
 
 # create a new DataFrame that only includes data that matches the mode of the maximum value
 filtered_df = new_df[new_df['CYCLE_PERIOD'] == new_df['Mode_of_Max_Value']]
+
 filtered_df.to_csv('filt.csv')
 
+# average cycles based on the u,v commands
+avg_df = filtered_df.groupby(['CYCLE_TIME', 'OBS_RAW_009_u_star', 'OBS_RAW_010_v_star']).mean().reset_index()
+avg_df.to_csv('avg.csv')
+
+# delete unnecessary columns
+avg_df = avg_df.drop('TIME', axis=1)
+avg_df = avg_df.drop('CONDITION', axis=1)
+avg_df = avg_df.drop('CYCLE_NUM', axis=1)
+avg_df = avg_df.drop('CYCLE_PERIOD', axis=1)
+avg_df = avg_df.drop('Mode_of_Max_Value', axis=1)
+avg_df = avg_df.drop('FOOT_FORCES_000', axis=1)
+avg_df = avg_df.drop('FOOT_FORCES_001', axis=1)
+avg_df = avg_df.drop('FOOT_FORCES_002', axis=1)
+avg_df = avg_df.drop('FOOT_FORCES_003', axis=1)
+
+# recompute actual time based on cycle_time
+avg_df.insert(loc=0, column='TIME', value=avg_df['CYCLE_TIME'] * 0.004)
+avg_df.to_csv('avg_format.csv')
+
+
+# sort data by condition
+sorted_df = avg_df.sort_values(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'TIME'], ascending=[True, True, True])
+
+# create conidtion column: boolean mask indicating where column values change from one row to the next
+mask = (sorted_df['OBS_RAW_009_u_star'] != sorted_df['OBS_RAW_009_u_star'].shift()) | (sorted_df['OBS_RAW_010_v_star'] != sorted_df['OBS_RAW_010_v_star'].shift())
+
+# add condition column back in
+sorted_df.insert(loc=0, column='CONDITION', value=mask.cumsum() - 1)
+
+sorted_df.to_csv('avg_sorted.csv')
+
+print('hi')
