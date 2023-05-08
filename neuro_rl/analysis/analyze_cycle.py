@@ -20,7 +20,10 @@ import sklearn.metrics
 def analyze_cycle(path: str):
 
     # load DataFrame
-    df = pd.read_parquet(path + 'RAW_DATA_ALL' + '.parquet')
+    df = pd.read_csv(path + 'RAW_DATA' + '.csv')
+
+    # get dt time step
+    DT = df['TIME'][1] - df['TIME'][0]
 
     # this entry is the first time step of swing phase (this FOOT_FORCE_002 = zero)
     mask_swingf = df['FOOT_FORCES_002'] == 0
@@ -69,7 +72,7 @@ def analyze_cycle(path: str):
     avg_sorted_df = avg_sorted_df.drop('Mode_of_Max_Value', axis=1)
 
     # recompute actual time based on cycle_time
-    avg_sorted_df.insert(loc=0, column='TIME', value=avg_sorted_df['CYCLE_TIME'] * 0.004)
+    avg_sorted_df.insert(loc=0, column='TIME', value=avg_sorted_df['CYCLE_TIME'] * DT)
 
     # export trial-averaged data (1 cycle per CONDITION) !!!
-    avg_sorted_df.to_csv(path + 'RAW_DATA' + '.csv')
+    avg_sorted_df.to_csv(path + 'RAW_DATA_AVG' + '.csv')

@@ -19,20 +19,22 @@ import sklearn.decomposition
 import sklearn.manifold
 import sklearn.metrics
 
-######################## Loading all data files ##########################
-
-# DATA_PATH = '/home/gene/code/rl_neural_dynamics/IsaacGymEnvs/isaacgymenvs/videos/AnymalTerrain_2023-03-14_17-28-09/'
-# DATA_PATH = '/home/gene/code/rl_neural_dynamics/IsaacGymEnvs/isaacgymenvs/videos/ShadowHandAsymmLSTM_2023-03-14_16-19-22/'
-
-# DATA_PATH = '/home/gene/code/neuro-rl/IsaacGymEnvs/isaacgymenvs/shadowhand_2023_03_11_1279/'
-# DATA_PATH = '/home/gene/code/neuro-rl/IsaacGymEnvs/isaacgymenvs/anymalterrain_2023_04_17_00/'
-# DATA_PATH = '/home/gene/code/neuro-rl/IsaacGymEnvs/isaacgymenvs/anymalterrain_2023_04_17_01/'
-# DATA_PATH = '/home/gene/code/neuro-rl/IsaacGymEnvs/isaacgymenvs/anymalterrain_2023_04_17_AGENT_17_44/'
-DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data_AnymalTerrain_Flat_t0_t1000/'
-DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/'
-
-
 def compute_pca(df_raw, n_components, columns):
+
+
+    # # get column names that contain the string "RAW"
+    # cols_to_normalize = [col for col in df_raw.columns if 'RAW' in col]
+
+    # # normalize only the columns that contain the string "norm", avoiding normalization if max = min
+    # col_min = df_raw[cols_to_normalize].min()
+    # col_max = df_raw[cols_to_normalize].max()
+    # col_range = (col_max - col_min).compute() + 5
+    # col_range[col_range == 0] = 1 # avoid division by zero
+    # normalized_df = df_raw[cols_to_normalize] / col_range
+
+    # # concatenate the normalized dataframe with the original dataframe along the columns axis
+    # df_raw = pd.concat([df_raw.drop(cols_to_normalize, axis=1).compute(), normalized_df.compute()], axis=1)
+
 
     # create PCA object
     pca = sklearn.decomposition.PCA(n_components=n_components)
@@ -57,20 +59,12 @@ def export_pca(pca: sklearn.decomposition.PCA, path: str):
 def import_pca(path: str):
     return pk.load(open(path,'rb'))
 
-def analyze_pca(path: str, data_names: List[str]):
+def analyze_pca(path: str, data_names: List[str], file_suffix: str = ''):
 
     N_COMPONENTS = 10
 
-    dt = 0.005
-
     # load DataFrame
-    data = process_data(path + 'RAW_DATA' + '.csv')
-
-    # data1 = pd.read_csv(DATA_PATH + 'RAW_DATA_1' + '.csv', index_col=0)
-    # data2 = pd.read_csv(DATA_PATH + 'RAW_DATA_2' + '.csv', index_col=0)
-    # data2['CONDITION'] = 7 + data2['CONDITION']
-    # data = data1.append(data2, ignore_index = True)
-    # data.to_csv('RAW_DATA_COMBINED' + '.csv')
+    data = process_data(path + 'RAW_DATA' + file_suffix + '.csv')
 
     for idx, data_type in enumerate(data_names):
 
@@ -92,5 +86,5 @@ def analyze_pca(path: str, data_names: List[str]):
             export_pca(pca, path + data_type +'_PCA' + '.pkl')
 
             # export DataFrame
-            pc_df.to_csv(path + data_type + '_PC_DATA' + '.csv')
+            pc_df.to_csv(path + data_type + '_' + 'PC_DATA' + file_suffix + '.csv')
 

@@ -87,12 +87,12 @@ def export_tangling(pca: sklearn.decomposition.PCA, path: str):
 def import_tangling(path: str):
     return pk.load(open(path,'rb'))
 
-def analyze_tangling(path: str, data_names: List[str]):
+def analyze_tangling(path: str, data_names: List[str], file_suffix: str = ''):
 
     N_COMPONENTS = 10
 
     # load DataFrame
-    data = pd.read_csv(path + 'RAW_DATA' + '.csv', index_col=0)
+    data = pd.read_csv(path + 'RAW_DATA' + file_suffix + '.csv', index_col=0)
 
     for idx, data_type in enumerate(data_names):
 
@@ -108,5 +108,5 @@ def analyze_tangling(path: str, data_names: List[str]):
             tangling_df = pd.DataFrame(tangling, columns = [data_type + '_TANGLING'])
 
             # export DataFrame
-            tangling_df.to_csv(path + data_type + '_TANGLING_DATA' + '.csv')
+            tangling_df.to_csv(path + data_type + '_TANGLING_DATA' + file_suffix + '.csv')
 

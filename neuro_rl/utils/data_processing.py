@@ -13,12 +13,11 @@ def format_df(data: np.array):
     return df
 
 
-def process_data_to_pd(file_path: str):
+def process_data_to_pd(folder_path: str, file_suffix: str):
 
-    data_dir = Path(file_path)
+    data_dir = Path(folder_path)
     full_df = pd.concat(
-        (pd.read_csv(file, index_col=0) for file in data_dir.glob('*DATA.csv')), axis=1
+        (pd.read_csv(file, index_col=0) for file in data_dir.glob('*' + file_suffix + '.csv')), axis=1
     )
-    # full_df.to_csv(file_path + 'csv_file.csv')
 
     return full_df

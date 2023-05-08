@@ -3,11 +3,11 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 
-def plot_scatter3_ti_tf(title, data, twidth, t0, x, y, z, c):
+def plot_scatter3_ti_tf(title, data, t0, twidth, x, y, z, c):
     
     # TODO TO DO: remove hard coding of 1/dt here
-    idx = np.array(data['TIME'] * 250, dtype=int)
-    mask = (idx > t0) & (idx <= t0 + twidth)
+    t = np.array(data['TIME'])
+    mask = (t > t0) & (t <= t0 + twidth)
 
     # All points (grey markers)
     # figa = px.scatter_3d(

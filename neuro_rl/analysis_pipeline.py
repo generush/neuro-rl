@@ -16,6 +16,7 @@ from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbed
 from analysis.analyze_cycle import analyze_cycle
 from analysis.analyze_pca import analyze_pca
 from analysis.analyze_tangling import analyze_tangling
+from plotting.dashboard import run_dashboard
 
 import sklearn.decomposition
 import sklearn.manifold
@@ -36,16 +37,24 @@ DATASETS = [
     'CGRU_HX',
 ]
 
+AVG = False
+
 start = time.process_time()
 
-analyze_cycle(DATA_PATH)
+if AVG:
+    # analyze_cycle(DATA_PATH)
+    # print('Finished analyze_cycle', time.process_time() - start)
 
-print('Finished analyze_cycle', time.process_time() - start)
+    analyze_pca(DATA_PATH, DATASETS, '_AVG')
+    print('Finished analyze_pca', time.process_time() - start)
 
-analyze_pca(DATA_PATH, DATASETS)
+    analyze_tangling(DATA_PATH, DATASETS, '_AVG')
+    print('Finished analyze_tangling', time.process_time() - start)
 
-print('Finished analyze_pca', time.process_time() - start)
+    run_dashboard(DATA_PATH, '_AVG')
 
-analyze_tangling(DATA_PATH, DATASETS)
+else:
+    analyze_pca(DATA_PATH, DATASETS)
+    print('Finished analyze_pca', time.process_time() - start)
 
-print('Finished analyze_tangling', time.process_time() - start)
+    run_dashboard(DATA_PATH)
