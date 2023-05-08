@@ -50,10 +50,10 @@ def analyze_cycle(path: str):
     df = df.rename(columns={'CYCLE_TIME_y': 'CYCLE_PERIOD'})
 
     # get the most common cycle length for each set of u,v commands
-    mode_df = df.groupby(['CYCLE_NUM', 'OBS_RAW_009_u_star', 'OBS_RAW_010_v_star'])['CYCLE_PERIOD'].max().reset_index().groupby(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star'])['CYCLE_PERIOD'].apply(lambda x: x.mode())
+    mode_df = df.groupby(['CYCLE_NUM', 'OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star'])['CYCLE_PERIOD'].max().reset_index().groupby(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star'])['CYCLE_PERIOD'].apply(lambda x: x.mode())
 
     # merge the grouped DataFrame with the original DataFrame to add the new column
-    df = pd.merge(df, mode_df, on=['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star'], how='left')
+    df = pd.merge(df, mode_df, on=['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star'], how='left')
     df = df.rename(columns={'CYCLE_PERIOD_x': 'CYCLE_PERIOD'})
     df = df.rename(columns={'CYCLE_PERIOD_y': 'Mode_of_Max_Value'})
 
@@ -61,7 +61,7 @@ def analyze_cycle(path: str):
     filtered_df = df[df['CYCLE_PERIOD'] == df['Mode_of_Max_Value']]
 
     # average cycles based on the u,v commands
-    avg_df = filtered_df.groupby(['CYCLE_TIME', 'OBS_RAW_009_u_star', 'OBS_RAW_010_v_star']).mean().reset_index()
+    avg_df = filtered_df.groupby(['CYCLE_TIME', 'OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star']).mean().reset_index()
 
     # sort by condition and then by time
     avg_sorted_df = avg_df.sort_values(['CONDITION', 'CYCLE_TIME'], ascending=[True, True]).reset_index(drop=True)

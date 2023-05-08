@@ -167,14 +167,14 @@ def run_dashboard(folder_path: str, file_suffix: str = ''):
 
     NUM_PLOTS = 8
     PLOT_NAMES = np.zeros((NUM_PLOTS), dtype=object)
-    PLOT_NAMES[0] = 'OBS-RAW'
-    PLOT_NAMES[1] = 'ACT-RAW'
-    PLOT_NAMES[2] = 'OBS-PC'
-    PLOT_NAMES[3] = 'ACT-PC'
-    PLOT_NAMES[4] = 'ALSTM_HX-PC'
-    PLOT_NAMES[5] = 'ALSTM_CX-PC'
-    PLOT_NAMES[6] = 'CLSTM_HX-PC'
-    PLOT_NAMES[7] = 'CLSTM_CX-PC'
+    PLOT_NAMES[0] = 'Observations raw'
+    PLOT_NAMES[1] = 'Actions raw'
+    PLOT_NAMES[2] = 'Obserations'
+    PLOT_NAMES[3] = 'Actions'
+    PLOT_NAMES[4] = 'Actor LSTM_H_X'
+    PLOT_NAMES[5] = 'Actor LSTM_C_X'
+    PLOT_NAMES[6] = 'Actor MLP'
+    PLOT_NAMES[7] = 'Critic MLP'
     # PLOT_NAMES[8] = 'AGRU_HX-PC'
     # PLOT_NAMES[9] = 'CGRU_HX-PC'
 
@@ -194,13 +194,20 @@ def run_dashboard(folder_path: str, file_suffix: str = ''):
 
     dd_defaults[0] = ['OBS_RAW_000_u', 'OBS_RAW_001_v', 'OBS_RAW_005_r', 'OBS_RAW_011_r_star']
     dd_defaults[1] = ['ACT_RAW_000_LF_HAA', 'ACT_RAW_001_LF_HFE', 'ACT_RAW_002_LF_KFE', 'ACT_RAW_002_LF_KFE']
+
     dd_defaults[2] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'CONDITION']
     dd_defaults[3] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'CONDITION']
-
     dd_defaults[4] = ['ALSTM_HX_PC_000', 'ALSTM_HX_PC_001', 'ALSTM_HX_PC_002', 'CONDITION']
     dd_defaults[5] = ['ALSTM_CX_PC_000', 'ALSTM_CX_PC_001', 'ALSTM_CX_PC_002', 'CONDITION']
     dd_defaults[6] = ['CLSTM_HX_PC_000', 'CLSTM_HX_PC_001', 'CLSTM_HX_PC_002', 'CONDITION']
     dd_defaults[7] = ['CLSTM_CX_PC_000', 'CLSTM_CX_PC_001', 'CLSTM_CX_PC_002', 'CONDITION']
+
+    # dd_defaults[2] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'OBS_TANGLING']
+    # dd_defaults[3] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'ACT_TANGLING']
+    # dd_defaults[4] = ['ALSTM_HX_PC_000', 'ALSTM_HX_PC_001', 'ALSTM_HX_PC_002', 'ALSTM_HX_TANGLING']
+    # dd_defaults[5] = ['ALSTM_CX_PC_000', 'ALSTM_CX_PC_001', 'ALSTM_CX_PC_002', 'ALSTM_CX_TANGLING']
+    # dd_defaults[6] = ['CLSTM_HX_PC_000', 'CLSTM_HX_PC_001', 'CLSTM_HX_PC_002', 'CLSTM_HX_TANGLING']
+    # dd_defaults[7] = ['CLSTM_CX_PC_000', 'CLSTM_CX_PC_001', 'CLSTM_CX_PC_002', 'CLSTM_CX_TANGLING']
 
     # Define the layout as a grid with M rows and N columns
     grid_layout = []
@@ -284,7 +291,7 @@ def run_dashboard(folder_path: str, file_suffix: str = ''):
         )
 
         def repeated_callback(t0, twidth, ddx, ddy, ddz, ddc):
-            return plot_scatter3_ti_tf(plot_name, plot_data, t0, twidth, ddx, ddy, ddz, ddc)
+            return plot_scatter3_ti_tf(plot_name, plot_data, t0, twidth, ddx, ddy, ddz, ddc, folder_path, file_suffix)
 
     for idx, name in enumerate(PLOT_NAMES):
         single_callback(idx, name, data)

@@ -3,7 +3,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 
-def plot_scatter3_ti_tf(title, data, t0, twidth, x, y, z, c):
+def plot_scatter3_ti_tf(title, data, t0, twidth, x, y, z, c, folder_path: str, file_suffix: str=''):
     
     # TODO TO DO: remove hard coding of 1/dt here
     t = np.array(data['TIME'])
@@ -83,6 +83,7 @@ def plot_scatter3_ti_tf(title, data, t0, twidth, x, y, z, c):
             # yaxis_visible=False,
             # zaxis_visible=False,
         ),
+        legend_title=str(c),
         autosize=False,
         width=400,
         height=290,
@@ -94,5 +95,7 @@ def plot_scatter3_ti_tf(title, data, t0, twidth, x, y, z, c):
             pad=4
         ),
     )
+
+    fig.write_image(folder_path + '/' + title + file_suffix + '.svg')
 
     return fig
