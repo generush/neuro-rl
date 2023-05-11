@@ -37,7 +37,7 @@ DATASETS = [
     'CGRU_HX',
 ]
 
-AVG = False
+AVG = True
 
 start = time.process_time()
 
@@ -45,11 +45,11 @@ if AVG:
     analyze_cycle(DATA_PATH)
     print('Finished analyze_cycle', time.process_time() - start)
 
-    analyze_pca(DATA_PATH, DATASETS, '_AVG')
-    print('Finished analyze_pca', time.process_time() - start)
+    # analyze_pca(DATA_PATH, DATASETS, '_AVG')
+    # print('Finished analyze_pca', time.process_time() - start)
 
-    analyze_tangling(DATA_PATH, DATASETS, '_AVG')
-    print('Finished analyze_tangling', time.process_time() - start)
+    # analyze_tangling(DATA_PATH, DATASETS, '_AVG')
+    # print('Finished analyze_tangling', time.process_time() - start)
 
     run_dashboard(DATA_PATH, '_AVG')
 
