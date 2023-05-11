@@ -52,7 +52,7 @@ for i, data_type in enumerate(DATASETS):
         RR = df_filt.loc[idx].to_numpy()
 
         # initialize PCA object
-        PPpca = sklearn.decomposition.PCA(n_components=10)
+        pca = sklearn.decomposition.PCA(n_components=10)
 
         # fit pca transform
         data_pc = pca.fit_transform(RR)
@@ -114,7 +114,6 @@ ax.set_ylabel('v')
 ax.set_zlabel('r')
 
 plt.show()
-
 
 # Compute the cosine similarity between the first PC for different CONDITIONS (000, 001):
 sklearn.metrics.pairwise.cosine_similarity(W[0][:,0].reshape(1,-1) , W[1][:,0].reshape(1,-1) )

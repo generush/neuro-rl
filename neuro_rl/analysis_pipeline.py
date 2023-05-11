@@ -15,6 +15,7 @@ from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbed
 
 from analysis.analyze_cycle import analyze_cycle
 from analysis.analyze_pca import analyze_pca
+from analysis.analyze_pca_speed_axis import analyze_pca_speed_axis
 from analysis.analyze_tangling import analyze_tangling
 from plotting.dashboard import run_dashboard
 
@@ -25,16 +26,17 @@ import sklearn.metrics
 import time
 
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/'
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data_TEST_speed_axes/'
 
 DATASETS = [
-    'OBS',
-    'ACT',
-    'ALSTM_HX',
+    # 'OBS',
+    # 'ACT',
+    # 'ALSTM_HX',
     'ALSTM_CX',
-    'CLSTM_HX',
-    'CLSTM_CX',
-    'AGRU_HX',
-    'CGRU_HX',
+    # 'CLSTM_HX',
+    # 'CLSTM_CX',
+    # 'AGRU_HX',
+    # 'CGRU_HX',
 ]
 
 AVG = True
@@ -45,8 +47,11 @@ if AVG:
     analyze_cycle(DATA_PATH)
     print('Finished analyze_cycle', time.process_time() - start)
 
-    # analyze_pca(DATA_PATH, DATASETS, '_AVG')
-    # print('Finished analyze_pca', time.process_time() - start)
+    analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG')
+    print('Finished analyze_pca', time.process_time() - start)
+
+    analyze_pca(DATA_PATH, DATASETS, '_AVG')
+    print('Finished analyze_pca', time.process_time() - start)
 
     # analyze_tangling(DATA_PATH, DATASETS, '_AVG')
     # print('Finished analyze_tangling', time.process_time() - start)
