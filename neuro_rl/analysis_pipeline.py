@@ -26,17 +26,20 @@ import sklearn.metrics
 import time
 
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/'
-# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data_TEST_speed_axes/'
 
 DATASETS = [
     # 'OBS',
-    # 'ACT',
-    # 'ALSTM_HX',
-    'ALSTM_CX',
-    # 'CLSTM_HX',
-    # 'CLSTM_CX',
-    # 'AGRU_HX',
-    # 'CGRU_HX',
+    'ACT',
+    'A_MLP_XX',
+    'A_LSTM_CX',
+    'A_LSTM_HX',
+    'A_LSTM_C1X',
+    'A_LSTM_C2X',
+    # 'C_MLP_XX',
+    # 'C_LSTM_CX',
+    # 'C_LSTM_HX',
+    # 'A_GRU_HX',
+    # 'C_GRU_HX',
 ]
 
 AVG = True
@@ -44,17 +47,17 @@ AVG = True
 start = time.process_time()
 
 if AVG:
-    analyze_cycle(DATA_PATH)
-    print('Finished analyze_cycle', time.process_time() - start)
+    # analyze_cycle(DATA_PATH)
+    # print('Finished analyze_cycle', time.process_time() - start)
 
-    analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG')
-    print('Finished analyze_pca', time.process_time() - start)
+    # analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG')
+    # print('Finished analyze_pca', time.process_time() - start)
 
     analyze_pca(DATA_PATH, DATASETS, '_AVG')
     print('Finished analyze_pca', time.process_time() - start)
 
-    # analyze_tangling(DATA_PATH, DATASETS, '_AVG')
-    # print('Finished analyze_tangling', time.process_time() - start)
+    analyze_tangling(DATA_PATH, DATASETS, '_AVG')
+    print('Finished analyze_tangling', time.process_time() - start)
 
     run_dashboard(DATA_PATH, '_AVG')
 

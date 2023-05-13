@@ -167,14 +167,14 @@ def run_dashboard(folder_path: str, file_suffix: str = ''):
 
     NUM_PLOTS = 8
     PLOT_NAMES = np.zeros((NUM_PLOTS), dtype=object)
-    PLOT_NAMES[0] = 'Observations raw'
-    PLOT_NAMES[1] = 'Actions raw'
-    PLOT_NAMES[2] = 'Obserations'
-    PLOT_NAMES[3] = 'Actions'
-    PLOT_NAMES[4] = 'Actor LSTM_H_X'
-    PLOT_NAMES[5] = 'Actor LSTM_C_X'
-    PLOT_NAMES[6] = 'Actor MLP'
-    PLOT_NAMES[7] = 'Critic MLP'
+    PLOT_NAMES[0] = 'Actions raw'
+    PLOT_NAMES[1] = 'Observations'
+    PLOT_NAMES[2] = 'A_MLP_XX'
+    PLOT_NAMES[3] = 'A_LSTM_CX'
+    PLOT_NAMES[4] = 'A_LSTM_C1X'
+    PLOT_NAMES[5] = 'A_LSTM_C2X'
+    PLOT_NAMES[6] = 'A_LSTM_HX'
+    PLOT_NAMES[7] = 'Actions'
     # PLOT_NAMES[8] = 'AGRU_HX-PC'
     # PLOT_NAMES[9] = 'CGRU_HX-PC'
 
@@ -192,15 +192,16 @@ def run_dashboard(folder_path: str, file_suffix: str = ''):
     # dd_defaults[6] = ['AHX_PC_000', 'AHX_PC_001', 'AHX_PC_002', 'CONDITION']
     # dd_defaults[7] = ['CHX_PC_000', 'CHX_PC_001', 'CHX_PC_002', 'CONDITION']
 
-    dd_defaults[0] = ['OBS_RAW_000_u', 'OBS_RAW_001_v', 'OBS_RAW_005_r', 'OBS_RAW_011_r_star']
-    dd_defaults[1] = ['ACT_RAW_000_LF_HAA', 'ACT_RAW_001_LF_HFE', 'ACT_RAW_002_LF_KFE', 'ACT_RAW_002_LF_KFE']
+    # dd_defaults[0] = ['OBS_RAW_000_u', 'OBS_RAW_001_v', 'OBS_RAW_005_r', 'OBS_RAW_011_r_star']
+    dd_defaults[0] = ['ACT_RAW_000_LF_HAA', 'ACT_RAW_001_LF_HFE', 'ACT_RAW_002_LF_KFE', 'ACT_RAW_002_LF_KFE']
 
-    dd_defaults[2] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'CONDITION']
-    dd_defaults[3] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'CONDITION']
-    dd_defaults[4] = ['ALSTM_HX_PC_000', 'ALSTM_HX_PC_001', 'ALSTM_HX_PC_002', 'CONDITION']
-    dd_defaults[5] = ['ALSTM_CX_PC_000', 'ALSTM_CX_PC_001', 'ALSTM_CX_PC_002', 'CONDITION']
-    dd_defaults[6] = ['CLSTM_HX_PC_000', 'CLSTM_HX_PC_001', 'CLSTM_HX_PC_002', 'CONDITION']
-    dd_defaults[7] = ['CLSTM_CX_PC_000', 'CLSTM_CX_PC_001', 'CLSTM_CX_PC_002', 'CONDITION']
+    dd_defaults[1] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'CONDITION']
+    dd_defaults[2] = ['A_MLP_XX_PC_000', 'A_MLP_XX_PC_001', 'A_MLP_XX_PC_002', 'CONDITION']
+    dd_defaults[3] = ['A_LSTM_CX_PC_000', 'A_LSTM_CX_PC_001', 'A_LSTM_CX_PC_002', 'CONDITION']
+    dd_defaults[4] = ['A_LSTM_C1X_PC_000', 'A_LSTM_C1X_PC_001', 'A_LSTM_C1X_PC_002', 'CONDITION']
+    dd_defaults[5] = ['A_LSTM_C2X_PC_000', 'A_LSTM_C2X_PC_001', 'A_LSTM_C2X_PC_002', 'CONDITION']
+    dd_defaults[6] = ['A_LSTM_HX_PC_000', 'A_LSTM_HX_PC_001', 'A_LSTM_HX_PC_002', 'CONDITION']
+    dd_defaults[7] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'CONDITION']
 
     # dd_defaults[2] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'OBS_TANGLING']
     # dd_defaults[3] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'ACT_TANGLING']
