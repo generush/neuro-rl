@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 
 from utils.data_processing import process_data
+from analysis.analyze_pca import compute_pca
 from plotting.generation import generate_dropdown, generate_graph
 from plotting.plot import plot_scatter3_ti_tf
 from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
@@ -19,36 +20,6 @@ import sklearn.decomposition
 import sklearn.manifold
 import sklearn.metrics
 
-def compute_pca(df_raw, n_components, columns):
-
-
-    # # get column names that contain the string "RAW"
-    # cols_to_normalize = [col for col in df_raw.columns if 'RAW' in col]
-
-    # # normalize only the columns that contain the string "norm", avoiding normalization if max = min
-    # col_min = df_raw[cols_to_normalize].min()
-    # col_max = df_raw[cols_to_normalize].max()
-    # col_range = (col_max - col_min).compute() + 5
-    # col_range[col_range == 0] = 1 # avoid division by zero
-    # normalized_df = df_raw[cols_to_normalize] / col_range
-
-    # # concatenate the normalized dataframe with the original dataframe along the columns axis
-    # df_raw = pd.concat([df_raw.drop(cols_to_normalize, axis=1).compute(), normalized_df.compute()], axis=1)
-
-
-    # create PCA object
-    pca = sklearn.decomposition.PCA(n_components=n_components)
-
-    # fit pca transform
-    data_pc = pca.fit_transform(df_raw)
-
-    # create DataFrame
-    df_pc = pd.DataFrame(data_pc)
-
-    # name DataFrame columns
-    df_pc.columns = columns
-
-    return pca, df_pc
 
 # https://datascience.stackexchange.com/questions/55066/how-to-export-pca-to-use-in-another-program
 import pickle as pk
@@ -61,7 +32,7 @@ def import_pca(path: str):
 
 # define the objective function to minimize
 def objective(d, x, v):
-    return np.linalg.norm(np.matmul(x, d) - v)
+    return -np.linalg.norm(np.matmul(x, d))
 
 # define the constraint function that enforces ||d|| = 1
 def constraint(d):
@@ -72,7 +43,7 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
     N_COMPONENTS = 12
 
     # load DataFrame
-    df = process_data(path + 'RAW_DATA' + file_suffix + '.csv')
+    df = process_data(path + 'NORM_DATA' + file_suffix + '.csv')
 
     dt = df['TIME'][1].compute().to_numpy() - df['TIME'][0].compute().to_numpy()
 
@@ -131,7 +102,7 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         problem = {
             'fun': objective,
             'x0': d0,
-            'args': (x_bar / np.linalg.norm(x_bar), v_bar - v_bar.mean()), # mean-centered mean velocities
+            'args': (x_bar, v_bar - v_bar.mean()), # mean-centered mean velocities
             'constraints': {'type': 'eq', 'fun': constraint}
         }
 
@@ -175,6 +146,10 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
 
         # Plot the original trajectory and the interpolated trajectory
         fig = plt.figure()
+
+        plt.style.use('fivethirtyeight') # fivethirtyeight is name of style
+        plt.rcParams['text.usetex'] = True
+        
         ax = fig.add_subplot(111, projection='3d')
 
         color_vals = []  # Store the original interp_s_vals for color bar
@@ -219,13 +194,19 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
             ss[:, idx] = interp_s_vals
 
         # Plot the interpolated trajectory as scatter with color corresponding to interp_s
-        scatter1 = ax.scatter(xx, yy, zz, c=ss, s=2*np.ones_like(xx), cmap='bwr', alpha=1)
+        scatter1 = ax.scatter(xx, yy, zz, c=ss, s=2*np.ones_like(xx), cmap='Spectral', alpha=1)
 
         # Add labels and a legend
         ax.set_xlabel('PC1')
         ax.set_ylabel('PC2')
-        ax.set_zlabel('Speed Axis')
-        ax.set_title(data_type + " interpolation")
+        ax.set_zlabel('PC3')
+        # ax.set_title(data_type + " interpolation")
+
+        manager = plt.get_current_fig_manager()
+        manager.window.title(data_type + ' interpolation')
+
+        # Set the elevation (up/down) and the azimuth (left/right)
+        ax.view_init(20, 55)
 
         # Add a 2D projection (x, y)
         scatter2 = ax.scatter(xx.flatten(), yy.flatten(), 1.5 * zz.min()*np.ones_like(zz), c='grey', s=1*np.ones_like(xx), alpha=1)
@@ -237,8 +218,70 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         norm = mcolors.Normalize(vmin=ss.min(), vmax=ss.max())  # Adjust vmin and vmax according to your data
 
         # Create colorbars for each scatter plot
-        cbar1 = fig.colorbar(cm.ScalarMappable(norm=norm, cmap='bwr'), ax=ax)
-        cbar1.set_label('Speed')
+        cbar = fig.colorbar(cm.ScalarMappable(norm=norm, cmap='Spectral'), ax=ax, shrink=0.75)
+
+        # labelpad is the padding between colorbar and label, adjust it as needed.
+        # rotation=0 makes the label horizontal
+        cbar.set_label('Speed', labelpad=-29, y=1.1, rotation=0)
+
+        # Adjust colorbar position
+        cax = cbar.ax
+        cax.set_position([0.80, 0.15, 0.02, 0.5])  # [left, bottom, width, height]
+
+        minimal_formatting = False
+        if minimal_formatting:
+            # Create some data
+
+                # Turn off grid lines
+                ax.grid(False)
+
+                # Set background color to white
+                ax.set_facecolor('white')
+
+                # Remove axis tick marks
+                ax.set_xticks([])
+                ax.set_yticks([])
+                ax.set_zticks([])
+
+                # Remove axis labels
+                ax.set_xlabel('')
+                ax.set_ylabel('')
+                ax.set_zlabel('')
+
+                # set pane color to be transparent:
+                ax.xaxis.pane.fill = False
+                ax.yaxis.pane.fill = False
+                ax.zaxis.pane.fill = False
+
+                # Add mini axis symbol
+                ax2 = fig.add_axes([0.0, 0.0, 0.2, 0.2], projection='3d')
+                ax2.quiver([0], [0], [0], [1], [0], [0], color='k')  # x direction
+                ax2.quiver([0], [0], [0], [0], [1], [0], color='k')  # y direction
+                ax2.quiver([0], [0], [0], [0], [0], [1], color='k')  # z direction
+                ax2.text(1.1, 0, 0, "PC1", color='k')
+                ax2.text(0, 1.1, 0, "PC2", color='k')
+                ax2.text(0, 0, 1.1, "PC3", color='k')
+
+                # Make the panes and the grid lines transparent
+                ax2.xaxis.pane.fill = ax2.yaxis.pane.fill = ax2.zaxis.pane.fill = False
+                ax2.grid(False)
+
+                # Make the axes (including the arrows) invisible
+                ax2.set_axis_off()
+
+                # Set the limits and the aspect ratio of the plot
+                ax2.set_xlim([-1, 1])
+                ax2.set_ylim([-1, 1])
+                ax2.set_zlim([-1, 1])
+                ax2.set_box_aspect([1,1,1])
+
+                # Match the view angles of the mini axis symbol to the main plot
+                elev, azim = np.degrees(ax.elev), np.degrees(ax.azim)  # get the current view angles
+                ax2.view_init(elev, azim)  # set the view angles of the mini axis symbol
+
+        fig.savefig(data_type + '.svg')
+
+        print(data_type, ' Speed Axis PC3-12:', d_opt)
 
         plt.show()
 

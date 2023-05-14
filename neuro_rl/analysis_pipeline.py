@@ -33,8 +33,8 @@ DATASETS = [
     'A_MLP_XX',
     'A_LSTM_CX',
     'A_LSTM_HX',
-    'A_LSTM_C1X',
-    'A_LSTM_C2X',
+    # 'A_LSTM_C1X',
+    # 'A_LSTM_C2X',
     # 'C_MLP_XX',
     # 'C_LSTM_CX',
     # 'C_LSTM_HX',
@@ -50,8 +50,8 @@ if AVG:
     df_avg = analyze_cycle(DATA_PATH)
     print('Finished analyze_cycle', time.process_time() - start)
 
-    # analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG')
-    # print('Finished analyze_pca', time.process_time() - start)
+    analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG')
+    print('Finished analyze_pca', time.process_time() - start)
 
     analyze_pca(DATA_PATH, DATASETS, '_AVG')
     print('Finished analyze_pca', time.process_time() - start)
