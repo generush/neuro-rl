@@ -28,7 +28,7 @@ import time
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/'
 
 DATASETS = [
-    # 'OBS',
+    'OBS',
     'ACT',
     'A_MLP_XX',
     'A_LSTM_CX',
@@ -47,8 +47,8 @@ AVG = True
 start = time.process_time()
 
 if AVG:
-    # analyze_cycle(DATA_PATH)
-    # print('Finished analyze_cycle', time.process_time() - start)
+    df_avg = analyze_cycle(DATA_PATH)
+    print('Finished analyze_cycle', time.process_time() - start)
 
     # analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG')
     # print('Finished analyze_pca', time.process_time() - start)

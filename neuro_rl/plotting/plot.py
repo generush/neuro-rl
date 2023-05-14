@@ -5,9 +5,16 @@ import plotly.graph_objects as go
 
 def plot_scatter3_ti_tf(title, data, t0, twidth, x, y, z, c, folder_path: str, file_suffix: str=''):
     
-    # TODO TO DO: remove hard coding of 1/dt here
+    # get time from data DataFrame
     t = np.array(data['TIME'])
-    mask = (t > t0) & (t <= t0 + twidth)
+    
+    # round time so can compare
+    t = np.around(t, 4)
+    t0 = np.around(t0, 4)
+    twidth = np.around(twidth, 4)
+
+    # create mask (False --> data will not show up in plots)
+    mask = (t >= t0) & (t <= t0 + twidth)
 
     # All points (grey markers)
     # figa = px.scatter_3d(

@@ -14,6 +14,7 @@ from plotting.generation import generate_dropdown, generate_graph
 from plotting.plot import plot_scatter3_ti_tf
 from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
 
+import sklearn.preprocessing
 import sklearn.decomposition
 import sklearn.manifold
 import sklearn.metrics
@@ -23,6 +24,9 @@ import numpy as np
 
 def compute_tangling(X: np.array, t: np.array):
     
+    scaler = sklearn.preprocessing.StandardScaler()
+    X = scaler.fit_transform(X)
+
     dt = t[1] - t[0]
 
     t_diff = np.diff(t, axis=0)

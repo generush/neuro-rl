@@ -15,6 +15,7 @@ from plotting.generation import generate_dropdown, generate_graph
 from plotting.plot import plot_scatter3_ti_tf
 from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
 
+import sklearn.preprocessing
 import sklearn.decomposition
 import sklearn.manifold
 import sklearn.metrics
@@ -35,12 +36,15 @@ def compute_pca(df_raw, n_components, columns):
     # # concatenate the normalized dataframe with the original dataframe along the columns axis
     # df_raw = pd.concat([df_raw.drop(cols_to_normalize, axis=1).compute(), normalized_df.compute()], axis=1)
 
+    # added scaling since dimensions might have different magnitudes
+    scaler = sklearn.preprocessing.StandardScaler()
+    df_scaled = scaler.fit_transform(df_raw)
 
     # create PCA object
     pca = sklearn.decomposition.PCA(n_components=n_components)
 
     # fit pca transform
-    data_pc = pca.fit_transform(df_raw)
+    data_pc = pca.fit_transform(df_scaled)
 
     # create DataFrame
     df_pc = pd.DataFrame(data_pc)

@@ -20,7 +20,7 @@ import sklearn.metrics
 def analyze_cycle(path: str):
 
     # load DataFrame
-    df = pd.read_csv(path + 'RAW_DATA' + '.csv')
+    df = pd.read_csv(path + 'RAW_DATA' + '.csv', index_col=0)
 
     # get dt time step
     DT = df['TIME'][1] - df['TIME'][0]
@@ -31,10 +31,10 @@ def analyze_cycle(path: str):
     # the prior entry is the last time step of stance phase (the previous FOOT_FORCE_002 > 0)
     mask_swing0 = (df['FOOT_FORCES_002'] > 0).shift()
 
-    # first time step entry of new condition
+    # first time step entry of new condition (env id)
     mask_new = df['CONDITION'].diff()
 
-    # create dataframe one all ones
+    # create dataframe of all ones
     mask_ones = df['CONDITION'] >= 0
 
     # compute the cycle id (when starting swing phase or when new test)
@@ -58,15 +58,16 @@ def analyze_cycle(path: str):
     df = df.rename(columns={'CYCLE_PERIOD_y': 'Mode_of_Max_Value'})
 
     # create a new DataFrame that only includes data that matches the mode of the maximum value
-    filtered_df = df[df['CYCLE_PERIOD'] == df['Mode_of_Max_Value']]
+    filtered_df = df[df['CYCLE_PERIOD'] == df['Mode_of_Max_Value']].reset_index(drop=True)
 
-    # average cycles based on the u,v commands
+    # average cycles based on the u, v, r commands
     avg_df = filtered_df.groupby(['CYCLE_TIME', 'OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star']).mean().reset_index()
 
     # sort by condition and then by time
-    avg_sorted_df = avg_df.sort_values(['CONDITION', 'CYCLE_TIME'], ascending=[True, True]).reset_index(drop=True)
+    avg_sorted_df = avg_df.sort_values(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star', 'CYCLE_TIME'], ascending=[True, True, True, True]).reset_index(drop=True)
 
     # delete unnecessary columns
+    avg_sorted_df = avg_sorted_df.drop('CONDITION', axis=1)
     avg_sorted_df = avg_sorted_df.drop('TIME', axis=1)
     avg_sorted_df = avg_sorted_df.drop('CYCLE_NUM', axis=1)
     avg_sorted_df = avg_sorted_df.drop('Mode_of_Max_Value', axis=1)
@@ -74,5 +75,11 @@ def analyze_cycle(path: str):
     # recompute actual time based on cycle_time
     avg_sorted_df.insert(loc=0, column='TIME', value=avg_sorted_df['CYCLE_TIME'] * DT)
 
+
+    # The 'CONDITION' column will contain the unique indices based on commands u, v, r
+    avg_sorted_df['CONDITION'] = avg_sorted_df.groupby(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star'], sort=True).ngroup()
+
     # export trial-averaged data (1 cycle per CONDITION) !!!
     avg_sorted_df.to_csv(path + 'RAW_DATA_AVG' + '.csv')
+
+    return avg_sorted_df
