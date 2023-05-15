@@ -84,7 +84,7 @@ def analyze_tangling(path: str, data_names: List[str], file_suffix: str = ''):
     N_COMPONENTS = 10
 
     # load DataFrame
-    data = pd.read_csv(path + 'RAW_DATA' + file_suffix + '.csv', index_col=0)
+    data = pd.read_csv(path + 'NORM_DATA' + file_suffix + '.csv', index_col=0)
 
     for idx, data_type in enumerate(data_names):
 

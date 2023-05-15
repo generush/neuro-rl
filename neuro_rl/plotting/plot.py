@@ -47,20 +47,20 @@ def plot_scatter3_ti_tf(title, data, t0, twidth, x, y, z, c, folder_path: str, f
     )
 
     # Selected points (grey lines)
-    figc = px.line_3d(
-        data[mask],
-        x=x,
-        y=y,
-        z=z,
-    )
-    figc.update_traces(line=dict(color='black', width=1))
+    # figc = px.line_3d(
+    #     data[mask],
+    #     x=x,
+    #     y=y,
+    #     z=z,
+    # )
+    # figc.update_traces(line=dict(color='black', width=1))
 
     # Combine figures
     # https://stackoverflow.com/questions/65124833/plotly-how-to-combine-scatter-and-line-plots-using-plotly-express
     # https://stackoverflow.com/questions/52863305/plotly-scatter3d-how-can-i-force-3d-axes-to-have-the-same-scale-aspect-ratio
     layout = go.Layout(scene=dict(aspectmode='data'))
-    fig = go.Figure(data=figb.data + figc.data, layout=layout)
-    # fig = go.Figure(data=figb.data, layout=layout)
+    # fig = go.Figure(data=figb.data + figc.data, layout=layout)
+    fig = go.Figure(data=figb.data, layout=layout)
 
     
     go.scatter3d.projection.X.show = True

@@ -50,8 +50,8 @@ if AVG:
     df_avg = analyze_cycle(DATA_PATH)
     print('Finished analyze_cycle', time.process_time() - start)
 
-    analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG')
-    print('Finished analyze_pca', time.process_time() - start)
+    # analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG')
+    # print('Finished analyze_pca', time.process_time() - start)
 
     analyze_pca(DATA_PATH, DATASETS, '_AVG')
     print('Finished analyze_pca', time.process_time() - start)

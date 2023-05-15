@@ -56,7 +56,7 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         spd_act = df.loc[:,'OBS_RAW_000_u'].compute()
 
         # get indices for jth condition
-        idx = df[(df['OBS_RAW_010_v_star'] == 0) & (df['OBS_RAW_011_r_star'] == 0)].index.compute()
+        idx = df.index.compute()
 
         df_neuron = filt_data.loc[idx].reset_index(drop=True)
         df_speed_cmd = spd_cmd.loc[idx].reset_index(drop=True)
@@ -260,7 +260,7 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
                 ax2.quiver([0], [0], [0], [0], [0], [1], color='k')  # z direction
                 ax2.text(1.1, 0, 0, "PC1", color='k')
                 ax2.text(0, 1.1, 0, "PC2", color='k')
-                ax2.text(0, 0, 1.1, "PC3", color='k')
+                ax2.text(0, 0, 1.1, "Speed Axis", color='k')
 
                 # Make the panes and the grid lines transparent
                 ax2.xaxis.pane.fill = ax2.yaxis.pane.fill = ax2.zaxis.pane.fill = False
@@ -279,7 +279,8 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
                 elev, azim = np.degrees(ax.elev), np.degrees(ax.azim)  # get the current view angles
                 ax2.view_init(elev, azim)  # set the view angles of the mini axis symbol
 
-        fig.savefig(data_type + '.svg')
+        fig.savefig(data_type + '.svg', format='svg')
+        fig.savefig(data_type + '.pdf', format='pdf')
 
         print(data_type, ' Speed Axis PC3-12:', d_opt)
 
