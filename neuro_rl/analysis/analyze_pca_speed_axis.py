@@ -49,8 +49,12 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
 
     for idx, data_type in enumerate(data_names):
 
-        # select data for PCA analysis (only raw data)
+        # get data for PCA analysis (only raw data)
         filt_data = df.loc[:,df.columns.str.contains(data_type + '_RAW')].compute()
+
+        # get tangling data
+        tangl_data = df.loc[:,df.columns.str.contains(data_type + '_TANGLING')].compute()
+
 
         spd_cmd = df.loc[:,'OBS_RAW_009_u_star'].compute()
         spd_act = df.loc[:,'OBS_RAW_000_u'].compute()
@@ -61,6 +65,7 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         df_neuron = filt_data.loc[idx].reset_index(drop=True)
         df_speed_cmd = spd_cmd.loc[idx].reset_index(drop=True)
         df_speed_act = spd_act.loc[idx].reset_index(drop=True)
+        df_tangling = tangl_data.loc[idx].reset_index(drop=True)
 
         # get number of dimensions of DataFrame
         N_DIMENSIONS = len(df_neuron.columns)
@@ -121,9 +126,6 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
 
         pc_speed_df = pd.DataFrame(np.matmul ( df_neuron.to_numpy(), pc_speed_tf) )
 
-
-
-
         import matplotlib.pyplot as plt
         from scipy.interpolate import CubicSpline
         from mpl_toolkits.mplot3d.art3d import Line3DCollection
@@ -137,28 +139,30 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         zz = np.zeros((N_INTERP_TIMES, NUM_SPEEDS), dtype=float)
         ss = np.zeros((N_INTERP_TIMES, NUM_SPEEDS), dtype=float)
 
-
-        import matplotlib.pyplot as plt
-        from scipy.interpolate import CubicSpline
-        import matplotlib.cm as cm
-
+        # speed command data
         c = df_speed_cmd.to_numpy()
 
         # Plot the original trajectory and the interpolated trajectory
         fig = plt.figure()
-
+        fig.patch.set_facecolor('white')
         plt.style.use('fivethirtyeight') # fivethirtyeight is name of style
         plt.rcParams['text.usetex'] = True
+        plt.rcParams['figure.facecolor'] = 'white'
+        plt.rcParams['figure.edgecolor'] = 'white'
         
         ax = fig.add_subplot(111, projection='3d')
 
         color_vals = []  # Store the original interp_s_vals for color bar
 
+        # get data for specified speed cmd
         for idx, v in enumerate(v_bar):
             x = pc_df.iloc[:, 0][c == v].to_numpy()
             y = pc_df.iloc[:, 1][c == v].to_numpy()
             z = pc_df.iloc[:, 2][c == v].to_numpy()
+
+            # color code (speed or tangling)
             s = df_speed_cmd[c == v].to_numpy()
+            s = df_tangling[c == v].to_numpy()
 
             # get the length of the trajectory
             n = len(x)
@@ -193,8 +197,21 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
             zz[:, idx] = interp_z_vals
             ss[:, idx] = interp_s_vals
 
+        # Set background color to white
+        ax.set_facecolor('white')
+
+        # Remove grey box around 3D plot
+        # ax.xaxis.pane.fill = True
+        # ax.yaxis.pane.fill = True
+        # ax.zaxis.pane.fill = True
+
+        # # Remove grid lines
+        # ax.xaxis.pane.set_edgecolor('white')
+        # ax.yaxis.pane.set_edgecolor('white')
+        # ax.zaxis.pane.set_edgecolor('white')
+
         # Plot the interpolated trajectory as scatter with color corresponding to interp_s
-        scatter1 = ax.scatter(xx, yy, zz, c=ss, s=2*np.ones_like(xx), cmap='Spectral', alpha=1)
+        scatter1 = ax.scatter(xx, yy, zz, c=ss, s=2*np.ones_like(xx), cmap='Spectral', alpha=1, rasterized=True)
 
         # Add labels and a legend
         ax.set_xlabel('PC1')
@@ -202,6 +219,12 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         ax.set_zlabel('PC3')
         # ax.set_title(data_type + " interpolation")
 
+        # Set the color of the 3D panes
+        ax.xaxis.pane.fill = ax.yaxis.pane.fill = ax.zaxis.pane.fill = False
+        ax.xaxis.pane.set_edgecolor('white')
+        ax.yaxis.pane.set_edgecolor('white')
+        ax.zaxis.pane.set_edgecolor('white')
+    
         manager = plt.get_current_fig_manager()
         manager.window.title(data_type + ' interpolation')
 
@@ -209,7 +232,7 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         ax.view_init(20, 55)
 
         # Add a 2D projection (x, y)
-        scatter2 = ax.scatter(xx.flatten(), yy.flatten(), 1.5 * zz.min()*np.ones_like(zz), c='grey', s=1*np.ones_like(xx), alpha=1)
+        scatter2 = ax.scatter(xx.flatten(), yy.flatten(), 1.5 * zz.min()*np.ones_like(zz), c='grey', s=1*np.ones_like(xx), alpha=1, rasterized=True)
 
         # # Plot the original data points as scatter
         # scatter3 = ax.scatter(x, y, z, c=s, s=50*np.ones_like(x), alpha=1)
@@ -279,12 +302,14 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
                 elev, azim = np.degrees(ax.elev), np.degrees(ax.azim)  # get the current view angles
                 ax2.view_init(elev, azim)  # set the view angles of the mini axis symbol
 
-        fig.savefig(data_type + '.svg', format='svg')
-        fig.savefig(data_type + '.pdf', format='pdf')
+        
 
         print(data_type, ' Speed Axis PC3-12:', d_opt)
 
+        plt.tight_layout()
         plt.show()
+        fig.savefig(data_type + '.svg', format='svg', dpi=600, facecolor=fig.get_facecolor())
+        fig.savefig(data_type + '.pdf', format='pdf', dpi=600)
 
 
 

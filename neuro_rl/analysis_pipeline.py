@@ -47,17 +47,17 @@ AVG = True
 start = time.process_time()
 
 if AVG:
-    df_avg = analyze_cycle(DATA_PATH)
-    print('Finished analyze_cycle', time.process_time() - start)
+    # df_avg = analyze_cycle(DATA_PATH)
+    # print('Finished analyze_cycle', time.process_time() - start)
 
-    # analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG')
-    # print('Finished analyze_pca', time.process_time() - start)
+    # data_w_tangling = analyze_tangling(DATA_PATH, DATASETS, '_AVG')
+    # print('Finished analyze_tangling', time.process_time() - start)
 
-    analyze_pca(DATA_PATH, DATASETS, '_AVG')
+    analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG_WITH_TANGLING')
     print('Finished analyze_pca', time.process_time() - start)
 
-    analyze_tangling(DATA_PATH, DATASETS, '_AVG')
-    print('Finished analyze_tangling', time.process_time() - start)
+    # analyze_pca(DATA_PATH, DATASETS, '_AVG')
+    # print('Finished analyze_pca', time.process_time() - start)
 
     run_dashboard(DATA_PATH, '_AVG')
 

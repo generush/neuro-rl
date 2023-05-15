@@ -86,6 +86,9 @@ def analyze_tangling(path: str, data_names: List[str], file_suffix: str = ''):
     # load DataFrame
     data = pd.read_csv(path + 'NORM_DATA' + file_suffix + '.csv', index_col=0)
 
+    # copy data DataFrame so can add tangling data to it
+    data_w_tangling = data
+
     for idx, data_type in enumerate(data_names):
 
         # select data for PCA analysis
@@ -99,6 +102,10 @@ def analyze_tangling(path: str, data_names: List[str], file_suffix: str = ''):
 
             tangling_df = pd.DataFrame(tangling, columns = [data_type + '_TANGLING'])
 
-            # export DataFrame
-            tangling_df.to_csv(path + data_type + '_TANGLING_DATA' + file_suffix + '.csv')
+            # append tangling as a new column in the data DataFrame
+            data_w_tangling = pd.concat([data_w_tangling, tangling_df], axis=1)
 
+    # export DataFrame
+    data_w_tangling.to_csv(path + 'NORM_DATA' + file_suffix + '_WITH_TANGLING' + '.csv')
+
+    return data_w_tangling
