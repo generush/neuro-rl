@@ -37,6 +37,7 @@ def compute_pca(df_raw, n_components, columns):
     # df_raw = pd.concat([df_raw.drop(cols_to_normalize, axis=1).compute(), normalized_df.compute()], axis=1)
 
     # added scaling since dimensions might have different magnitudes
+    
     scaler = sklearn.preprocessing.StandardScaler()
     df_scaled = scaler.fit_transform(df_raw)
 

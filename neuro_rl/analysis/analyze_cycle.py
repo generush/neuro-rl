@@ -20,7 +20,7 @@ import sklearn.metrics
 def analyze_cycle(path: str):
 
     # load DataFrame
-    df = pd.read_csv(path + 'NORM_DATA' + '.csv')
+    df = pd.read_csv(path + 'RAW_DATA' + '.csv')
 
     # get dt time step
     DT = df['TIME'][1] - df['TIME'][0]
@@ -80,6 +80,6 @@ def analyze_cycle(path: str):
     avg_sorted_df['CONDITION'] = avg_sorted_df.groupby(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star'], sort=True).ngroup()
 
     # export trial-averaged data (1 cycle per CONDITION) !!!
-    avg_sorted_df.to_csv(path + 'NORM_DATA_AVG' + '.csv')
+    avg_sorted_df.to_csv(path + 'RAW_DATA_AVG' + '.csv')
 
     return avg_sorted_df

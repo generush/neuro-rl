@@ -84,7 +84,7 @@ def analyze_tangling(path: str, data_names: List[str], file_suffix: str = ''):
     N_COMPONENTS = 10
 
     # load DataFrame
-    data = pd.read_csv(path + 'NORM_DATA' + file_suffix + '.csv', index_col=0)
+    data = pd.read_csv(path + 'RAW_DATA' + file_suffix + '.csv', index_col=0)
 
     # copy data DataFrame so can add tangling data to it
     data_w_tangling = data
@@ -106,6 +106,6 @@ def analyze_tangling(path: str, data_names: List[str], file_suffix: str = ''):
             data_w_tangling = pd.concat([data_w_tangling, tangling_df], axis=1)
 
     # export DataFrame
-    data_w_tangling.to_csv(path + 'NORM_DATA' + file_suffix + '_WITH_TANGLING' + '.csv')
+    data_w_tangling.to_csv(path + 'RAW_DATA' + file_suffix + '_WITH_TANGLING' + '.csv')
 
     return data_w_tangling
