@@ -72,7 +72,7 @@ def constraint(d):
 
 def interpolate_data(data, speed_cmd, tangling, dt):
     
-    N_INTERP_TIMES = 1000
+    N_INTERP_TIMES = 10000
 
     unique_speeds = np.unique(speed_cmd)
 
@@ -85,7 +85,7 @@ def interpolate_data(data, speed_cmd, tangling, dt):
     interp_s = np.zeros((N_INTERP_TIMES, N_CONDITIONS))
     interp_t = np.zeros((N_INTERP_TIMES, N_CONDITIONS))
 
-    unique_speeds = np.unique(speed_cmd)
+    unique_speeds = np.array([2.0])
     for idx, v in enumerate(unique_speeds):
         mask = (speed_cmd == v)
         x, y, z1, z2 = data[mask, 0], data[mask, 1], data[mask, 2], data[mask, 3]
@@ -93,22 +93,12 @@ def interpolate_data(data, speed_cmd, tangling, dt):
         t = tangling[mask]
 
         n = len(x)
-        time = np.arange(0, n + 1) * dt
-        time_periodic = np.arange(0, len(x) + 1) * dt
+        time = np.arange(0, n) * dt
 
-        x = np.append(x, x[0])
-        y = np.append(y, y[0])
-        z1 = np.append(z1, z1[0])
-        z2 = np.append(z2, z2[0])
-        t = np.append(t, t[0])
-        s = np.append(s, s[0])
-
-        spline_x = CubicSpline(time_periodic, x, bc_type='periodic')
-        spline_y = CubicSpline(time_periodic, y, bc_type='periodic')
-        spline_z1 = CubicSpline(time_periodic, z1, bc_type='periodic')
-        spline_z2 = CubicSpline(time_periodic, z2, bc_type='periodic')
-        spline_t = CubicSpline(time_periodic, t, bc_type='periodic')
-        spline_s = CubicSpline(time_periodic, s, bc_type='periodic')
+        spline_x = CubicSpline(time, x)
+        spline_y = CubicSpline(time, y)
+        spline_z1 = CubicSpline(time, z1)
+        spline_z2 = CubicSpline(time, z2)
 
         fine_time = np.linspace(time[0], time[-1], num=N_INTERP_TIMES)
 
@@ -116,15 +106,12 @@ def interpolate_data(data, speed_cmd, tangling, dt):
         interp_y_vals = spline_y(fine_time)
         interp_z1_vals = spline_z1(fine_time)
         interp_z2_vals = spline_z2(fine_time)
-        interp_t_vals = spline_t(fine_time)
-        interp_s_vals = spline_s(fine_time)
-
-        interp_x[:,idx] = interp_x_vals
-        interp_y[:,idx] = interp_y_vals
-        interp_z1[:,idx] = interp_z1_vals
-        interp_z2[:,idx] = interp_z2_vals
-        interp_s[:,idx] = interp_s_vals
-        interp_t[:,idx] = interp_t_vals
+        interp_x = interp_x_vals
+        interp_y = interp_y_vals
+        interp_z1 = interp_z1_vals
+        interp_z2 = interp_z2_vals
+        interp_s = fine_time
+        interp_t  = fine_time
 
     return interp_x, interp_y, interp_z1, interp_z2, interp_s, interp_t
 
@@ -133,10 +120,10 @@ def plot_data(x_data, y_data, z_data, c_data, cc_global_min, cc_global_max, data
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    xx = np.concatenate(x_data, axis=0)
-    yy = np.concatenate(y_data, axis=0)
-    zz = np.concatenate(z_data, axis=0)
-    cc = np.concatenate(c_data, axis=0)
+    xx = x_data
+    yy = y_data
+    zz = z_data
+    cc = c_data
 
     # plot figures with speed colors and tangling colors
     scatter1 = ax.scatter(xx, yy, zz, c=cc, s=2*np.ones_like(xx), cmap=cmap, vmin=cc_global_min, vmax=cc_global_max, alpha=1, depthshade=True, rasterized=True)
@@ -182,7 +169,7 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
     for idx, data_type in enumerate(data_names):
         # get data for PCA analysis (only raw data)
         filt_data = df.loc[:, df.columns.str.contains(data_type + '_RAW')].compute()
-        tangl_data = df.loc[:, df.columns.str.contains(data_type + '_TANGLING')].compute()
+        tangl_data = df.loc[:, df.columns.str.contains(data_type + 'TIME')].compute()
         spd_cmd = df.loc[:, 'OBS_RAW_009_u_star'].compute()
         spd_act = df.loc[:, 'OBS_RAW_000_u'].compute()
         idx = df.index.compute()
@@ -262,13 +249,13 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         tt = t_data[idx]
         
         # PC1, PC2, PC3, Speed
-        plot_data(xx, yy, zz1, ss, s_global_min, s_global_max, data_type, 'PC 3', 'u [m/s]', 'Spectral', path, save_figs=True)
+        plot_data(xx, yy, zz1, ss, s_global_min, s_global_max, data_type, 'PC 3', 't [s]', 'Spectral', path, save_figs=True)
 
         # PC1, PC2, PC3, Tangling
         plot_data(xx, yy, zz1, tt, t_global_min, t_global_max, data_type, 'PC 3', 'Tangling', 'viridis', path, save_figs=True)
 
         # PC1, PC2, SpeedAxis, Speed
-        plot_data(xx, yy, zz2, ss, s_global_min, s_global_max, data_type, 'Speed Axis', 'u [m/s]', 'Spectral', path, save_figs=True)
+        plot_data(xx, yy, zz2, ss, s_global_min, s_global_max, data_type, 'Speed Axis', 't [s]', 'Spectral', path, save_figs=True)
 
         # PC1, PC2, SpeedAxis, Speed
         plot_data(xx, yy, zz2, tt, t_global_min, t_global_max, data_type, 'Speed Axis', 'Tangling', 'viridis', path, save_figs=True)
