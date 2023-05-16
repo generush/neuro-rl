@@ -20,7 +20,7 @@ import sklearn.metrics
 def analyze_cycle(path: str):
 
     # load DataFrame
-    df = pd.read_csv(path + 'RAW_DATA' + '.csv')
+    df = pd.read_parquet(path + 'RAW_DATA' + '.parquet')
 
     # get dt time step
     DT = df['TIME'][1] - df['TIME'][0]

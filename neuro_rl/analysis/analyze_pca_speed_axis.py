@@ -33,6 +33,22 @@ from scipy.optimize import minimize
 # https://datascience.stackexchange.com/questions/55066/how-to-export-pca-to-use-in-another-program
 import pickle as pk
 
+
+import os
+from pdfCropMargins import crop
+
+def crop_pdfs_in_folder(folder_path):
+    # Create the "cropped" folder if it doesn't exist
+    cropped_folder = os.path.join(folder_path, "cropped")
+    os.makedirs(cropped_folder, exist_ok=True)
+
+    for file_name in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file_name)
+        if os.path.isfile(file_path) and file_name.endswith(".pdf"):
+            crop([file_path, '-o', folder_path + '/cropped/'])
+        else:
+            print(f"Skipping file: {file_name} (not a PDF)")
+            
 def export_pca(pca: sklearn.decomposition.PCA, path: str):
     pk.dump(pca, open(path,"wb"))
 
@@ -147,9 +163,7 @@ def plot_data(x_data, y_data, z_data, c_data, cc_global_min, cc_global_max, data
 
     if save_figs:
         filename = f"{data_type}__{xlabel}{ylabel}{zlabel}__{clabel}".replace("/", "-")
-        fig.savefig(path + filename + '.svg', format='svg', dpi=600, facecolor=fig.get_facecolor())
         fig.savefig(path + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
-
 
 def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = ''):
     N_COMPONENTS = 12
@@ -248,17 +262,20 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         tt = t_data[idx]
         
         # PC1, PC2, PC3, Speed
-        plot_data(xx, yy, zz1, ss, s_global_min, s_global_max, data_type, 'PC 3', 'Speed [m/s]', 'Spectral', path, save_figs=True)
+        plot_data(xx, yy, zz1, ss, s_global_min, s_global_max, data_type, 'PC 3', 'u [m/s]', 'Spectral', path, save_figs=True)
 
         # PC1, PC2, PC3, Tangling
         plot_data(xx, yy, zz1, tt, t_global_min, t_global_max, data_type, 'PC 3', 'Tangling', 'viridis', path, save_figs=True)
 
         # PC1, PC2, SpeedAxis, Speed
-        plot_data(xx, yy, zz2, ss, s_global_min, s_global_max, data_type, 'Speed Axis', 'Speed [m/s]', 'Spectral', path, save_figs=True)
+        plot_data(xx, yy, zz2, ss, s_global_min, s_global_max, data_type, 'Speed Axis', 'u [m/s]', 'Spectral', path, save_figs=True)
 
         # PC1, PC2, SpeedAxis, Speed
         plot_data(xx, yy, zz2, tt, t_global_min, t_global_max, data_type, 'Speed Axis', 'Tangling', 'viridis', path, save_figs=True)
 
     plt.show()
 
+    # crop white space out of pdfs
+    crop_pdfs_in_folder(path)
+    
     print('done plotting')
