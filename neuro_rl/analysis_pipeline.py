@@ -35,6 +35,38 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_22-34-50_u[-1,1,2]_v[0]_r[0]_n[100]/'
 
 
+# exp 1
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/exp1_2023-05-16_23-21-39_u[1]_v[0]_r[0]_n[100]_w_noise/'
+
+# exp 1a (perturbation)
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/exp1a_2023-05-16_02-29-51_u[1]_v[0]_r[0]_n[1]__wo_noise_w_velperturb/'
+
+# exp 2
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/exp2a_2023-05-17_00-01-33_u[-1,1,2]_v[0]_r[0]_n[100]_w_noise/'
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/exp2b_2023-05-17_00-09-06_u[0]_v[-1,1,2]_r[0]_n[100]_w_noise/'
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/exp2c_2023-05-17_00-13-34_u[1]_v[0]_r[-1,1,2]_n[100]_w_noise/'
+
+# exp3
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/exp3_2023-05-17_00-53-30_u[0.4,1.0,7]_v[0]_r[0]_n[100]_w_noise/'
+# # need to generate the rest of the results for the Suppl Mat
+
+# # actually less tangling?
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/exp_extra4_2023-05-17_01-25-18_u[0.4,1,7]_v[0]_r[0]_n[100]_w_noise_w_act_in_obs/'
+
+# # no major difference
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-17_01-38-44_u[0.4,1,7]_v[0]_r[0]_n[100]_w_noise_trainedwofriction/'
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-17_01-48-03_u[0.4,1,7]_v[0]_r[0]_n[100]_w_noise_trainedwofrictionterrain/'
+
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-17_02-01-56_u[0.4,1.0,7]_v[0]_r[0]_n[100]_w_noise/'
+
+# # grabbign PC1 vector, PC2 vector, and speed axis vector for a lstm cx, and % variance explained ratio vector for act and a lstm cx
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-17_02-18-59_u[-1,1.0,2]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-17_02-45-04_u[0,0.0,1]_v[-1.0,1.0,2]_r[0.0,0.0,1]_n[100]/'
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-17_02-50-13_u[1.0,1.0,1]_v[0.0,0.0,1]_r[-1.0,1.0,2]_n[100]/'
+
+# want to see smearing
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-17_11-53-03_u[0.0,0.0,1]_v[0.4,1.0,7]_r[0.0,0.0,1]_n[100]/'
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-17_11-58-24_u[-1.0,-0.4,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
 
 
 
