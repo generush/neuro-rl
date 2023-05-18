@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 
 from utils.data_processing import process_data
-from analysis.analyze_pca import compute_pca
+from analysis.analyze_pca import compute_pca, export_pca
 from plotting.generation import generate_dropdown, generate_graph
 from plotting.plot import plot_scatter3_ti_tf
 from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
@@ -234,10 +234,21 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         s_data.append(s)
         t_data.append(t)
 
+        # export some data for the paper/suppl matl
+        pd.DataFrame(pc_12speed_tf).to_csv(path + 'info_' + data_type + '_pc_12speed_tf.csv')
+        pd.DataFrame(pc_123_tf).to_csv(path + 'info_' + data_type + '_pc_123_tf.csv')
+        pd.DataFrame(pca.explained_variance_ratio_.cumsum()).to_csv(path + 'info_' + data_type + '_cumvar.csv')
+        pd.DataFrame(t).to_csv(path + 'info_' + data_type + '_tangling_by_speed.csv')
+        pd.DataFrame(d_opt).to_csv(path + 'info_' + data_type + '_dopt.csv')
+        export_pca(pca, path + 'info_' + data_type +'_PCA' + '.pkl')
+
     s_global_min = np.min(s_data)
     s_global_max = np.max(s_data)
     t_global_min = np.min(t_data)
     t_global_max = np.max(t_data)
+
+    pd.DataFrame(pca.explained_variance_ratio_.cumsum()).to_csv(data_type + '_cumvar.csv')
+
 
     # Plot the data for each data_type
     for idx, data_type in enumerate(data_names):
