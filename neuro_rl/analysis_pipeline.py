@@ -14,7 +14,6 @@ from plotting.plot import plot_scatter3_ti_tf
 from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
 
 from analysis.analyze_cycle import analyze_cycle
-from analysis.analyze_avg_traj import analyze_avg_traj
 from analysis.analyze_pca import analyze_pca
 from analysis.analyze_pca_speed_axis import analyze_pca_speed_axis
 from analysis.analyze_tangling import analyze_tangling
@@ -31,11 +30,15 @@ import time
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_21-33-03_u[0]_v[-1,-0.4,7]_r[0]_n[100]/'
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_21-36-23_u[0]_v[0.4,1,7]_r[0]_n[100]/'
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_21-39-15_u[1]_v[0]_r[-1,1,7]_n[100]/'
-# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_22-37-25_u[1]_v[0]_r[-1,1,2]_n[100]/'
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_22-37-25_u[1]_v[0]_r[-1,1,2]_n[100]/'
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_22-36-09_u[0]_v[-1,1,2]_r[0]_n[100]/'
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_22-34-50_u[-1,1,2]_v[0]_r[0]_n[100]/'
-# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_23-49-58_u[0.4,1.0,7]_v[0]_r[0]_n[100]_w_noise/'
-DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-16_02-29-51_u[1]_v[0]_r[0]_n[1]_velperturb/'
+
+
+
+
+
+
 
 
 # exp 1
@@ -121,12 +124,8 @@ AVG = True
 start = time.process_time()
 
 if AVG:
-
-    df_avg = analyze_avg_traj(DATA_PATH)
+    df_avg = analyze_cycle(DATA_PATH)
     print('Finished analyze_cycle', time.process_time() - start)
-
-    # df_avg = analyze_cycle(DATA_PATH)
-    # print('Finished analyze_cycle', time.process_time() - start)
 
     data_w_tangling = analyze_tangling(DATA_PATH, DATASETS, '_AVG')
     print('Finished analyze_tangling', time.process_time() - start)
