@@ -35,7 +35,14 @@ def compute_tangling(X: np.array, t: np.array):
     # compute derivatives of X
     X_dot = np.diff(X, axis=0) / dt
     X_dot = np.insert(X_dot, 0, X_dot[0,:], axis=0)
-    X_dot[np.where(t_diff < 0)[0],:] = X_dot[np.where(t_diff < 0)[0] + 1,:]
+
+    # find first time step
+    first_indices = np.where(t == 0)[0]
+    last_indices = np.roll(first_indices, -1) - 1
+    last_indices[-1] = len(t) - 1
+
+    for i in range(len(first_indices)):
+        X_dot[first_indices[i], :] = ( X[first_indices[i], :] - X[last_indices[i], :] ) / dt  # X_dot = X[first time step w/in CONDITION] - X[last time step w/in CONDITION] 
  
     # compute constant, prevents denominator from shrinking to zero
     epsilon = 0.1 * np.var(X)
