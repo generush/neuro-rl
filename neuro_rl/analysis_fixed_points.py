@@ -25,6 +25,8 @@ import sklearn.metrics
 
 import time
 
+import torch
+
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_21-25-03_u[-1,-0.4,7]_v[0]_r[0]_n[100]/'
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_21-20-32_u[0.4,1,7]_v[0]_r[0]_n[100]/'
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_21-33-03_u[0]_v[-1,-0.4,7]_r[0]_n[100]/'
@@ -33,12 +35,6 @@ import time
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_22-37-25_u[1]_v[0]_r[-1,1,2]_n[100]/'
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_22-36-09_u[0]_v[-1,1,2]_r[0]_n[100]/'
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_22-34-50_u[-1,1,2]_v[0]_r[0]_n[100]/'
-
-
-
-
-
-
 
 
 # exp 1
@@ -76,6 +72,7 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 
 
 
+
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/supp/exp3_modspeeds/2023-05-23_08-40-40_u[-1.0,-0.4,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/supp/exp3_modspeeds/2023-05-23_08-47-27_u[0.4,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/supp/exp3_modspeeds/2023-05-23_09-04-55_u[0.0,0.0,1]_v[-1.0,-0.4,7]_r[0.0,0.0,1]_n[100]/'
@@ -103,45 +100,108 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-24_10-43-18_u[-1.0,1.0,2]_v[-1.0,1.0,2]_r[-1.0,1.0,2]_n[100]/'
 
-# no bias
-DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-26_09-57-04_u[0.4,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
+# debug tangling
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/exp3_modspeeds/exp3_2023-05-17_00-53-30_u[0.4,1.0,7]_v[0]_r[0]_n[100]_w_noise/'
 
-DATASETS = [
-    'OBS',
-    'ACT',
-    # 'A_MLP_XX',
-    'A_LSTM_CX',
-    'A_LSTM_HX',
-    # 'A_LSTM_C1X',
-    # 'A_LSTM_C2X',
-    # 'C_MLP_XX',
-    # 'C_LSTM_CX',
-    # 'C_LSTM_HX',
-    # 'A_GRU_HX',
-    # 'C_GRU_HX',
-]
 
-AVG = True
 
-start = time.process_time()
+model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_04-17-35-59/nn/last_AnymalTerrain_ep_2950_rew_20.14143.pth')
+model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_25-14-47-18/nn/last_AnymalTerrain_ep_2950_rew_20.2923.pth')
 
-if AVG:
-    df_avg = analyze_cycle(DATA_PATH)
-    print('Finished analyze_cycle', time.process_time() - start)
 
-    data_w_tangling = analyze_tangling(DATA_PATH, DATASETS, '_AVG')
-    print('Finished analyze_tangling', time.process_time() - start)
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from collections import OrderedDict
+import random
 
-    analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG_WITH_TANGLING')
-    print('Finished analyze_pca', time.process_time() - start)
 
-    # analyze_pca(DATA_PATH, DATASETS, '_AVG')
-    # print('Finished analyze_pca', time.process_time() - start)
+# Create an instance of the A2C network
+input_size = 256  # Replace with the appropriate input size
+hidden_size = 128  # Replace with the desired hidden size of the LSTM
+num_layers = 1  # Replace with the desired number of LSTM layers
+output_size = 128  # Replace with the appropriate output size
 
-    run_dashboard(DATA_PATH, '_AVG')
+a_rnn = nn.LSTM(input_size, hidden_size, num_layers)
 
-else:
-    analyze_pca(DATA_PATH, DATASETS)
-    print('Finished analyze_pca', time.process_time() - start)
+# Load the LSTM model weights
+state_dict = {
+    key.replace('a2c_network.a_rnn.rnn.', ''): value
+    for key, value in model['model'].items()
+    if key.startswith('a2c_network.a_rnn.rnn')
+}
+a_rnn.load_state_dict(state_dict)
 
-    run_dashboard(DATA_PATH)
+# Set the device for the LSTM
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+a_rnn.to(device)
+
+# Perform forward pass
+
+# random_numbers = [random.random() for _ in range(hidden_size * 2)]
+# h = torch.tensor(random_numbers, dtype=torch.float32).reshape(1, hidden_size * 2).to(device)
+
+M = 4096
+
+input_data = torch.zeros(1, M, input_size, dtype=torch.float32).to(device)
+
+random_numbers = [[random.random() for _ in range(hidden_size * 2)] for _ in range(M)]
+h = torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M, hidden_size * 2).to(device)
+
+# cx0 = torch.zeros(1, hidden_size, dtype=torch.float32).to(device)
+
+h.requires_grad = True
+h.retain_grad()
+
+gamma = 0.05
+max_iters = 10000
+
+q = torch.zeros(1, M, dtype=torch.float32).to(device)
+q_last = torch.zeros(1, M, dtype=torch.float32).to(device)
+q_last_last = torch.zeros(1, M, dtype=torch.float32).to(device)
+
+for epoch in range(max_iters):
+    a_rnn_output, (a_rnn_hx, a_rnn_cx) = a_rnn(input_data, (h[:,:,:128].contiguous(), h[:,:,128:].contiguous()))
+    _h = torch.cat((a_rnn_hx, a_rnn_cx), dim=2)
+
+    # Compute speed
+    q = torch.norm(h - _h, dim=2)
+    # print(epoch, gamma, q, abs(q - q_last), _h - h)
+
+    # print stats
+    norm_q = torch.norm(q, dim=0)
+    min_value, min_index = norm_q.min(dim=0)
+
+    print(
+        f"epoch: {epoch}"
+        f"\t _h min idx|: {min_index.item()}"
+        f"\t |_h|: {torch.norm(_h[:,min_index,:]).item():.2e}"
+        f"\t q: {q[:,min_index].item():.2e}"
+        f"\t |q - q_last|: {torch.norm(q[:,min_index] - q_last[:,min_index]).item():.2e}"
+        f"\t gamma: {gamma:.2e}"
+        f"\t |q - q_last_last|: {torch.norm(q[:,min_index] - q_last_last[:,min_index]).item():.2e}"
+    )
+
+    # print whole tensor _h
+    # norms = torch.norm(_h, dim=2)
+    # norms_str = ", ".join(f"{norm:.3f}" for norm in norms.flatten())
+    # print(f"\t |_h|: {norms_str}")
+
+    # Step in the direction of decreasing speed
+    q.backward(torch.ones_like(q))
+
+    # Update hidden state, h.grad = dq/dh
+    h = h - gamma * h.grad
+    h.retain_grad()
+
+    # Reduce gamma if q bounces back and forth between two values
+    if torch.norm(q[0,0] - q_last[0,0]) > 10 * torch.norm(q[0,0] - q_last_last[0,0]): # TO DO: FIX POINTS BOUNCING BACK AND FORTH AND NOT CONVERGING
+        gamma *= 0.999
+        # random_numbers = [[random.random() for _ in range(hidden_size * 2)] for _ in range(M)]
+        # h += 0.001 * gamma * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M, hidden_size * 2).to(device)
+        # random_numbers =  [random.random() for _ in range(hidden_size * 2)]
+        # h += 0.001 * gamma * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, hidden_size * 2).to(device)
+
+    # Update previous speeds
+    q_last_last = q_last
+    q_last = q
