@@ -38,8 +38,8 @@ def compute_pca(df_raw, n_components, columns):
 
     # added scaling since dimensions might have different magnitudes
     
-    scaler = sklearn.preprocessing.StandardScaler()
-    df_scaled = scaler.fit_transform(df_raw)
+    scl = sklearn.preprocessing.StandardScaler()
+    df_scaled = scl.fit_transform(df_raw)
 
     # create PCA object
     pca = sklearn.decomposition.PCA(n_components=n_components)
@@ -53,10 +53,14 @@ def compute_pca(df_raw, n_components, columns):
     # name DataFrame columns
     df_pc.columns = columns
 
-    return pca, df_pc
+    return scl, pca, df_pc
 
 # https://datascience.stackexchange.com/questions/55066/how-to-export-pca-to-use-in-another-program
 import pickle as pk
+
+
+def export_scl(scl: sklearn.preprocessing.StandardScaler, path: str):
+    pk.dump(scl, open(path,"wb"))
 
 def export_pca(pca: sklearn.decomposition.PCA, path: str):
     pk.dump(pca, open(path,"wb"))

@@ -104,8 +104,9 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/exp3_modspeeds/exp3_2023-05-17_00-53-30_u[0.4,1.0,7]_v[0]_r[0]_n[100]_w_noise/'
 
 
-
 model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_04-17-35-59/nn/last_AnymalTerrain_ep_2950_rew_20.14143.pth')
+
+# no bias
 model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_25-14-47-18/nn/last_AnymalTerrain_ep_2950_rew_20.2923.pth')
 
 
@@ -114,6 +115,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from collections import OrderedDict
 import random
+
+from torch.autograd import grad
 
 
 # Create an instance of the A2C network
@@ -143,18 +146,28 @@ a_rnn.to(device)
 
 M = 4096
 
+# cx0 = torch.zeros(1, hidden_size, dtype=torch.float32).to(device)
+
+
+max_iters = 10000
+
+gamma = 0.1 * torch.ones(1, M, 1, dtype=torch.float32).to(device)
+
 input_data = torch.zeros(1, M, input_size, dtype=torch.float32).to(device)
 
-random_numbers = [[random.random() for _ in range(hidden_size * 2)] for _ in range(M)]
-h = torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M, hidden_size * 2).to(device)
-
-# cx0 = torch.zeros(1, hidden_size, dtype=torch.float32).to(device)
+random_numbers = [[random.random() for _ in range(hidden_size * 2)] for _ in range(M//2)]
+h = torch.zeros(M, hidden_size * 2, dtype=torch.float32).reshape(1, M, hidden_size * 2).to(device) # 5 --> _h=5.72 # 1 --> _h=0 # 0.01 --> _h=0
+h1 = 1 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M//2, hidden_size * 2).to(device) # 5 --> _h=5.72 # 1 --> _h=0 # 0.01 --> _h=0
+h2 = 5 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M//2, hidden_size * 2).to(device) # 5 --> _h=5.72 # 1 --> _h=0 # 0.01 --> _h=0
+h = torch.cat((h1, h2),dim=1)
 
 h.requires_grad = True
 h.retain_grad()
 
-gamma = 0.05
-max_iters = 10000
+hx_traj = torch.zeros(max_iters//100, M, hidden_size, dtype=torch.float32)
+cx_traj = torch.zeros(max_iters//100, M, hidden_size, dtype=torch.float32)
+q_traj = torch.zeros(max_iters//100, M, dtype=torch.float32)
+
 
 q = torch.zeros(1, M, dtype=torch.float32).to(device)
 q_last = torch.zeros(1, M, dtype=torch.float32).to(device)
@@ -175,10 +188,10 @@ for epoch in range(max_iters):
     print(
         f"epoch: {epoch}"
         f"\t _h min idx|: {min_index.item()}"
-        f"\t |_h|: {torch.norm(_h[:,min_index,:]).item():.2e}"
+        f"\t |_h|: {torch.norm(h[:,min_index,:]).item():.2e}"
         f"\t q: {q[:,min_index].item():.2e}"
         f"\t |q - q_last|: {torch.norm(q[:,min_index] - q_last[:,min_index]).item():.2e}"
-        f"\t gamma: {gamma:.2e}"
+        f"\t gamma: {gamma[:, min_index, :].item():.2e}"
         f"\t |q - q_last_last|: {torch.norm(q[:,min_index] - q_last_last[:,min_index]).item():.2e}"
     )
 
@@ -188,15 +201,25 @@ for epoch in range(max_iters):
     # print(f"\t |_h|: {norms_str}")
 
     # Step in the direction of decreasing speed
-    q.backward(torch.ones_like(q))
+
+    # Now, let's create a tensor of the same shape as `output`
+    gradient = torch.ones_like(q)
+
+    # Now you can compute the gradient
+    q.backward(gradient)
 
     # Update hidden state, h.grad = dq/dh
     h = h - gamma * h.grad
     h.retain_grad()
 
     # Reduce gamma if q bounces back and forth between two values
-    if torch.norm(q[0,0] - q_last[0,0]) > 10 * torch.norm(q[0,0] - q_last_last[0,0]): # TO DO: FIX POINTS BOUNCING BACK AND FORTH AND NOT CONVERGING
-        gamma *= 0.999
+    mask = torch.norm(q - q_last, dim=0) > 10 * torch.norm(q - q_last_last, dim=0)
+    mask = mask.unsqueeze(dim=1).unsqueeze(dim=0)
+    
+    gamma *= torch.where(mask, 0.99, 1.0)
+
+    # if torch.norm(q[0,0] - q_last[0,0]) > 10 * torch.norm(q[0,0] - q_last_last[0,0]): # TO DO: FIX POINTS BOUNCING BACK AND FORTH AND NOT CONVERGING
+    #     gamma *= 0.99
         # random_numbers = [[random.random() for _ in range(hidden_size * 2)] for _ in range(M)]
         # h += 0.001 * gamma * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M, hidden_size * 2).to(device)
         # random_numbers =  [random.random() for _ in range(hidden_size * 2)]
@@ -205,3 +228,27 @@ for epoch in range(max_iters):
     # Update previous speeds
     q_last_last = q_last
     q_last = q
+
+    if epoch % 100 == 0:
+        hx_traj[epoch//100,:,:] = _h[:,:,:128].detach().cpu()
+        cx_traj[epoch//100,:,:] = _h[:,:,128:].detach().cpu()
+        q_traj[epoch//100,:] = q[:,:].detach().cpu()
+
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-26_09-57-04_u[0.4,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
+
+import h5py
+
+# Create an HDF5 file
+with h5py.File(DATA_PATH + 'cx_traj.h5', 'w') as f:
+    # Create a dataset in the file and write the tensor data
+    f.create_dataset('cx_traj', data=cx_traj.numpy())
+
+# Create an HDF5 file
+with h5py.File(DATA_PATH + 'hx_traj.h5', 'w') as f:
+    # Create a dataset in the file and write the tensor data
+    f.create_dataset('hx_traj', data=hx_traj.numpy())
+
+# Create an HDF5 file
+with h5py.File(DATA_PATH + 'q_traj.h5', 'w') as f:
+    # Create a dataset in the file and write the tensor data
+    f.create_dataset('q_traj', data=q_traj.numpy())
