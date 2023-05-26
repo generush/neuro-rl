@@ -149,17 +149,17 @@ M = 4096
 # cx0 = torch.zeros(1, hidden_size, dtype=torch.float32).to(device)
 
 
-max_iters = 10000
+max_iters = 5000
 
 gamma = 0.1 * torch.ones(1, M, 1, dtype=torch.float32).to(device)
 
 input_data = torch.zeros(1, M, input_size, dtype=torch.float32).to(device)
 
-random_numbers = [[random.random() for _ in range(hidden_size * 2)] for _ in range(M//2)]
-h = torch.zeros(M, hidden_size * 2, dtype=torch.float32).reshape(1, M, hidden_size * 2).to(device) # 5 --> _h=5.72 # 1 --> _h=0 # 0.01 --> _h=0
-h1 = 1 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M//2, hidden_size * 2).to(device) # 5 --> _h=5.72 # 1 --> _h=0 # 0.01 --> _h=0
-h2 = 5 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M//2, hidden_size * 2).to(device) # 5 --> _h=5.72 # 1 --> _h=0 # 0.01 --> _h=0
-h = torch.cat((h1, h2),dim=1)
+random_numbers = [[random.random() for _ in range(hidden_size * 2)] for _ in range(M)]
+h = 5 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M, hidden_size * 2).to(device) # 5 --> _h=5.72 # 1 --> _h=0 # 0.01 --> _h=0
+
+# h2 = 5 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M//2, hidden_size * 2).to(device) # 5 --> _h=5.72 # 1 --> _h=0 # 0.01 --> _h=0
+# h = torch.cat((h1, h2),dim=1)
 
 h.requires_grad = True
 h.retain_grad()

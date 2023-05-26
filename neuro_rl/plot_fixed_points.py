@@ -34,19 +34,19 @@ import h5py
 
 
 # Load the HDF5 file
-with h5py.File(DATA_PATH + 'cx_traj.h5', 'r') as f:
-    # Read the dataset from the file
-    cx_traj = f['cx_traj'][:]
-    # Convert NumPy array to PyTorch tensor
-    cx_traj = torch.from_numpy(cx_traj)
+# with h5py.File(DATA_PATH + 'cx_traj.h5', 'r') as f:
+#     # Read the dataset from the file
+#     cx_traj = f['cx_traj'][:]
+#     # Convert NumPy array to PyTorch tensor
+#     cx_traj = torch.from_numpy(cx_traj)
 
 
 # Load the HDF5 file
 with h5py.File(DATA_PATH + 'hx_traj.h5', 'r') as f:
     # Read the dataset from the file
-    hx_traj = f['hx_traj'][:]
+    cx_traj = f['hx_traj'][:]
     # Convert NumPy array to PyTorch tensor
-    hx_traj = torch.from_numpy(hx_traj)
+    cx_traj = torch.from_numpy(cx_traj)
 
 
 # Load the HDF5 file
@@ -73,13 +73,13 @@ cycle_z = cycle_z.to_numpy().reshape(-1)
 
 
 
-cx_pc = np.zeros((10000//100,4096,12))
+cx_pc = np.zeros((5000//100,4096,12))
 cx_pc_end = np.zeros((4096,12))
 
-cx_pc_end = pca.transform(scl.transform(torch.squeeze(cx_traj[99,:,:]).detach().cpu().numpy()))
-cx_q_end = torch.squeeze(q_traj[99,:]).detach().cpu().numpy()
+cx_pc_end = pca.transform(scl.transform(torch.squeeze(cx_traj[-1,:,:]).detach().cpu().numpy()))
+cx_q_end = torch.squeeze(q_traj[-1,:]).detach().cpu().numpy()
 
-for i in range(10000//100):
+for i in range(5000//100):
     cx_pc[i,:,:] = pca.transform(scl.transform(torch.squeeze(cx_traj[i,:,:]).detach().cpu().numpy()))
 
 import numpy as np
@@ -97,9 +97,9 @@ cx_z = cx_pc_reshaped[:, 2]
 # Create the scatter plot
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.scatter(cycle_x, cycle_y, cycle_z, s=1, c='r')
 ax.scatter(cx_x, cx_y, cx_z, c=np.log10(cx_q), cmap='viridis', s=1)
 ax.scatter(cx_pc_end[:,0], cx_pc_end[:,1], cx_pc_end[:,2], c=np.log10(cx_q_end), cmap='viridis', s=10)
+ax.scatter(cycle_x, cycle_y, cycle_z, s=1, c='r')
 
 # Set labels and title
 ax.set_xlabel('X')
