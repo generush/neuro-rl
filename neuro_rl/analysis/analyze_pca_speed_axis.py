@@ -258,8 +258,8 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         pd.DataFrame(z2).to_csv(path + 'info_' + data_type + '_z2_by_speed.csv')
         pd.DataFrame(t).to_csv(path + 'info_' + data_type + '_tangling_by_speed.csv')
         pd.DataFrame(d_opt).to_csv(path + 'info_' + data_type + '_dopt.csv')
-        export_scl(pca, path + 'info_' + data_type +'_SCL' + '.pkl')
-        export_pca(scl, path + 'info_' + data_type +'_PCA' + '.pkl')
+        export_scl(scl, path + 'info_' + data_type +'_SCL' + '.pkl')
+        export_pca(pca, path + 'info_' + data_type +'_PCA' + '.pkl')
 
     s_global_min = np.min(s_data)
     s_global_max = np.max(s_data)

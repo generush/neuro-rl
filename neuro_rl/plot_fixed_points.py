@@ -28,25 +28,30 @@ import time
 import torch
 
 
+# no bias
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-26_09-57-04_u[0.4,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
+
+# no bias but pos u and neg u
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_08-29-41_u[-1,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_10-29-52_u[-1,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
 import h5py
 
 
 # Load the HDF5 file
-# with h5py.File(DATA_PATH + 'cx_traj.h5', 'r') as f:
-#     # Read the dataset from the file
-#     cx_traj = f['cx_traj'][:]
-#     # Convert NumPy array to PyTorch tensor
-#     cx_traj = torch.from_numpy(cx_traj)
+with h5py.File(DATA_PATH + 'cx_traj.h5', 'r') as f:
+    # Read the dataset from the file
+    cx_traj = f['cx_traj'][:]
+    # Convert NumPy array to PyTorch tensor
+    cx_traj = torch.from_numpy(cx_traj)
 
 
 # Load the HDF5 file
 with h5py.File(DATA_PATH + 'hx_traj.h5', 'r') as f:
     # Read the dataset from the file
-    cx_traj = f['hx_traj'][:]
+    hx_traj = f['hx_traj'][:]
     # Convert NumPy array to PyTorch tensor
-    cx_traj = torch.from_numpy(cx_traj)
+    hx_traj = torch.from_numpy(hx_traj)
 
 
 # Load the HDF5 file
@@ -71,15 +76,17 @@ cycle_z = cycle_z.to_numpy().reshape(-1)
 
 
 
+M = 4096
+EPOCHS = 10000
+SAMPLE_RATE = 100
 
-
-cx_pc = np.zeros((5000//100,4096,12))
-cx_pc_end = np.zeros((4096,12))
+cx_pc = np.zeros((EPOCHS//SAMPLE_RATE,M,12))
+cx_pc_end = np.zeros((M,12))
 
 cx_pc_end = pca.transform(scl.transform(torch.squeeze(cx_traj[-1,:,:]).detach().cpu().numpy()))
 cx_q_end = torch.squeeze(q_traj[-1,:]).detach().cpu().numpy()
 
-for i in range(5000//100):
+for i in range(EPOCHS//SAMPLE_RATE):
     cx_pc[i,:,:] = pca.transform(scl.transform(torch.squeeze(cx_traj[i,:,:]).detach().cpu().numpy()))
 
 import numpy as np
@@ -97,7 +104,7 @@ cx_z = cx_pc_reshaped[:, 2]
 # Create the scatter plot
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.scatter(cx_x, cx_y, cx_z, c=np.log10(cx_q), cmap='viridis', s=1)
+# ax.scatter(cx_x, cx_y, cx_z, c=np.log10(cx_q), cmap='viridis', s=1)
 ax.scatter(cx_pc_end[:,0], cx_pc_end[:,1], cx_pc_end[:,2], c=np.log10(cx_q_end), cmap='viridis', s=10)
 ax.scatter(cycle_x, cycle_y, cycle_z, s=1, c='r')
 
