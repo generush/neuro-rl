@@ -104,7 +104,7 @@ cx_z = cx_pc_reshaped[:, 2]
 # Create the scatter plot
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-# ax.scatter(cx_x, cx_y, cx_z, c=np.log10(cx_q), cmap='viridis', s=1)
+ax.scatter(cx_x, cx_y, cx_z, c=np.log10(cx_q), cmap='viridis', s=1)
 ax.scatter(cx_pc_end[:,0], cx_pc_end[:,1], cx_pc_end[:,2], c=np.log10(cx_q_end), cmap='viridis', s=10)
 ax.scatter(cycle_x, cycle_y, cycle_z, s=1, c='r')
 
