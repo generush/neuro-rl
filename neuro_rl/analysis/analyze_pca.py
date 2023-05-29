@@ -73,7 +73,7 @@ def analyze_pca(path: str, data_names: List[str], file_suffix: str = ''):
     N_COMPONENTS = 10
 
     # load DataFrame
-    data = process_data(path + 'NORM_DATA' + file_suffix + '.csv')
+    data = process_data(path + 'RAW_DATA' + file_suffix + '.csv')
 
     for idx, data_type in enumerate(data_names):
 
@@ -89,10 +89,11 @@ def analyze_pca(path: str, data_names: List[str], file_suffix: str = ''):
         if N_DIMENSIONS > 0:
 
             # computa pca
-            pca, pc_df = compute_pca(filt_data, N_COMPONENTS, COLUMNS)
+            scl, pca, pc_df = compute_pca(filt_data, N_COMPONENTS, COLUMNS)
 
             # export PCA object
             export_pca(pca, path + data_type +'_PCA' + '.pkl')
+            export_scl(scl, path + data_type +'_SCL' + '.pkl')
 
             # export DataFrame
             pc_df.to_csv(path + data_type + '_' + 'PC_DATA' + file_suffix + '.csv')

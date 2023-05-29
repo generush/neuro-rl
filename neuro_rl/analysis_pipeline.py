@@ -116,11 +116,49 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 # fixed CX1, CX2
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-28_20-55-55_u[1,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/'
 
+# LSTM trained w/ perturb, tested w/ perturb N=1
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-29_08-06-39_u[1,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/'
+
+# LSTM trained w/o perturb, tested w/ perturb N=1
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-29_08-08-00_u[1,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/'
+
+# LSTM trained w/ perturb, tested w/o perturb N=1
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-29_08-12-29_u[1,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/'
+
+# LSTM trained w/o perturb, tested w/o perturb N=1
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-29_08-13-18_u[1,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/'
+
+# LSTM trained w/o perturb, tested w/o perturb N=700 --> VERIFIED IT LOOKS NORMAL
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-29_08-28-38_u[0.4,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
+
+# LSTM trained w/ perturb, tested w/o perturb N=700
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-29_08-32-16_u[0.4,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
+
+# FF trained w/ perturb, tested w/o perturb N=700
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-29_09-42-49_u[0.4,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-29_09-49-43_u[0.4,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
+
+# ShadowHand 4 rolls
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-29_11-28-20_u[-90.0,90.0,4]_v[0.0,0.0,0]_r[0.0,0.0,0]/'
+
+# ShadowHand 4 same block sizes
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-29_12-15-43_u[90.0,90.0,4]_v[0.0,0.0,0]_r[0.0,0.0,0]/'
+
+# ShadowHand 4 diff block sizes 0.95-1.05
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-29_12-31-34_u[90.0,90.0,4]_v[0.0,0.0,0]_r[0.0,0.0,0]/'
+
+# ShadowHand 4 diff block sizes 0.8-1.2
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-29_12-34-22_u[90.0,90.0,4]_v[0.0,0.0,0]_r[0.0,0.0,0]/'
+
+# ShadowHand 4 diff block masses 0.5-2.0
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-29_12-38-14_u[90.0,90.0,4]_v[0.0,0.0,0]_r[0.0,0.0,0]/'
+
+
 
 DATASETS = [
     'OBS',
     'ACT',
-    # 'A_MLP_XX',
+    'A_MLP_XX',
     'A_LSTM_CX',
     'A_LSTM_HX',
     'A_LSTM_C1X',
@@ -137,19 +175,19 @@ AVG = True
 start = time.process_time()
 
 if AVG:
-    df_avg = analyze_cycle(DATA_PATH)
-    print('Finished analyze_cycle', time.process_time() - start)
+    # df_avg = analyze_cycle(DATA_PATH)
+    # print('Finished analyze_cycle', time.process_time() - start)
 
-    data_w_tangling = analyze_tangling(DATA_PATH, DATASETS, '_AVG')
-    print('Finished analyze_tangling', time.process_time() - start)
+    # data_w_tangling = analyze_tangling(DATA_PATH, DATASETS, '_AVG')
+    # print('Finished analyze_tangling', time.process_time() - start)
 
-    analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG_WITH_TANGLING')
-    print('Finished analyze_pca', time.process_time() - start)
-
-    # analyze_pca(DATA_PATH, DATASETS, '_AVG')
+    # analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG_WITH_TANGLING')
     # print('Finished analyze_pca', time.process_time() - start)
 
-    run_dashboard(DATA_PATH, '_AVG')
+    analyze_pca(DATA_PATH, DATASETS)
+    print('Finished analyze_pca', time.process_time() - start)
+
+    run_dashboard(DATA_PATH)
 
 else:
     analyze_pca(DATA_PATH, DATASETS)
