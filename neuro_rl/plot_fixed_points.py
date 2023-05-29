@@ -35,6 +35,10 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_08-29-41_u[-1,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_10-29-52_u[-1,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
+# no bias but pos u and neg u, no noise/perturb
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_17-11-41_u[-1,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+
+
 import h5py
 
 
@@ -104,7 +108,7 @@ cx_z = cx_pc_reshaped[:, 2]
 # Create the scatter plot
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.scatter(cx_x, cx_y, cx_z, c=np.log10(cx_q), cmap='viridis', s=1)
+# ax.scatter(cx_x, cx_y, cx_z, c=np.log10(cx_q), cmap='viridis', s=1)
 ax.scatter(cx_pc_end[:,0], cx_pc_end[:,1], cx_pc_end[:,2], c=np.log10(cx_q_end), cmap='viridis', s=10)
 ax.scatter(cycle_x, cycle_y, cycle_z, s=1, c='r')
 

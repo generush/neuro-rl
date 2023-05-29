@@ -32,6 +32,10 @@ model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgym
 # no bias
 model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_25-14-47-18/nn/last_AnymalTerrain_ep_2950_rew_20.2923.pth')
 
+# no bias but pos u and neg u, no noise/perturb
+model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_27-12-07-49/nn/last_AnymalTerrain_ep_1800_rew_21.021248.pth')
+
+
 
 import torch
 import torch.nn as nn
@@ -105,6 +109,9 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_08-29-41_u[-1,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_10-29-52_u[-1,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
+# no bias but pos u and neg u, no noise/perturb
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_17-11-41_u[-1,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+
 # Save data to hdf5
 with h5py.File(DATA_PATH + 'cx_traj.h5', 'w') as f:
     f.create_dataset('cx_traj', data=cx_traj.detach().numpy())
@@ -113,4 +120,101 @@ with h5py.File(DATA_PATH + 'hx_traj.h5', 'w') as f:
 with h5py.File(DATA_PATH + 'q_traj.h5', 'w') as f:
     f.create_dataset('q_traj', data=q_traj.detach().numpy())
 
+
+
+
+# PLOT EVOLUTION WITH ZERO INPUT
+
+data = pd.read_csv(DATA_PATH + 'RAW_DATA_AVG.csv')
+N_ENTRIES = len(data)
+input = torch.zeros((1, N_ENTRIES, INPUT_DIM), device=device,  dtype=torch.float32)
+hx = torch.tensor(data.loc[:,data.columns.str.contains('A_LSTM_HX')].values, device=device,  dtype=torch.float32).unsqueeze(dim=0)
+cx = torch.tensor(data.loc[:,data.columns.str.contains('A_LSTM_CX')].values, device=device,  dtype=torch.float32).unsqueeze(dim=0)
+
+hx_out = torch.zeros_like(hx)
+cx_out = torch.zeros_like(cx)
+
+a_rnn_out, (hx, cx) = a_rnn(input, (hx.contiguous(), cx.contiguous()))
+
+# https://datascience.stackexchange.com/questions/55066/how-to-export-pca-to-use-in-another-program
+import pickle as pk
+pca = pk.load(open(DATA_PATH + 'info_A_LSTM_CX_PCA.pkl','rb'))
+scl = pk.load(open(DATA_PATH + 'A_LSTM_CX_SPEED_SCL.pkl','rb'))
+
+cx_pc = pca.transform(scl.transform(torch.squeeze(cx).detach().cpu().numpy()))
+cx_out_pc = pca.transform(scl.transform(torch.squeeze(cx_out).detach().cpu().numpy()))
+
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Generate some random 3D arrays
+array1 = np.random.random((10, 10, 10))
+array2 = np.random.random((10, 10, 10))
+
+# Create a figure and subplots
+fig = plt.figure()
+ax1 = fig.add_subplot(121, projection='3d')
+ax2 = fig.add_subplot(122, projection='3d')
+
+# Plot the first set of 3D arrays
+x1, y1, z1 = np.meshgrid(np.arange(array1.shape[0]), np.arange(array1.shape[1]), np.arange(array1.shape[2]))
+ax1.scatter(cx_pc[1:,0], cx_pc[1:,1], cx_pc[1:,2], c='r', cmap='viridis')
+
+# Plot the second set of 3D arrays
+x2, y2, z2 = np.meshgrid(np.arange(array2.shape[0]), np.arange(array2.shape[1]), np.arange(array2.shape[2]))
+ax1.scatter(cx_out_pc[1:,0], cx_out_pc[1:,1], cx_out_pc[1:,2], c='b', cmap='viridis')
+
+
+# Plot the first set of 3D arrays
+x1, y1, z1 = np.meshgrid(np.arange(array1.shape[0]), np.arange(array1.shape[1]), np.arange(array1.shape[2]))
+ax1.scatter(cx_pc[0,0], cx_pc[0,1], cx_pc[0,2], c='g', cmap='viridis')
+
+# Plot the second set of 3D arrays
+x2, y2, z2 = np.meshgrid(np.arange(array2.shape[0]), np.arange(array2.shape[1]), np.arange(array2.shape[2]))
+ax1.scatter(cx_out_pc[0,0], cx_out_pc[0,1], cx_out_pc[0,2], c='k', cmap='viridis')
+
+
+# Set labels and title for the subplots
+ax1.set_xlabel('X')
+ax1.set_ylabel('Y')
+ax1.set_zlabel('Z')
+ax1.set_title('Array 1')
+
+ax2.set_xlabel('X')
+ax2.set_ylabel('Y')
+ax2.set_zlabel('Z')
+ax2.set_title('Array 2')
+
+# Adjust subplot spacing
+fig.tight_layout()
+
+# Show the plot
+plt.show()
+
+
+
 print('Finished processing.')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

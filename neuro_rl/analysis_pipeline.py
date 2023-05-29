@@ -110,6 +110,12 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_08-29-41_u[-1,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_10-29-52_u[-1,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
+# no bias but pos u and neg u, no noise/perturb
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_17-11-41_u[-1,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+
+# fixed CX1, CX2
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-28_20-55-55_u[1,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/'
+
 
 DATASETS = [
     'OBS',
@@ -117,8 +123,8 @@ DATASETS = [
     # 'A_MLP_XX',
     'A_LSTM_CX',
     'A_LSTM_HX',
-    # 'A_LSTM_C1X',
-    # 'A_LSTM_C2X',
+    'A_LSTM_C1X',
+    'A_LSTM_C2X',
     # 'C_MLP_XX',
     # 'C_LSTM_CX',
     # 'C_LSTM_HX',
