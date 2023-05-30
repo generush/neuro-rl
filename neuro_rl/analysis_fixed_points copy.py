@@ -189,6 +189,11 @@ formatter.set_powerlimits((-3, 4))  # Adjust the power limits if needed
 ax1.xaxis.set_major_formatter(formatter)
 ax1.yaxis.set_major_formatter(formatter)
 
+# Set labels and title
+ax1.set_xlabel('PC 1')
+ax1.set_ylabel('PC 2')
+ax1.set_zlabel('PC 3')
+
 # Show the plot
 plt.show()
 
@@ -222,6 +227,10 @@ def find_unique_points(tensor, eps=0.5, min_samples=5):
     return centroids
 
 fps = find_unique_points(torch.cat((hx_traj[-1,:,:], cx_traj[-1,:,:]), dim=1).detach())
+fps_cx = find_unique_points(cx_traj[-1,:,:].detach())
+
+cx_out_pc = pca.transform(scl.transform(fps_cx))
+
 
 # Stability Test
 
