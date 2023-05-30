@@ -73,12 +73,17 @@ def analyze_pca(path: str, data_names: List[str], file_suffix: str = ''):
     N_COMPONENTS = 10
 
     # load DataFrame
-    data = process_data(path + 'RAW_DATA' + file_suffix + '.csv')
+    data = process_data(path + 'RAW_DATA' + file_suffix + '.parquet')
+    data['TIME']
+
+    meta_data = data.loc[:,~data.columns.str.contains('_RAW')].compute()
+    meta_data.to_csv(path + 'META_DATA' + file_suffix + '.csv')
 
     for idx, data_type in enumerate(data_names):
 
         # select data for PCA analysis (only raw data)
         filt_data = data.loc[:,data.columns.str.contains(data_type + '_RAW')]
+
 
         # get number of dimensions of DataFrame
         N_DIMENSIONS = len(filt_data.columns)

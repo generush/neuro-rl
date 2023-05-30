@@ -35,6 +35,8 @@ model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgym
 # no bias but pos u and neg u, no noise/perturb
 model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_27-12-07-49/nn/last_AnymalTerrain_ep_1800_rew_21.021248.pth')
 
+model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_29-22-48-36/nn/last_AnymalTerrain_ep_4700_rew_20.763342.pth')
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -60,10 +62,8 @@ a_rnn.load_state_dict(state_dict)
 
 # Prepare input data
 input_data = torch.zeros(1, M, INPUT_DIM, dtype=torch.float32).to(device)
-random_numbers = [[random.random() for _ in range(HIDDEN_DIM * 2)] for _ in range(M//2)]
-h1 = 1 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M//2, HIDDEN_DIM * 2).to(device)
-h2 = 5 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M//2, HIDDEN_DIM * 2).to(device)
-h = torch.nn.Parameter(torch.cat((h1, h2), dim=1))  # Change h into an nn.Parameter
+random_numbers = [[random.random() for _ in range(HIDDEN_DIM * 2)] for _ in range(M)]
+h = 10 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M, HIDDEN_DIM * 2).to(device)
 h.requires_grad = True
 
 # Initialize optimizer
@@ -105,6 +105,9 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 
 # no bias but pos u and neg u, no noise/perturb
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_17-11-41_u[-1,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+
+# AnymalTerrain (perturb longer)
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_08-13-39_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
 # Save data to hdf5
 with h5py.File(DATA_PATH + 'cx_traj.h5', 'w') as f:
@@ -157,11 +160,15 @@ import pickle as pk
 pca = pk.load(open(DATA_PATH + 'info_A_LSTM_CX_PCA.pkl','rb'))
 scl = pk.load(open(DATA_PATH + 'A_LSTM_CX_SPEED_SCL.pkl','rb'))
 
-cx_out1 = cx_out[:,:,:]
+cx_out1 = cx_out[-1,:,:]
+cx_traj0 = cx_traj[:,3700:,:]
 cx_traj1 = cx_traj[75:,3700:,:]
+cx_traj2 = cx_traj[-1,3700:,:]
 
 cx_out_pc = pca.transform(scl.transform(torch.squeeze(cx_out1).reshape(-1, 128).detach().cpu().numpy()))
-cx_traj_pc = pca.transform(scl.transform(torch.squeeze(cx_traj1).reshape(-1, 128).detach().cpu().numpy()))
+cx_traj0_pc = pca.transform(scl.transform(torch.squeeze(cx_traj0).reshape(-1, 128).detach().cpu().numpy()))
+cx_traj1_pc = pca.transform(scl.transform(torch.squeeze(cx_traj1).reshape(-1, 128).detach().cpu().numpy()))
+cx_traj2_pc = pca.transform(scl.transform(torch.squeeze(cx_traj2).reshape(-1, 128).detach().cpu().numpy()))
 
 import matplotlib.ticker as ticker
 
@@ -173,10 +180,16 @@ fig = plt.figure()
 ax1 = fig.add_subplot(121, projection='3d')
 
 # Plot the second set of 3D arrays
-ax1.scatter(cx_traj_pc[:,0], cx_traj_pc[:,1], cx_traj_pc[:,2], c='b', s=1)
+ax1.scatter(cx_traj0_pc[:,0], cx_traj0_pc[:,1], cx_traj0_pc[:,2], c='g', s=1, alpha=0.50)
 
 # Plot the second set of 3D arrays
-ax1.scatter(cx_out_pc[:,0], cx_out_pc[:,1], cx_out_pc[:,2], c='m', s=1)
+ax1.scatter(cx_traj1_pc[:,0], cx_traj1_pc[:,1], cx_traj1_pc[:,2], c='g', s=10, alpha=0.75)
+
+# Plot the second set of 3D arrays
+ax1.scatter(cx_traj2_pc[:,0], cx_traj2_pc[:,1], cx_traj2_pc[:,2], c='m', s=50, alpha=1.0)
+
+# Plot the second set of 3D arrays
+ax1.scatter(cx_out_pc[:,0], cx_out_pc[:,1], cx_out_pc[:,2], c='gray', s=75)
 
 ax1.scatter(cycle_x, cycle_y, cycle_z, c='k', s=1)
 
@@ -230,83 +243,6 @@ fps = find_unique_points(torch.cat((hx_traj[-1,:,:], cx_traj[-1,:,:]), dim=1).de
 fps_cx = find_unique_points(cx_traj[-1,:,:].detach())
 
 cx_out_pc = pca.transform(scl.transform(fps_cx))
-
-
-# Stability Test
-
-# for i in range(3):
-#     inp = input_data[0,0,:].unsqueeze(0) # Add batch dimension
-#     h = fps[0,:128].unsqueeze(0).to(device) # Add batch dimension
-#     c = fps[0,128:].unsqueeze(0).to(device)  # Add batch dimension
-    
-#     h_full = torch.cat((h,c), dim=1).requires_grad_() 
-#     outp, (h_out, c_out) = a_rnn(inp, (h, c))
-#     h_full_out = torch.cat((h_out,c_out), dim=1).requires_grad_() 
-
-#     """Computes jacobian at the hidden state fixed point of the RNN."""
-#     n_units = h.size(dim=1)
-#     jacobian = torch.zeros(n_units, n_units)
-
-#     # Compute Jacobian (change in hidden states from RNN update w.r.t change in individual hidden states)
-#     for i in range(n_units):
-#         output = torch.zeros((1, n_units)).to('cuda')
-#         output[:,i] = 1
-
-#         # self.h: RNN hidden state before update
-#         # self.model.hx: RNN hidden state after update
-#         g = torch.autograd.grad(c, c_out, grad_outputs=output, retain_graph=True)[0]
-#         jacobian[i,:] = g
-    
-#     self.jacobian = jacobian
-
-
-
-
-
-
-
-class RNNJacobian:
-    def __init__(self, a_rnn, h, constant_input):
-        self.a_rnn = a_rnn
-        self.h = h
-        self.hx = h
-        self.constant_input = constant_input
-        self.jacobian = None
-    
-    def update():
-        self.hx = self.a_rnn(self.constant_input, self.h)
-
-    def compute_jacobian(self):
-        """Computes Jacobian at the hidden state fixed point of the RNN."""
-        n_units = self.h.size(dim=0)
-        jacobian = torch.zeros(n_units, n_units)
-
-        # Initialize hidden state
-        # self.a_rnn.hx = self.h.requires_grad_(True)
-        # self.h.requires_grad_(True)
-
-        # Update RNN model (this updates self.a_rnn.hx)
-        self.update()
-
-        # Compute Jacobian (change in hidden states from RNN update w.r.t change in individual hidden states)
-        for i in range(n_units):
-            output = torch.zeros(1, n_units).to('cuda')
-            output[0, i] = 1
-
-            # self.h: RNN hidden state before update
-            # self.a_rnn.hx: RNN hidden state after update
-            grad_output = output.expand(self.a_rnn.hx.size())  # Expand the shape of grad_output to match output
-            g = torch.autograd.grad(self.hx, self.h, grad_outputs=grad_output, retain_graph=True)[0]
-            jacobian[i,:] = g
-        
-        self.jacobian = jacobian
-
-constant_input = torch.zeros((1,1,INPUT_DIM)).to(device)  # Replace ... with appropriate shape and values for constant input
-h = torch.unsqueeze(fps[0,:],dim=0).to(device)
-jacobian_calculator = RNNJacobian(a_rnn, h, constant_input)
-
-# Compute Jacobian
-jacobian_calculator.compute_jacobian()
 
 
 print('Finished processing.')

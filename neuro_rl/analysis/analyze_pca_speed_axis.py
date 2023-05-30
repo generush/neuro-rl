@@ -169,7 +169,7 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
     N_COMPONENTS = 12
 
     # load DataFrame
-    df = process_data(path + 'RAW_DATA' + file_suffix + '.csv')
+    df = process_data(path + 'RAW_DATA' + file_suffix + '.parquet')
     dt = df['TIME'][1].compute().to_numpy() - df['TIME'][0].compute().to_numpy()
 
     x_data = []

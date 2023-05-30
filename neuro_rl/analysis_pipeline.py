@@ -153,16 +153,18 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 # ShadowHand 4 diff block masses 0.5-2.0
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-29_12-38-14_u[90.0,90.0,4]_v[0.0,0.0,0]_r[0.0,0.0,0]/'
 
+# AnymalTerrain (perturb longer)
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_08-13-39_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
 
 DATASETS = [
     'OBS',
     'ACT',
-    'A_MLP_XX',
+    # 'A_MLP_XX',
     'A_LSTM_CX',
     'A_LSTM_HX',
-    'A_LSTM_C1X',
-    'A_LSTM_C2X',
+    # 'A_LSTM_C1X',
+    # 'A_LSTM_C2X',
     # 'C_MLP_XX',
     # 'C_LSTM_CX',
     # 'C_LSTM_HX',
@@ -175,17 +177,17 @@ AVG = True
 start = time.process_time()
 
 if AVG:
-    # df_avg = analyze_cycle(DATA_PATH)
-    # print('Finished analyze_cycle', time.process_time() - start)
+    df_avg = analyze_cycle(DATA_PATH)
+    print('Finished analyze_cycle', time.process_time() - start)
 
-    # data_w_tangling = analyze_tangling(DATA_PATH, DATASETS, '_AVG')
-    # print('Finished analyze_tangling', time.process_time() - start)
+    data_w_tangling = analyze_tangling(DATA_PATH, DATASETS, '_AVG')
+    print('Finished analyze_tangling', time.process_time() - start)
 
-    # analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG_WITH_TANGLING')
-    # print('Finished analyze_pca', time.process_time() - start)
-
-    analyze_pca(DATA_PATH, DATASETS)
+    analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG_WITH_TANGLING')
     print('Finished analyze_pca', time.process_time() - start)
+
+    # analyze_pca(DATA_PATH, DATASETS)
+    # print('Finished analyze_pca', time.process_time() - start)
 
     run_dashboard(DATA_PATH)
 

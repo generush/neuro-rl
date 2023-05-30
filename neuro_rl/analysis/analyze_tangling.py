@@ -113,6 +113,6 @@ def analyze_tangling(path: str, data_names: List[str], file_suffix: str = ''):
             data_w_tangling = pd.concat([data_w_tangling, tangling_df], axis=1)
 
     # export DataFrame
-    data_w_tangling.to_csv(path + 'RAW_DATA' + file_suffix + '_WITH_TANGLING' + '.csv')
+    data_w_tangling.to_parquet(path + 'RAW_DATA' + file_suffix + '_WITH_TANGLING' + '.parquet')
 
     return data_w_tangling
