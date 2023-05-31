@@ -156,11 +156,16 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 # AnymalTerrain (perturb longer)
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_08-13-39_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
+# AnymalTerrain (perturb longer) (with HC = (HC, CX))
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_13-54-22_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+
+
 
 DATASETS = [
     'OBS',
     'ACT',
     # 'A_MLP_XX',
+    'A_LSTM_HC',
     'A_LSTM_CX',
     'A_LSTM_HX',
     # 'A_LSTM_C1X',

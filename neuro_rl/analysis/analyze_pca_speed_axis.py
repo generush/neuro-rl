@@ -21,7 +21,11 @@ import sklearn.decomposition
 import sklearn.manifold
 import sklearn.metrics
 
+import matplotlib
+matplotlib.use('TkAgg')  # Replace 'TkAgg' with another backend if needed
+
 import matplotlib.pyplot as plt
+
 from scipy.interpolate import CubicSpline
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 import matplotlib.colors as mcolors

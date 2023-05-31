@@ -19,6 +19,9 @@ from analysis.analyze_pca_speed_axis import analyze_pca_speed_axis
 from analysis.analyze_tangling import analyze_tangling
 from plotting.dashboard import run_dashboard
 
+from analysis.cluster import find_clusters
+from analysis.jacobian import compute_jacobian
+
 import sklearn.decomposition
 import sklearn.manifold
 import sklearn.metrics
@@ -27,83 +30,46 @@ import time
 
 import torch
 
-model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_04-17-35-59/nn/last_AnymalTerrain_ep_2950_rew_20.14143.pth')
-
-# no bias
-model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_25-14-47-18/nn/last_AnymalTerrain_ep_2950_rew_20.2923.pth')
-
-# no bias but pos u and neg u, no noise/perturb
-model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_27-12-07-49/nn/last_AnymalTerrain_ep_1800_rew_21.021248.pth')
-
-
-
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import random
 from torch.autograd import grad
+
+import random
+
 import h5py
 
-INPUT_DIM = 256
-HIDDEN_DIM = 128
-N_LAYERS = 1
-OUTPUT_DIM = 128
-M = 4096
-SAMPLE_RATE = 100
-MAX_ITERATIONS = 10000
+import numpy as np
+import pandas as pd
 
+# https://datascience.stackexchange.com/questions/55066/how-to-export-pca-to-use-in-another-program
+import pickle as pk
+
+
+### SET LSTM MODEL PATH
+
+lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_04-17-35-59/nn/last_AnymalTerrain_ep_2950_rew_20.14143.pth')
+
+# no bias
+lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_25-14-47-18/nn/last_AnymalTerrain_ep_2950_rew_20.2923.pth')
+
+# no bias but pos u and neg u, no noise/perturb
+lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_27-12-07-49/nn/last_AnymalTerrain_ep_1800_rew_21.021248.pth')
+
+lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_29-22-48-36/nn/last_AnymalTerrain_ep_4700_rew_20.763342.pth')
+
+state_dict = {key.replace('a2c_network.a_rnn.rnn.', ''): value for key, value in lstm_model['model'].items() if key.startswith('a2c_network.a_rnn.rnn')}
+
+# get LSTM dimensions
+HIDDEN_SIZE = state_dict['weight_ih_l0'].size()[0] // 4
+INPUT_SIZE = state_dict['weight_ih_l0'].size()[1]
+N_LAYERS = max([int(key.split('_l')[-1]) for key in state_dict.keys() if key.startswith('weight_ih_l') or key.startswith('weight_hh_l')]) + 1
+
+# instantiate the LSTM and load weights
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
-# Load model and LSTM
-# model = torch.load('model_path', map_location=device)
-a_rnn = nn.LSTM(INPUT_DIM, HIDDEN_DIM, N_LAYERS).to(device)
-state_dict = {key.replace('a2c_network.a_rnn.rnn.', ''): value for key, value in model['model'].items() if key.startswith('a2c_network.a_rnn.rnn')}
+a_rnn = nn.LSTM(INPUT_SIZE, HIDDEN_SIZE, N_LAYERS).to(device)
 a_rnn.load_state_dict(state_dict)
 
-# Prepare input data
-input_data = torch.zeros(1, M, INPUT_DIM, dtype=torch.float32).to(device)
-random_numbers = [[random.random() for _ in range(HIDDEN_DIM * 2)] for _ in range(M//2)]
-h1 = 1 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M//2, HIDDEN_DIM * 2).to(device)
-h2 = 5 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, M//2, HIDDEN_DIM * 2).to(device)
-h = torch.cat((h1, h2), dim=1)
-h.requires_grad = True
-
-# Other data
-gamma = 0.5 * torch.ones(1, M, 1, dtype=torch.float32).to(device)
-hx_traj = torch.zeros(MAX_ITERATIONS//SAMPLE_RATE, M, HIDDEN_DIM, dtype=torch.float32)
-cx_traj = torch.zeros(MAX_ITERATIONS//SAMPLE_RATE, M, HIDDEN_DIM, dtype=torch.float32)
-q_traj = torch.zeros(MAX_ITERATIONS//SAMPLE_RATE, M, dtype=torch.float32)
-
-q = torch.zeros(1, M, dtype=torch.float32).to(device)
-q_last = torch.zeros(1, M, dtype=torch.float32).to(device)
-q_last_last = torch.zeros(1, M, dtype=torch.float32).to(device)
-
-for epoch in range(MAX_ITERATIONS):
-    a_rnn_output, (a_rnn_hx, a_rnn_cx) = a_rnn(input_data, (h[:,:,:HIDDEN_DIM].contiguous(), h[:,:,HIDDEN_DIM:].contiguous()))
-    _h = torch.cat((a_rnn_hx, a_rnn_cx), dim=2)
-    q = torch.norm(_h - h, dim=2)
-
-    if epoch % 100 == 0:
-        # print only every 100 epochs
-        min_index = torch.argmin(torch.norm(q, dim=0))
-        print(f"epoch: {epoch}, _h min idx|: {min_index.item()}, |_h|: {torch.norm(h[:,min_index,:]).item():.2e}, q: {q[:,min_index].item():.2e}, |q - q_last|: {torch.norm(q[:,min_index] - q_last[:,min_index]).item():.2e}, gamma: {gamma[:, min_index, :].item():.2e}, |q - q_last_last|: {torch.norm(q[:,min_index] - q_last_last[:,min_index]).item():.2e}")
-
-    gradient = torch.ones_like(q)
-    q.backward(gradient)
-
-    h = h.detach() - gamma * h.grad
-    h.requires_grad = True
-
-    mask = torch.norm(q - q_last, dim=0) > 10 * torch.norm(q - q_last_last, dim=0)
-    gamma *= torch.where(mask.unsqueeze(dim=1).unsqueeze(dim=0), 0.9, 1.0)
-
-    q_last_last = q_last
-    q_last = q
-
-    if epoch % SAMPLE_RATE == 0:
-        hx_traj[epoch//SAMPLE_RATE,:,:] = h[:,:,:HIDDEN_DIM].cpu()
-        cx_traj[epoch//SAMPLE_RATE,:,:] = h[:,:,HIDDEN_DIM:].cpu()
-        q_traj[epoch//SAMPLE_RATE,:] = q[:,:].cpu()
+### IMPORT TRANSFORMATION DATA
 
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-26_09-57-04_u[0.4,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_08-29-41_u[-1,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
@@ -112,50 +78,120 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 # no bias but pos u and neg u, no noise/perturb
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_17-11-41_u[-1,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
+# AnymalTerrain (perturb longer)
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_08-13-39_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+
+# AnymalTerrain (perturb longer) (with HC = (HC, CX))
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_13-54-22_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+
+# load scaler and pca transforms
+scl = pk.load(open(DATA_PATH + 'A_LSTM_HC_SPEED_SCL.pkl','rb'))
+pca = pk.load(open(DATA_PATH + 'info_A_LSTM_HC_PCA.pkl','rb'))
+PCA_DIM = pca.n_components
+
+# Set parameters for fix point finder
+INITIAL_GUESS_RANGE_PC1 = 5
+INITIAL_GUESS_RANGE_PC2 = 1.5
+INITIAL_GUESS_RANGE_PC3 = 1.5
+INITIAL_GUESS_QTY = 25
+SAMPLE_RATE = 100
+MAX_ITERATIONS = 10000
+
+# initialize 
+N_INITIAL_GUESSES = INITIAL_GUESS_QTY ** 3
+hc0_pc = np.zeros((N_INITIAL_GUESSES, PCA_DIM), dtype=float)
+
+# Define the range of values for each axis
+x_range = np.linspace(-INITIAL_GUESS_RANGE_PC1, INITIAL_GUESS_RANGE_PC1, INITIAL_GUESS_QTY)
+y_range = np.linspace(-INITIAL_GUESS_RANGE_PC2, INITIAL_GUESS_RANGE_PC2, INITIAL_GUESS_QTY)
+z_range = np.linspace(-INITIAL_GUESS_RANGE_PC3, INITIAL_GUESS_RANGE_PC3, INITIAL_GUESS_QTY)
+
+# Create a grid of coordinates using meshgrid
+x, y, z = np.meshgrid(x_range, y_range, z_range)
+
+# Stack the coordinate grids into a 3D array and reshape to 2D array
+hc0_pc[:,:3] = np.stack((x, y, z), axis=-1).reshape((-1, 3))
+
+# transform hc0_pc back to original coordinates
+hc = torch.tensor(scl.inverse_transform(pca.inverse_transform(hc0_pc)), dtype=torch.float32).unsqueeze(dim=0).to(device)
+
+# Prepare input data
+input_data = torch.zeros(1, N_INITIAL_GUESSES, INPUT_SIZE, dtype=torch.float32).to(device)
+# random_numbers = [[random.random() for _ in range(HIDDEN_SIZE * 2)] for _ in range(N_INITIAL_GUESSES)]
+# hc = 10 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, N_INITIAL_GUESSES, HIDDEN_SIZE * 2).to(device)
+hc.requires_grad = True
+
+# Initialize optimizer
+optimizer = torch.optim.Adam([hc], lr=0.0005)  # You may need to adjust learning rate based on your problem
+
+# Other data
+hc_hist_fixedpt = torch.zeros(MAX_ITERATIONS//SAMPLE_RATE, N_INITIAL_GUESSES, HIDDEN_SIZE * 2, dtype=torch.float32)
+q_hist_fixedpt = torch.zeros(MAX_ITERATIONS//SAMPLE_RATE, N_INITIAL_GUESSES, dtype=torch.float32)
+
+for epoch in range(MAX_ITERATIONS):
+    # Zero out the gradients
+    optimizer.zero_grad()
+
+    _, (_h, _c) = a_rnn(input_data, (hc[:,:,:HIDDEN_SIZE].contiguous(), hc[:,:,HIDDEN_SIZE:].contiguous()))
+    _hc = torch.cat((_h, _c), dim=2)
+    q = torch.norm(_hc - hc, dim=2)
+
+    # Backpropagate the error
+    gradient = torch.ones_like(q)
+    q.backward(gradient)
+    
+    # Update the weights
+    optimizer.step()
+
+    if epoch % 100 == 0:
+        # print only every 100 epochs
+        min_index = torch.argmin(torch.norm(q, dim=0))
+        print(f"epoch: {epoch}, _hc min idx|: {min_index.item()}, |_hc|: {torch.norm(hc[:,min_index,:]).item():.2e}, q: {q[:,min_index].item():.2e}")
+
+    if epoch % SAMPLE_RATE == 0:
+        hc_hist_fixedpt[epoch//SAMPLE_RATE,:,:] = hc.cpu()
+        q_hist_fixedpt[epoch//SAMPLE_RATE,:] = q[:,:].cpu()
+
 # Save data to hdf5
-with h5py.File(DATA_PATH + 'cx_traj.h5', 'w') as f:
-    f.create_dataset('cx_traj', data=cx_traj.detach().numpy())
-with h5py.File(DATA_PATH + 'hx_traj.h5', 'w') as f:
-    f.create_dataset('hx_traj', data=hx_traj.detach().numpy())
-with h5py.File(DATA_PATH + 'q_traj.h5', 'w') as f:
-    f.create_dataset('q_traj', data=q_traj.detach().numpy())
-
-
-
-
-
-
-
+with h5py.File(DATA_PATH + 'hc_hist_fixedpt.h5', 'w') as f:
+    f.create_dataset('hc_hist_fixedpt', data=hc_hist_fixedpt.detach().numpy())
+with h5py.File(DATA_PATH + 'q_hist_fixedpt.h5', 'w') as f:
+    f.create_dataset('q_hist_fixedpt', data=q_hist_fixedpt.detach().numpy())
 
 # PLOT EVOLUTION WITH ZERO INPUT
 
-data = pd.read_csv(DATA_PATH + 'RAW_DATA_AVG.csv')
-N_ENTRIES = len(data)
-input = torch.zeros((1, N_ENTRIES, INPUT_DIM), device=device,  dtype=torch.float32)
-hx = torch.tensor(data.loc[:,data.columns.str.contains('A_LSTM_HX')].values, device=device,  dtype=torch.float32).unsqueeze(dim=0)
-cx = torch.tensor(data.loc[:,data.columns.str.contains('A_LSTM_CX')].values, device=device,  dtype=torch.float32).unsqueeze(dim=0)
+cycle_data = pd.read_csv(DATA_PATH + 'RAW_DATA_AVG.csv')
+input = torch.zeros((1, len(cycle_data), INPUT_SIZE), device=device,  dtype=torch.float32)
+hc = torch.tensor(cycle_data.loc[:,cycle_data.columns.str.contains('A_LSTM_HC')].values, device=device,  dtype=torch.float32).unsqueeze(dim=0)
 
-desired_length = 2000
+desired_length = 200
 
 # Extend hx_out in the first dimension
-hx_out = torch.zeros((desired_length,) + hx.shape[1:], dtype=hx.dtype)
-cx_out = torch.zeros((desired_length,) + cx.shape[1:], dtype=cx.dtype)
+hc_hist_zeroinput = torch.zeros((desired_length,) + hc.shape[1:], dtype=hc.dtype)
 
 for i in range(desired_length):
-    a_rnn_out, (hx, cx) = a_rnn(input, (hx.contiguous(), cx.contiguous()))
-    hx_out[i,:,:] = hx
-    cx_out[i,:,:] = cx
+    _, (hx, cx) = a_rnn(input, (hc[:,:,:HIDDEN_SIZE].contiguous(), hc[:,:,HIDDEN_SIZE:].contiguous()))
+    hc_hist_zeroinput[i,:,:] = torch.cat((hx, cx), dim=2)
 
+cycle_pc1 = pd.read_csv(DATA_PATH + 'info_A_LSTM_CX_x_by_speed.csv', index_col=0)
+cycle_pc2 = pd.read_csv(DATA_PATH + 'info_A_LSTM_CX_y_by_speed.csv', index_col=0)
+cycle_pc3 = pd.read_csv(DATA_PATH + 'info_A_LSTM_CX_z1_by_speed.csv', index_col=0)
 
-# https://datascience.stackexchange.com/questions/55066/how-to-export-pca-to-use-in-another-program
-import pickle as pk
-pca = pk.load(open(DATA_PATH + 'info_A_LSTM_CX_PCA.pkl','rb'))
-scl = pk.load(open(DATA_PATH + 'A_LSTM_CX_SPEED_SCL.pkl','rb'))
+cycle_pc1 = cycle_pc1.to_numpy().reshape(-1)
+cycle_pc2 = cycle_pc2.to_numpy().reshape(-1)
+cycle_pc3 = cycle_pc3.to_numpy().reshape(-1)
 
-cx_out_pc = pca.transform(scl.transform(torch.squeeze(cx_out[:,0,:]).detach().cpu().numpy()))
-cx_traj_pc = pca.transform(scl.transform(torch.squeeze(cx_traj[:,0,:]).detach().cpu().numpy()))
+hc_out1 = hc_hist_zeroinput[-1,:,:]
+hc_hist_fixedpt_ti = hc_hist_fixedpt[0,:,:]
+hc_hist_fixedpt_tnf = hc_hist_fixedpt[50:,:,:]
+hc_hist_fixedpt_tf = hc_hist_fixedpt[-1,:,:]
 
+hc_out_pc = pca.transform(scl.transform(torch.squeeze(hc_out1).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+hc_traj_i_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt_ti).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+hc_traj_nf_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt_tnf).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+hc_traj_f_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt_tf).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
 
+import matplotlib.ticker as ticker
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -163,46 +199,61 @@ import matplotlib.pyplot as plt
 # Create a figure and subplots
 fig = plt.figure()
 ax1 = fig.add_subplot(121, projection='3d')
-ax2 = fig.add_subplot(122, projection='3d')
-
-# Plot the first set of 3D arrays
-# ax1.scatter(cx_pc[1:,0], cx_pc[1:,1], cx_pc[1:,2], c='r', cmap='viridis')
 
 # Plot the second set of 3D arrays
-ax1.scatter(cx_traj_pc[:,0], cx_traj_pc[:,1], cx_traj_pc[:,2], c='b', cmap='viridis')
-
-# # Plot the first set of 3D arrays
-# ax1.scatter(cx_pc[0,0], cx_pc[0,1], cx_pc[0,2], c='g', cmap='viridis')
+# ax1.scatter(cx_traj0_pc[:,0], cx_traj0_pc[:,1], cx_traj0_pc[:,2], c='g', s=1, alpha=0.50)
 
 # Plot the second set of 3D arrays
-ax1.scatter(cx_out_pc[:,0], cx_out_pc[:,1], cx_out_pc[:,2], c='k', cmap='viridis')
+# ax1.scatter(cx_traj1_pc[:,0], cx_traj1_pc[:,1], cx_traj1_pc[:,2], c='g', s=10, alpha=0.75)
 
+# Plot the second set of 3D arrays
+# ax1.scatter(hc_traj_i_pc[:,0], hc_traj_i_pc[:,1], hc_traj_i_pc[:,2], c='k', s=50, alpha=1.0)
 
-# Set labels and title for the subplots
-ax1.set_xlabel('X')
-ax1.set_ylabel('Y')
-ax1.set_zlabel('Z')
-ax1.set_title('Array 1')
+# Plot the second set of 3D arrays
+# ax1.scatter(hc_traj_nf_pc[:,0], hc_traj_nf_pc[:,1], hc_traj_nf_pc[:,2], c='m', s=10, alpha=1.0)
 
-ax2.set_xlabel('X')
-ax2.set_ylabel('Y')
-ax2.set_zlabel('Z')
-ax2.set_title('Array 2')
+# Plot the second set of 3D arrays
+ax1.scatter(hc_traj_f_pc[:,0], hc_traj_f_pc[:,1], hc_traj_f_pc[:,2], c='b', s=50, alpha=1.0)
 
-# Adjust subplot spacing
-fig.tight_layout()
+# Plot the second set of 3D arrays
+# ax1.scatter(hc_out_pc[:,0], hc_out_pc[:,1], hc_out_pc[:,2], c='gray', s=75)
+
+# ax1.scatter(cycle_pc1, cycle_pc2, cycle_pc3, c='k', s=1)
+
+# Create a ScalarFormatter and set the desired format
+formatter = ticker.ScalarFormatter(useMathText=True)
+formatter.set_scientific(False)
+formatter.set_powerlimits((-3, 4))  # Adjust the power limits if needed
+
+# Apply the formatter to the axis
+ax1.xaxis.set_major_formatter(formatter)
+ax1.yaxis.set_major_formatter(formatter)
+
+# Set labels and title
+ax1.set_xlabel('PC 1')
+ax1.set_ylabel('PC 2')
+ax1.set_zlabel('PC 3')
 
 # Show the plot
 plt.show()
 
+fps = find_clusters(hc_hist_fixedpt[-1:,:].squeeze().detach())
+fps_pc = pca.transform(scl.transform(fps))
 
-for i in range(desired_length):
-    a_rnn_out, (hx, cx) = a_rnn(input_data, (h[:,:,:128].contiguous(), h[:,:,128:].contiguous()))
+pd.DataFrame(fps).to_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/fixed_points2.csv')
 
-print('Finished processing.')
-
+fixed_points = torch.Tensor(fps)
 
 
+
+fixed_point = torch.zeros(1, HIDDEN_SIZE * 2).to(device)
+input = torch.zeros(1, INPUT_SIZE).to(device)
+fixed_point[0,:] = fixed_points[1,:]
+
+J_input, J_hidden = compute_jacobian(a_rnn, input, fixed_point)
+J_eval, J_evec = torch.linalg.eig(J_hidden)
+
+torch.real(J_eval).max()
 
 
 
