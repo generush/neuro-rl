@@ -55,16 +55,17 @@ def compute_jacobian(rnn, input, hidden):
 
     return J_input, J_hidden
 
-
 def compute_jacobian_alternate(rnn, input, hidden):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     HIDDEN_DIM = hidden.size(dim=1) // 2
+    INPUT_DIM = input.size(dim=1)
 
     hx = hidden[:,:HIDDEN_DIM].requires_grad_(True)
     cx = hidden[:,HIDDEN_DIM:].requires_grad_(True)
+    input.requires_grad_(True)
 
     # Make sure the hidden state requires gradient
-    input.requires_grad_(True)
     J_hh = torch.zeros(HIDDEN_DIM, HIDDEN_DIM)
     J_hc = torch.zeros(HIDDEN_DIM, HIDDEN_DIM)
     J_ch = torch.zeros(HIDDEN_DIM, HIDDEN_DIM)
@@ -73,10 +74,10 @@ def compute_jacobian_alternate(rnn, input, hidden):
     J_ci = torch.zeros(HIDDEN_DIM, INPUT_DIM)
 
     for i in range(HIDDEN_DIM):
-        output = torch.zeros(1, HIDDEN_DIM)
+        output = torch.zeros(1, HIDDEN_DIM).to(device)
         output[:, i] = 1
 
-        _, (hx_new, cx_new) = a_rnn(input, (hx, cx))  # LSTM returns output, (h_n, c_n)
+        _, (hx_new, cx_new) = rnn(input, (hx, cx))  # LSTM returns output, (h_n, c_n)
 
         g_hh = torch.autograd.grad(hx_new, hx, grad_outputs=output, retain_graph=True)[0]
         g_hc = torch.autograd.grad(hx_new, cx, grad_outputs=output, retain_graph=True)[0]
@@ -101,5 +102,32 @@ def compute_jacobian_alternate(rnn, input, hidden):
     )
 
     J_input = torch.cat((J_hi, J_ci), dim=0)
+
+    return J_input, J_hidden
+
+
+def compute_jacobian_alternate2(rnn, input, hidden):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    HIDDEN_DIM = hidden.size(dim=1)
+    INPUT_DIM = input.size(dim=1)
+
+    hc = hidden.requires_grad_(True)
+    input.requires_grad_(True)
+
+    # Make sure the hidden state requires gradient
+    J_hidden = torch.zeros(HIDDEN_DIM, HIDDEN_DIM)
+    J_input = torch.zeros(HIDDEN_DIM, INPUT_DIM)
+
+    for i in range(HIDDEN_DIM):
+        output = torch.zeros(1, HIDDEN_DIM).to(device)
+        output[:, i] = 1
+
+        _, (hx_new, cx_new) = rnn(input, (hc[:,:HIDDEN_DIM//2], hc[:,HIDDEN_DIM//2:]))  # LSTM returns output, (h_n, c_n)
+        hc_new = torch.cat((hx_new,cx_new),dim=1)
+        g_hidden = torch.autograd.grad(hc_new, hc, grad_outputs=output, retain_graph=True, allow_unused=True)[0]
+        g_input = torch.autograd.grad(hc_new, input, grad_outputs=output, retain_graph=True)[0]
+        J_hidden[i,:] = g_hidden
+        J_input[i,:] = g_input
 
     return J_input, J_hidden

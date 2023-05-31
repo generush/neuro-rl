@@ -20,7 +20,7 @@ from analysis.analyze_tangling import analyze_tangling
 from plotting.dashboard import run_dashboard
 
 from analysis.cluster import find_clusters
-from analysis.jacobian import compute_jacobian
+from analysis.jacobian import compute_jacobian, compute_jacobian_alternate, compute_jacobian_alternate2
 
 import sklearn.decomposition
 import sklearn.manifold
@@ -52,10 +52,15 @@ lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isa
 # no bias
 lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_25-14-47-18/nn/last_AnymalTerrain_ep_2950_rew_20.2923.pth')
 
-# no bias but pos u and neg u, no noise/perturb
-lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_27-12-07-49/nn/last_AnymalTerrain_ep_1800_rew_21.021248.pth')
+# 1) no bias but pos u and neg u, no noise/perturb
+# lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_27-12-07-49/nn/last_AnymalTerrain_ep_1800_rew_21.021248.pth')
 
+# 2) no bias (perturb longer w/o noise) (with HC = (HC, CX))
 lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_29-22-48-36/nn/last_AnymalTerrain_ep_4700_rew_20.763342.pth')
+
+# 3) no bias (perturb longer w/ noise) (with HC = (HC, CX))
+# lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_30-22-49-28/nn/last_AnymalTerrain_ep_4950_rew_20.344143.pth')
+
 
 state_dict = {key.replace('a2c_network.a_rnn.rnn.', ''): value for key, value in lstm_model['model'].items() if key.startswith('a2c_network.a_rnn.rnn')}
 
@@ -78,83 +83,69 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 # no bias but pos u and neg u, no noise/perturb
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_17-11-41_u[-1,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
-# AnymalTerrain (perturb longer)
-DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_08-13-39_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+# # AnymalTerrain (perturb longer)
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_08-13-39_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
-# AnymalTerrain (perturb longer) (with HC = (HC, CX))
+# 2) AnymalTerrain (perturb longer w/o noise) (with HC = (HC, CX))
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_13-54-22_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+
+# 1) AnymalTerrain (no bias) no bias but pos u and neg u, no noise/perturb (with HC = (HC, CX))
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_22-30-47_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+
+# 3) AnymalTerrain (no bias) (perturb longer w/ noise) (with HC = (HC, CX))
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_09-02-37_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+
 
 # load scaler and pca transforms
 scl = pk.load(open(DATA_PATH + 'A_LSTM_HC_SPEED_SCL.pkl','rb'))
-pca = pk.load(open(DATA_PATH + 'info_A_LSTM_HC_PCA.pkl','rb'))
+pca = pk.load(open(DATA_PATH + 'A_LSTM_HC_SPEED_PCA.pkl','rb'))
 PCA_DIM = pca.n_components
 
-# Set parameters for fix point finder
-INITIAL_GUESS_RANGE_PC1 = 5
-INITIAL_GUESS_RANGE_PC2 = 1.5
-INITIAL_GUESS_RANGE_PC3 = 1.5
-INITIAL_GUESS_QTY = 25
-SAMPLE_RATE = 100
-MAX_ITERATIONS = 30000
-
-# initialize 
+# specify parameters for fix point finder
 N_INITIAL_GUESSES = 4096
-hc0_pc = np.zeros((N_INITIAL_GUESSES, PCA_DIM), dtype=float)
+INITIAL_GUESS_RANGE = 20
+SAMPLE_RATE = 100
+MAX_ITERATIONS = 100000
 
-# Define the range of values for each axis
-# x_range = np.linspace(-INITIAL_GUESS_RANGE_PC1, INITIAL_GUESS_RANGE_PC1, INITIAL_GUESS_QTY)
-# y_range = np.linspace(-INITIAL_GUESS_RANGE_PC2, INITIAL_GUESS_RANGE_PC2, INITIAL_GUESS_QTY)
-# z_range = np.linspace(-INITIAL_GUESS_RANGE_PC3, INITIAL_GUESS_RANGE_PC3, INITIAL_GUESS_QTY)
+# Generate random numbers within the specified bounds
+random_numbers = [[random.uniform(-1, 1) for _ in range(PCA_DIM)] for _ in range(N_INITIAL_GUESSES)]
+# random_numbers = [[random.random() for _ in range(PCA_DIM)] for _ in range(N_INITIAL_GUESSES)]
+hc0_pc = INITIAL_GUESS_RANGE * torch.tensor(random_numbers, dtype=torch.float32)
+hc0 = torch.tensor(scl.inverse_transform(pca.inverse_transform(hc0_pc)), dtype=torch.float32).unsqueeze(dim=0).to(device)
 
-# # Create a grid of coordinates using meshgrid
-# x, y, z = np.meshgrid(x_range, y_range, z_range)
-
-# # Stack the coordinate grids into a 3D array and reshape to 2D array
-# hc0_pc[:,:3] = np.stack((x, y, z), axis=-1).reshape((-1, 3))
-
-# transform hc0_pc back to original coordinates
-# hc = torch.tensor(scl.inverse_transform(pca.inverse_transform(hc0_pc)), dtype=torch.float32).unsqueeze(dim=0).to(device)
-
-
-random_numbers = [[random.random() for _ in range(HIDDEN_SIZE * 2)] for _ in range(N_INITIAL_GUESSES)]
-hc = 10 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, N_INITIAL_GUESSES, HIDDEN_SIZE * 2).to(device)
-
-# Prepare input data
+# prepare input data
 input_data = torch.zeros(1, N_INITIAL_GUESSES, INPUT_SIZE, dtype=torch.float32).to(device)
-# random_numbers = [[random.random() for _ in range(HIDDEN_SIZE * 2)] for _ in range(N_INITIAL_GUESSES)]
-# hc = 10 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, N_INITIAL_GUESSES, HIDDEN_SIZE * 2).to(device)
+
+# set hc to initial guesses
+hc = hc0
 hc.requires_grad = True
 
-# Initialize optimizer
+# specify parameters for optimizer
 LEARNING_RATE = 0.001
 TOLERANCE = 5e-2
 optimizer = torch.optim.Adam([hc], lr=LEARNING_RATE)  # You may need to adjust learning rate based on your problem
 
-# Initialize as empty lists
+# initialize as empty lists
 hc_hist_fixedpt = [] 
 q_hist_fixedpt = []
+delta_hc = torch.inf
+q = torch.empty((1, N_INITIAL_GUESSES)).fill_(float('inf'))
 
 for epoch in range(MAX_ITERATIONS):
-    # Zero out the gradients
+
+    # zero out the gradients
     optimizer.zero_grad()
-
-    _, (_h, _c) = a_rnn(input_data, (hc[:,:,:HIDDEN_SIZE].contiguous(), hc[:,:,HIDDEN_SIZE:].contiguous()))
-    _hc = torch.cat((_h, _c), dim=2)
-    q = torch.norm(_hc - hc, dim=2)
-
-    # Backpropagate the error
-    gradient = torch.ones_like(q)
-    q.backward(gradient)
     
-    # Update the weights
-    optimizer.step()
-
+    # append hc (hidden state) and q (velocity) to history
     if epoch % SAMPLE_RATE == 0:
-        # print only every 100 epochs
+        hc_hist_fixedpt.append(hc.cpu())  # Append to the list
+        q_hist_fixedpt.append(q[:,:].cpu())
+
+        # compute change in hidden state (for exit criteria)
         if len(hc_hist_fixedpt) >= 2:
             delta_hc = (hc_hist_fixedpt[-1]-hc_hist_fixedpt[-2]).norm()
-        else:
-            delta_hc = np.inf
+
+        # printing
         max_index = torch.argmax(torch.norm(q, dim=0))
         max_elem = torch.max(q).item()
         print(f"\
@@ -164,16 +155,28 @@ for epoch in range(MAX_ITERATIONS):
             delta_hc: {delta_hc:.2e}"
         )
 
-        hc_hist_fixedpt.append(hc.cpu())  # Append to the list
-        q_hist_fixedpt.append(q[:,:].cpu())
+        # exit if found fixed points
+        if  delta_hc < TOLERANCE:  # Stopping criterion
+            print(f"Stopping criterion reached at epoch: {epoch}")
+            break
+    
+    # run optimization step
+    _, (_h, _c) = a_rnn(input_data, (hc[:,:,:HIDDEN_SIZE].contiguous(), hc[:,:,HIDDEN_SIZE:].contiguous()))
+    _hc = torch.cat((_h, _c), dim=2)
+    q = torch.norm(_hc - hc, dim=2)
 
-        # if  delta_hc < TOLERANCE:  # Stopping criterion
-        #     print(f"Stopping criterion reached at epoch: {epoch}")
-        #     break
+    # backpropagate the error
+    gradient = torch.ones_like(q)
+    q.backward(gradient)
+    
+    # Update the weights
+    optimizer.step()
+
+
 
 # Convert lists to tensors
-hc_hist_fixedpt = torch.stack(hc_hist_fixedpt)
-q_hist_fixedpt = torch.stack(q_hist_fixedpt)
+hc_hist_fixedpt = torch.stack(hc_hist_fixedpt).squeeze()
+q_hist_fixedpt = torch.stack(q_hist_fixedpt).squeeze()
 
 # Save data to hdf5
 with h5py.File(DATA_PATH + 'hc_hist_fixedpt.h5', 'w') as f:
@@ -185,34 +188,38 @@ with h5py.File(DATA_PATH + 'q_hist_fixedpt.h5', 'w') as f:
 
 cycle_data = pd.read_csv(DATA_PATH + 'RAW_DATA_AVG.csv')
 input = torch.zeros((1, len(cycle_data), INPUT_SIZE), device=device,  dtype=torch.float32)
-hc = torch.tensor(cycle_data.loc[:,cycle_data.columns.str.contains('A_LSTM_HC')].values, device=device,  dtype=torch.float32).unsqueeze(dim=0)
+hc0 = torch.tensor(cycle_data.loc[:,cycle_data.columns.str.contains('A_LSTM_HC')].values, device=device,  dtype=torch.float32).unsqueeze(dim=0)
+hc = hc0
 
-desired_length = 200
+desired_length = 1000
 
 # Extend hx_out in the first dimension
 hc_hist_zeroinput = torch.zeros((desired_length,) + hc.shape[1:], dtype=hc.dtype)
 
 for i in range(desired_length):
-    _, (hx, cx) = a_rnn(input, (hc[:,:,:HIDDEN_SIZE].contiguous(), hc[:,:,HIDDEN_SIZE:].contiguous()))
-    hc_hist_zeroinput[i,:,:] = torch.cat((hx, cx), dim=2)
 
-cycle_pc1 = pd.read_csv(DATA_PATH + 'info_A_LSTM_CX_x_by_speed.csv', index_col=0)
-cycle_pc2 = pd.read_csv(DATA_PATH + 'info_A_LSTM_CX_y_by_speed.csv', index_col=0)
-cycle_pc3 = pd.read_csv(DATA_PATH + 'info_A_LSTM_CX_z1_by_speed.csv', index_col=0)
+    # add hidden state to history
+    hc_hist_zeroinput[i,:,:] = hc
+
+    # run step
+    _, (hx, cx) = a_rnn(input, (hc[:,:,:HIDDEN_SIZE].contiguous(), hc[:,:,HIDDEN_SIZE:].contiguous()))
+    hc = torch.cat((hx, cx), dim=2)
+
+cycle_pc1 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_x_by_speed.csv', index_col=0)
+cycle_pc2 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_y_by_speed.csv', index_col=0)
+cycle_pc3 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_z1_by_speed.csv', index_col=0)
 
 cycle_pc1 = cycle_pc1.to_numpy().reshape(-1)
 cycle_pc2 = cycle_pc2.to_numpy().reshape(-1)
 cycle_pc3 = cycle_pc3.to_numpy().reshape(-1)
 
-hc_out1 = hc_hist_zeroinput[-1,:,:]
-hc_hist_fixedpt_ti = hc_hist_fixedpt[0,:,:]
-hc_hist_fixedpt_tnf = hc_hist_fixedpt[250:,:,:]
-hc_hist_fixedpt_tf = hc_hist_fixedpt[-1,:,:]
+hc_hist_zeroinput_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_zeroinput).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+hc_hist_zeroinput_ti_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_zeroinput[0,:,:]).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+hc_hist_zeroinput_tf_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_zeroinput[-1,:,:]).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
 
-hc_out_pc = pca.transform(scl.transform(torch.squeeze(hc_out1).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
-hc_traj_i_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt_ti).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
-hc_traj_nf_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt_tnf).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
-hc_traj_f_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt_tf).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+hc_hist_fixedpt_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+hc_hist_fixedpt_ti_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt[0,:,:]).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+hc_hist_fixedpt_tf_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt[-1,:,:]).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
 
 import matplotlib.ticker as ticker
 
@@ -223,25 +230,29 @@ import matplotlib.pyplot as plt
 fig = plt.figure()
 ax1 = fig.add_subplot(121, projection='3d')
 
-# Plot the second set of 3D arrays
-# ax1.scatter(cx_traj0_pc[:,0], cx_traj0_pc[:,1], cx_traj0_pc[:,2], c='g', s=1, alpha=0.50)
+# zero input: final points
+ax1.scatter(hc_hist_zeroinput_tf_pc[:,0], hc_hist_zeroinput_tf_pc[:,1], hc_hist_zeroinput_tf_pc[:,2], c='g', s=100, alpha=1.0)
 
-# Plot the second set of 3D arrays
-# ax1.scatter(cx_traj1_pc[:,0], cx_traj1_pc[:,1], cx_traj1_pc[:,2], c='g', s=10, alpha=0.75)
+# zero input: initial points
+# ax1.scatter(hc_hist_zeroinput_ti_pc[:,0], hc_hist_zeroinput_ti_pc[:,1], hc_hist_zeroinput_ti_pc[:,2], c='k', s=20, alpha=1.0)
 
-# Plot the second set of 3D arrays
-# ax1.scatter(hc_traj_i_pc[:,0], hc_traj_i_pc[:,1], hc_traj_i_pc[:,2], c='k', s=50, alpha=1.0)
+# zero input: history
+ax1.scatter(hc_hist_zeroinput_pc[:,0], hc_hist_zeroinput_pc[:,1], hc_hist_zeroinput_pc[:,2], c='gray', s=0.1, alpha=0.5)
 
-# Plot the second set of 3D arrays
-# ax1.scatter(hc_traj_nf_pc[:,0], hc_traj_nf_pc[:,1], hc_traj_nf_pc[:,2], c='m', s=10, alpha=1.0)
+# fixed points
+ax1.scatter(hc_hist_fixedpt_tf_pc[:,0], hc_hist_fixedpt_tf_pc[:,1], hc_hist_fixedpt_tf_pc[:,2], c='b', s=50, alpha=1.0)
 
-# Plot the second set of 3D arrays
-ax1.scatter(hc_traj_f_pc[:,0], hc_traj_f_pc[:,1], hc_traj_f_pc[:,2], c='b', s=5, alpha=1.0)
+# fixed point: initial guesses
+# ax1.scatter(hc_hist_fixedpt_ti_pc[:,0], hc_hist_fixedpt_ti_pc[:,1], hc_hist_fixedpt_ti_pc[:,2], c='k', s=1, alpha=1.0)
+
+# fixed point: history of guesses
+# ax1.scatter(hc_hist_fixedpt_pc[:,0], hc_hist_fixedpt_pc[:,1], hc_hist_fixedpt_pc[:,2], c='m', s=10, alpha=0.5)
+
 
 # Plot the second set of 3D arrays
 # ax1.scatter(hc_out_pc[:,0], hc_out_pc[:,1], hc_out_pc[:,2], c='gray', s=75)
 
-# ax1.scatter(cycle_pc1, cycle_pc2, cycle_pc3, c='k', s=1)
+ax1.scatter(cycle_pc1, cycle_pc2, cycle_pc3, c='r', s=1)
 
 # Create a ScalarFormatter and set the desired format
 formatter = ticker.ScalarFormatter(useMathText=True)
@@ -260,7 +271,7 @@ ax1.set_zlabel('PC 3')
 # Show the plot
 plt.show()
 
-fps = find_clusters(hc_hist_fixedpt[-1:,:].squeeze().detach())
+fps, cnt = find_clusters(hc_hist_fixedpt[-1:,:].squeeze().detach())
 fps_pc = pca.transform(scl.transform(fps))
 
 pd.DataFrame(fps).to_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/fixed_points2.csv')
@@ -271,9 +282,11 @@ fixed_points = torch.Tensor(fps)
 
 fixed_point = torch.zeros(1, HIDDEN_SIZE * 2).to(device)
 input = torch.zeros(1, INPUT_SIZE).to(device)
-fixed_point[0,:] = fixed_points[1,:]
+fixed_point[0,:] = fixed_points[2,:]
 
-J_input, J_hidden = compute_jacobian(a_rnn, input, fixed_point)
+J_input, J_hidden = compute_jacobian_alternate(a_rnn, input, fixed_point)
+J_input2, J_hidden2 = compute_jacobian_alternate(a_rnn, input, fixed_point)
+J_input3, J_hidden3 = compute_jacobian_alternate2(a_rnn, input, fixed_point)
 J_eval, J_evec = torch.linalg.eig(J_hidden)
 
 torch.real(J_eval).max()
