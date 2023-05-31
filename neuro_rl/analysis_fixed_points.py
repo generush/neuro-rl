@@ -95,25 +95,29 @@ INITIAL_GUESS_RANGE_PC2 = 1.5
 INITIAL_GUESS_RANGE_PC3 = 1.5
 INITIAL_GUESS_QTY = 25
 SAMPLE_RATE = 100
-MAX_ITERATIONS = 10000
+MAX_ITERATIONS = 30000
 
 # initialize 
-N_INITIAL_GUESSES = INITIAL_GUESS_QTY ** 3
+N_INITIAL_GUESSES = 4096
 hc0_pc = np.zeros((N_INITIAL_GUESSES, PCA_DIM), dtype=float)
 
 # Define the range of values for each axis
-x_range = np.linspace(-INITIAL_GUESS_RANGE_PC1, INITIAL_GUESS_RANGE_PC1, INITIAL_GUESS_QTY)
-y_range = np.linspace(-INITIAL_GUESS_RANGE_PC2, INITIAL_GUESS_RANGE_PC2, INITIAL_GUESS_QTY)
-z_range = np.linspace(-INITIAL_GUESS_RANGE_PC3, INITIAL_GUESS_RANGE_PC3, INITIAL_GUESS_QTY)
+# x_range = np.linspace(-INITIAL_GUESS_RANGE_PC1, INITIAL_GUESS_RANGE_PC1, INITIAL_GUESS_QTY)
+# y_range = np.linspace(-INITIAL_GUESS_RANGE_PC2, INITIAL_GUESS_RANGE_PC2, INITIAL_GUESS_QTY)
+# z_range = np.linspace(-INITIAL_GUESS_RANGE_PC3, INITIAL_GUESS_RANGE_PC3, INITIAL_GUESS_QTY)
 
-# Create a grid of coordinates using meshgrid
-x, y, z = np.meshgrid(x_range, y_range, z_range)
+# # Create a grid of coordinates using meshgrid
+# x, y, z = np.meshgrid(x_range, y_range, z_range)
 
-# Stack the coordinate grids into a 3D array and reshape to 2D array
-hc0_pc[:,:3] = np.stack((x, y, z), axis=-1).reshape((-1, 3))
+# # Stack the coordinate grids into a 3D array and reshape to 2D array
+# hc0_pc[:,:3] = np.stack((x, y, z), axis=-1).reshape((-1, 3))
 
 # transform hc0_pc back to original coordinates
-hc = torch.tensor(scl.inverse_transform(pca.inverse_transform(hc0_pc)), dtype=torch.float32).unsqueeze(dim=0).to(device)
+# hc = torch.tensor(scl.inverse_transform(pca.inverse_transform(hc0_pc)), dtype=torch.float32).unsqueeze(dim=0).to(device)
+
+
+random_numbers = [[random.random() for _ in range(HIDDEN_SIZE * 2)] for _ in range(N_INITIAL_GUESSES)]
+hc = 10 * torch.tensor(random_numbers, dtype=torch.float32).reshape(1, N_INITIAL_GUESSES, HIDDEN_SIZE * 2).to(device)
 
 # Prepare input data
 input_data = torch.zeros(1, N_INITIAL_GUESSES, INPUT_SIZE, dtype=torch.float32).to(device)
@@ -122,11 +126,13 @@ input_data = torch.zeros(1, N_INITIAL_GUESSES, INPUT_SIZE, dtype=torch.float32).
 hc.requires_grad = True
 
 # Initialize optimizer
-optimizer = torch.optim.Adam([hc], lr=0.0005)  # You may need to adjust learning rate based on your problem
+LEARNING_RATE = 0.001
+TOLERANCE = 5e-2
+optimizer = torch.optim.Adam([hc], lr=LEARNING_RATE)  # You may need to adjust learning rate based on your problem
 
-# Other data
-hc_hist_fixedpt = torch.zeros(MAX_ITERATIONS//SAMPLE_RATE, N_INITIAL_GUESSES, HIDDEN_SIZE * 2, dtype=torch.float32)
-q_hist_fixedpt = torch.zeros(MAX_ITERATIONS//SAMPLE_RATE, N_INITIAL_GUESSES, dtype=torch.float32)
+# Initialize as empty lists
+hc_hist_fixedpt = [] 
+q_hist_fixedpt = []
 
 for epoch in range(MAX_ITERATIONS):
     # Zero out the gradients
@@ -143,14 +149,31 @@ for epoch in range(MAX_ITERATIONS):
     # Update the weights
     optimizer.step()
 
-    if epoch % 100 == 0:
-        # print only every 100 epochs
-        min_index = torch.argmin(torch.norm(q, dim=0))
-        print(f"epoch: {epoch}, _hc min idx|: {min_index.item()}, |_hc|: {torch.norm(hc[:,min_index,:]).item():.2e}, q: {q[:,min_index].item():.2e}")
-
     if epoch % SAMPLE_RATE == 0:
-        hc_hist_fixedpt[epoch//SAMPLE_RATE,:,:] = hc.cpu()
-        q_hist_fixedpt[epoch//SAMPLE_RATE,:] = q[:,:].cpu()
+        # print only every 100 epochs
+        if len(hc_hist_fixedpt) >= 2:
+            delta_hc = (hc_hist_fixedpt[-1]-hc_hist_fixedpt[-2]).norm()
+        else:
+            delta_hc = np.inf
+        max_index = torch.argmax(torch.norm(q, dim=0))
+        max_elem = torch.max(q).item()
+        print(f"\
+            epoch: {epoch}, _hc min idx|: {max_index.item()}, \
+            |_hc|: {torch.norm(hc[:,max_index,:]).item():.2e}, \
+            q: {q[:,max_index].item():.2e}, \
+            delta_hc: {delta_hc:.2e}"
+        )
+
+        hc_hist_fixedpt.append(hc.cpu())  # Append to the list
+        q_hist_fixedpt.append(q[:,:].cpu())
+
+        # if  delta_hc < TOLERANCE:  # Stopping criterion
+        #     print(f"Stopping criterion reached at epoch: {epoch}")
+        #     break
+
+# Convert lists to tensors
+hc_hist_fixedpt = torch.stack(hc_hist_fixedpt)
+q_hist_fixedpt = torch.stack(q_hist_fixedpt)
 
 # Save data to hdf5
 with h5py.File(DATA_PATH + 'hc_hist_fixedpt.h5', 'w') as f:
@@ -183,7 +206,7 @@ cycle_pc3 = cycle_pc3.to_numpy().reshape(-1)
 
 hc_out1 = hc_hist_zeroinput[-1,:,:]
 hc_hist_fixedpt_ti = hc_hist_fixedpt[0,:,:]
-hc_hist_fixedpt_tnf = hc_hist_fixedpt[50:,:,:]
+hc_hist_fixedpt_tnf = hc_hist_fixedpt[250:,:,:]
 hc_hist_fixedpt_tf = hc_hist_fixedpt[-1,:,:]
 
 hc_out_pc = pca.transform(scl.transform(torch.squeeze(hc_out1).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
@@ -213,7 +236,7 @@ ax1 = fig.add_subplot(121, projection='3d')
 # ax1.scatter(hc_traj_nf_pc[:,0], hc_traj_nf_pc[:,1], hc_traj_nf_pc[:,2], c='m', s=10, alpha=1.0)
 
 # Plot the second set of 3D arrays
-ax1.scatter(hc_traj_f_pc[:,0], hc_traj_f_pc[:,1], hc_traj_f_pc[:,2], c='b', s=50, alpha=1.0)
+ax1.scatter(hc_traj_f_pc[:,0], hc_traj_f_pc[:,1], hc_traj_f_pc[:,2], c='b', s=5, alpha=1.0)
 
 # Plot the second set of 3D arrays
 # ax1.scatter(hc_out_pc[:,0], hc_out_pc[:,1], hc_out_pc[:,2], c='gray', s=75)
