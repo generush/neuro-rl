@@ -170,7 +170,7 @@ def plot_data(x_data, y_data, z_data, c_data, cc_global_min, cc_global_max, data
         fig.savefig(path + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
 
 def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = ''):
-    N_COMPONENTS = 12
+    N_COMPONENTS = 256
 
     # load DataFrame
     df = process_data(path + 'RAW_DATA' + file_suffix + '.parquet')

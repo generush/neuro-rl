@@ -52,14 +52,20 @@ lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isa
 # no bias
 lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_25-14-47-18/nn/last_AnymalTerrain_ep_2950_rew_20.2923.pth')
 
-# 1) no bias but pos u and neg u, no noise/perturb
+# AnymalTerrain (1) (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/o noise)
 # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_27-12-07-49/nn/last_AnymalTerrain_ep_1800_rew_21.021248.pth')
 
-# 2) no bias (perturb longer w/o noise) (with HC = (HC, CX))
-lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_29-22-48-36/nn/last_AnymalTerrain_ep_4700_rew_20.763342.pth')
+# AnymalTerrain (2) (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/o noise)
+# lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_29-22-48-36/nn/last_AnymalTerrain_ep_4700_rew_20.763342.pth')
 
-# 3) no bias (perturb longer w/ noise) (with HC = (HC, CX))
+# AnymalTerrain (3) (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/ noise)
 # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_30-22-49-28/nn/last_AnymalTerrain_ep_4950_rew_20.344143.pth')
+
+# AnymalTerrain (3a)  (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/ noise) (earlier in training, reward = 10)
+lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_30-22-49-28/nn/last_AnymalTerrain_ep_250_rew_10.102089.pth')
+
+# AnymalTerrain (3b)  (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/ noise) (earlier in training, reward = 15)
+lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_30-22-49-28/nn/last_AnymalTerrain_ep_2100_rew_15.587042.pth')
 
 
 state_dict = {key.replace('a2c_network.a_rnn.rnn.', ''): value for key, value in lstm_model['model'].items() if key.startswith('a2c_network.a_rnn.rnn')}
@@ -86,31 +92,34 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 # # AnymalTerrain (perturb longer)
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_08-13-39_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
-# 2) AnymalTerrain (perturb longer w/o noise) (with HC = (HC, CX))
-DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_13-54-22_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
-
-# 1) AnymalTerrain (no bias) no bias but pos u and neg u, no noise/perturb (with HC = (HC, CX))
+# AnymalTerrain (1) (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/o noise)
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_22-30-47_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
-# 3) AnymalTerrain (no bias) (perturb longer w/ noise) (with HC = (HC, CX))
+# AnymalTerrain (2) (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/o noise)
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_13-54-22_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+
+# AnymalTerrain (3) (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/ noise)
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_09-02-37_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+
+# AnymalTerrain (3a)  (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/ noise) (earlier in training, reward = 10)
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_15-54-36_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
 
 # load scaler and pca transforms
 scl = pk.load(open(DATA_PATH + 'A_LSTM_HC_SPEED_SCL.pkl','rb'))
 pca = pk.load(open(DATA_PATH + 'A_LSTM_HC_SPEED_PCA.pkl','rb'))
-PCA_DIM = pca.n_components
 
 # specify parameters for fix point finder
 N_INITIAL_GUESSES = 4096
 INITIAL_GUESS_RANGE = 20
+INITIAL_GUESS_DIM = 12
 SAMPLE_RATE = 100
 MAX_ITERATIONS = 100000
 
 # Generate random numbers within the specified bounds
-random_numbers = [[random.uniform(-1, 1) for _ in range(PCA_DIM)] for _ in range(N_INITIAL_GUESSES)]
-# random_numbers = [[random.random() for _ in range(PCA_DIM)] for _ in range(N_INITIAL_GUESSES)]
-hc0_pc = INITIAL_GUESS_RANGE * torch.tensor(random_numbers, dtype=torch.float32)
+random_numbers = [[random.uniform(-1, 1) for _ in range(INITIAL_GUESS_DIM)] for _ in range(N_INITIAL_GUESSES)]
+hc0_pc = torch.zeros((N_INITIAL_GUESSES, HIDDEN_SIZE * 2), dtype=torch.float32)
+hc0_pc[:,:INITIAL_GUESS_DIM] = INITIAL_GUESS_RANGE * torch.tensor(random_numbers, dtype=torch.float32)
 hc0 = torch.tensor(scl.inverse_transform(pca.inverse_transform(hc0_pc)), dtype=torch.float32).unsqueeze(dim=0).to(device)
 
 # prepare input data
@@ -174,85 +183,237 @@ for epoch in range(MAX_ITERATIONS):
 
 
 
-# Convert lists to tensors
-hc_hist_fixedpt = torch.stack(hc_hist_fixedpt).squeeze()
-q_hist_fixedpt = torch.stack(q_hist_fixedpt).squeeze()
 
-# Save data to hdf5
-with h5py.File(DATA_PATH + 'hc_hist_fixedpt.h5', 'w') as f:
-    f.create_dataset('hc_hist_fixedpt', data=hc_hist_fixedpt.detach().numpy())
-with h5py.File(DATA_PATH + 'q_hist_fixedpt.h5', 'w') as f:
-    f.create_dataset('q_hist_fixedpt', data=q_hist_fixedpt.detach().numpy())
+### cluster to get unique fixed points
+fps, cnt = find_clusters(hc_hist_fixedpt[-1:,:].squeeze().detach())
+fps_pc = pca.transform(scl.transform(fps))
+pd.DataFrame(fps).to_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/fixed_points2.csv')
+fixed_points = torch.Tensor(fps)
 
-# PLOT EVOLUTION WITH ZERO INPUT
+### compute jacobian and 
+fixed_point = torch.zeros(1, HIDDEN_SIZE * 2).to(device)
+input = torch.zeros(1, INPUT_SIZE).to(device)
+fixed_point[0,:] = fixed_points[0,:]
 
-cycle_data = pd.read_csv(DATA_PATH + 'RAW_DATA_AVG.csv')
-input = torch.zeros((1, len(cycle_data), INPUT_SIZE), device=device,  dtype=torch.float32)
-hc0 = torch.tensor(cycle_data.loc[:,cycle_data.columns.str.contains('A_LSTM_HC')].values, device=device,  dtype=torch.float32).unsqueeze(dim=0)
-hc = hc0
+J_input, J_hidden = compute_jacobian_alternate(a_rnn, input, fixed_point)
+J_input2, J_hidden2 = compute_jacobian_alternate(a_rnn, input, fixed_point)
+J_input3, J_hidden3 = compute_jacobian_alternate2(a_rnn, input, fixed_point)
+J_eval, J_evec = torch.linalg.eig(J_hidden)
+torch.real(J_eval).max()
 
-desired_length = 1000
+
+
+
+
+# # Convert lists to tensors
+# hc_hist_fixedpt = torch.stack(hc_hist_fixedpt).squeeze()
+# q_hist_fixedpt = torch.stack(q_hist_fixedpt).squeeze()
+
+# # Save data to hdf5
+# with h5py.File(DATA_PATH + 'hc_hist_fixedpt.h5', 'w') as f:
+#     f.create_dataset('hc_hist_fixedpt', data=hc_hist_fixedpt.detach().numpy())
+# with h5py.File(DATA_PATH + 'q_hist_fixedpt.h5', 'w') as f:
+#     f.create_dataset('q_hist_fixedpt', data=q_hist_fixedpt.detach().numpy())
+
+# # PLOT EVOLUTION WITH ZERO INPUT
+
+# cycle_data = pd.read_csv(DATA_PATH + 'RAW_DATA_AVG.csv')
+# input = torch.zeros((1, len(cycle_data), INPUT_SIZE), device=device,  dtype=torch.float32)
+# hc0 = torch.tensor(cycle_data.loc[:,cycle_data.columns.str.contains('A_LSTM_HC')].values, device=device,  dtype=torch.float32).unsqueeze(dim=0)
+# hc = hc0
+
+# desired_length = 1000
+
+# # Extend hx_out in the first dimension
+# hc_hist_zeroinput = torch.zeros((desired_length,) + hc.shape[1:], dtype=hc.dtype)
+
+# for i in range(desired_length):
+
+#     # add hidden state to history
+#     hc_hist_zeroinput[i,:,:] = hc
+
+#     # run step
+#     _, (hx, cx) = a_rnn(input, (hc[:,:,:HIDDEN_SIZE].contiguous(), hc[:,:,HIDDEN_SIZE:].contiguous()))
+#     hc = torch.cat((hx, cx), dim=2)
+
+# cycle_pc1 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_x_by_speed.csv', index_col=0)
+# cycle_pc2 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_y_by_speed.csv', index_col=0)
+# cycle_pc3 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_z1_by_speed.csv', index_col=0)
+
+# cycle_pc1 = cycle_pc1.to_numpy().reshape(-1)
+# cycle_pc2 = cycle_pc2.to_numpy().reshape(-1)
+# cycle_pc3 = cycle_pc3.to_numpy().reshape(-1)
+
+# hc_hist_zeroinput_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_zeroinput).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+# hc_hist_zeroinput_ti_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_zeroinput[0,:,:]).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+# hc_hist_zeroinput_tf_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_zeroinput[-1,:,:]).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+
+# hc_hist_fixedpt_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+# hc_hist_fixedpt_ti_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt[0,:,:]).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+# hc_hist_fixedpt_tf_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt[-1,:,:]).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+
+# import matplotlib.ticker as ticker
+
+# import numpy as np
+# import matplotlib.pyplot as plt
+
+# # Create a figure and subplots
+# fig = plt.figure()
+# ax1 = fig.add_subplot(121, projection='3d')
+
+# # zero input: final points
+# ax1.scatter(hc_hist_zeroinput_tf_pc[:,0], hc_hist_zeroinput_tf_pc[:,1], hc_hist_zeroinput_tf_pc[:,2], c='g', s=100, alpha=1.0)
+
+# # zero input: initial points
+# # ax1.scatter(hc_hist_zeroinput_ti_pc[:,0], hc_hist_zeroinput_ti_pc[:,1], hc_hist_zeroinput_ti_pc[:,2], c='k', s=20, alpha=1.0)
+
+# # zero input: history
+# ax1.scatter(hc_hist_zeroinput_pc[:,0], hc_hist_zeroinput_pc[:,1], hc_hist_zeroinput_pc[:,2], c='gray', s=0.1, alpha=0.5)
+
+# # fixed points
+# ax1.scatter(hc_hist_fixedpt_tf_pc[:,0], hc_hist_fixedpt_tf_pc[:,1], hc_hist_fixedpt_tf_pc[:,2], c='b', s=50, alpha=1.0)
+
+# # fixed point: initial guesses
+# # ax1.scatter(hc_hist_fixedpt_ti_pc[:,0], hc_hist_fixedpt_ti_pc[:,1], hc_hist_fixedpt_ti_pc[:,2], c='k', s=1, alpha=1.0)
+
+# # fixed point: history of guesses
+# # ax1.scatter(hc_hist_fixedpt_pc[:,0], hc_hist_fixedpt_pc[:,1], hc_hist_fixedpt_pc[:,2], c='m', s=10, alpha=0.5)
+
+
+# # Plot the second set of 3D arrays
+# # ax1.scatter(hc_out_pc[:,0], hc_out_pc[:,1], hc_out_pc[:,2], c='gray', s=75)
+
+# ax1.scatter(cycle_pc1, cycle_pc2, cycle_pc3, c='r', s=1)
+
+# # Create a ScalarFormatter and set the desired format
+# formatter = ticker.ScalarFormatter(useMathText=True)
+# formatter.set_scientific(False)
+# formatter.set_powerlimits((-3, 4))  # Adjust the power limits if needed
+
+# # Apply the formatter to the axis
+# ax1.xaxis.set_major_formatter(formatter)
+# ax1.yaxis.set_major_formatter(formatter)
+
+# # Set labels and title
+# ax1.set_xlabel('PC 1')
+# ax1.set_ylabel('PC 2')
+# ax1.set_zlabel('PC 3')
+
+# # Show the plot
+# plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Not sure if this is correct...
+
+# For the scaler, we need to consider the square root of the variance 
+# as the standard deviation is used for scaling
+scaled_variance = np.sqrt(scl.var_ + 1e-10)  # adding a small value to avoid division by zero
+
+# Reshape the variance to match matrix multiplication requirements
+scaled_variance = scaled_variance.reshape((1, len(scaled_variance)))
+
+J_scaled_input = J_input / scaled_variance.T
+J_scaled_hidden = J_hidden / scaled_variance.T
+
+J_pca_input = np.matmul(pca.components_, J_scaled_input)
+J_pca_hidden = np.matmul(pca.components_, J_scaled_hidden)
+
+# Now, you can compute the eigenvalues and eigenvectors of the PCA-transformed Jacobian.
+eigvals_input, eigvecs_input = torch.linalg.eig(J_pca_input)
+eigvals_hidden, eigvecs_hidden = torch.linalg.eig(J_pca_hidden)
+
+# These are the eigenvalues and eigenvectors of the system in PCA space.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+input = torch.zeros((1, 100, INPUT_SIZE), device=device,  dtype=torch.float32)
+hc0 = 1 * torch.tensor(scl.inverse_transform(pca.inverse_transform(hc0_pc[:100,:])), dtype=torch.float32).unsqueeze(dim=0).to(device)
+hc = torch.zeros((1, 100, HIDDEN_SIZE * 2), device=device,  dtype=torch.float32)
+hc[0,:,:] = hc0 + torch.tensor(fps[0,:]).to(device)
+
+desired_length = 100
 
 # Extend hx_out in the first dimension
-hc_hist_zeroinput = torch.zeros((desired_length,) + hc.shape[1:], dtype=hc.dtype)
+hc_hist_misc_zeroinput = torch.zeros((desired_length,) + hc.shape[1:], dtype=hc.dtype)
 
 for i in range(desired_length):
 
     # add hidden state to history
-    hc_hist_zeroinput[i,:,:] = hc
+    hc_hist_misc_zeroinput[i,:,:] = hc
 
     # run step
     _, (hx, cx) = a_rnn(input, (hc[:,:,:HIDDEN_SIZE].contiguous(), hc[:,:,HIDDEN_SIZE:].contiguous()))
     hc = torch.cat((hx, cx), dim=2)
 
-cycle_pc1 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_x_by_speed.csv', index_col=0)
-cycle_pc2 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_y_by_speed.csv', index_col=0)
-cycle_pc3 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_z1_by_speed.csv', index_col=0)
-
-cycle_pc1 = cycle_pc1.to_numpy().reshape(-1)
-cycle_pc2 = cycle_pc2.to_numpy().reshape(-1)
-cycle_pc3 = cycle_pc3.to_numpy().reshape(-1)
-
-hc_hist_zeroinput_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_zeroinput).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
-hc_hist_zeroinput_ti_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_zeroinput[0,:,:]).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
-hc_hist_zeroinput_tf_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_zeroinput[-1,:,:]).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
-
-hc_hist_fixedpt_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
-hc_hist_fixedpt_ti_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt[0,:,:]).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
-hc_hist_fixedpt_tf_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt[-1,:,:]).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
+hc_hist_misc_zeroinput_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_misc_zeroinput).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy())).reshape(hc_hist_misc_zeroinput.shape)
 
 import matplotlib.ticker as ticker
-
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Create a figure and subplots
 fig = plt.figure()
-ax1 = fig.add_subplot(121, projection='3d')
+ax1 = fig.add_subplot(111, projection='3d')
 
-# zero input: final points
-ax1.scatter(hc_hist_zeroinput_tf_pc[:,0], hc_hist_zeroinput_tf_pc[:,1], hc_hist_zeroinput_tf_pc[:,2], c='g', s=100, alpha=1.0)
+# Iterate over each line
+for i in range(100): # hc_hist_misc_zeroinput_pc.shape[1]
+    line = hc_hist_misc_zeroinput_pc[:, i, :]  # Get the current line
+    
+    # Plot the line
+    ax1.plot(line[:, 0], line[:, 1], line[:, 2], c='k')
 
-# zero input: initial points
-# ax1.scatter(hc_hist_zeroinput_ti_pc[:,0], hc_hist_zeroinput_ti_pc[:,1], hc_hist_zeroinput_ti_pc[:,2], c='k', s=20, alpha=1.0)
-
-# zero input: history
-ax1.scatter(hc_hist_zeroinput_pc[:,0], hc_hist_zeroinput_pc[:,1], hc_hist_zeroinput_pc[:,2], c='gray', s=0.1, alpha=0.5)
-
-# fixed points
-ax1.scatter(hc_hist_fixedpt_tf_pc[:,0], hc_hist_fixedpt_tf_pc[:,1], hc_hist_fixedpt_tf_pc[:,2], c='b', s=50, alpha=1.0)
-
-# fixed point: initial guesses
-# ax1.scatter(hc_hist_fixedpt_ti_pc[:,0], hc_hist_fixedpt_ti_pc[:,1], hc_hist_fixedpt_ti_pc[:,2], c='k', s=1, alpha=1.0)
-
-# fixed point: history of guesses
-# ax1.scatter(hc_hist_fixedpt_pc[:,0], hc_hist_fixedpt_pc[:,1], hc_hist_fixedpt_pc[:,2], c='m', s=10, alpha=0.5)
-
-
-# Plot the second set of 3D arrays
-# ax1.scatter(hc_out_pc[:,0], hc_out_pc[:,1], hc_out_pc[:,2], c='gray', s=75)
-
-ax1.scatter(cycle_pc1, cycle_pc2, cycle_pc3, c='r', s=1)
+# Scatter plot points for context
+# ax1.scatter(hc_hist_nearsaddle_zeroinput_pc[:, 0], hc_hist_nearsaddle_zeroinput_pc[:, 1], hc_hist_nearsaddle_zeroinput_pc[:, 2], c='k', s=1, alpha=1.0, label='zero input: final points')
+# ax1.scatter(cycle_pc1, cycle_pc2, cycle_pc3, c='r', s=1, label='cycle')
+ax1.scatter(hc_hist_fixedpt_tf_pc[:, 0], hc_hist_fixedpt_tf_pc[:, 1], hc_hist_fixedpt_tf_pc[:, 2], c='b', s=50, alpha=1.0, label='fixed points')
 
 # Create a ScalarFormatter and set the desired format
 formatter = ticker.ScalarFormatter(useMathText=True)
@@ -262,50 +423,18 @@ formatter.set_powerlimits((-3, 4))  # Adjust the power limits if needed
 # Apply the formatter to the axis
 ax1.xaxis.set_major_formatter(formatter)
 ax1.yaxis.set_major_formatter(formatter)
+ax1.zaxis.set_major_formatter(formatter)
 
 # Set labels and title
 ax1.set_xlabel('PC 1')
 ax1.set_ylabel('PC 2')
 ax1.set_zlabel('PC 3')
+ax1.set_title('3D Line Plot of PC Values')
+
+# Show the legend
+ax1.legend()
 
 # Show the plot
 plt.show()
-
-fps, cnt = find_clusters(hc_hist_fixedpt[-1:,:].squeeze().detach())
-fps_pc = pca.transform(scl.transform(fps))
-
-pd.DataFrame(fps).to_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/fixed_points2.csv')
-
-fixed_points = torch.Tensor(fps)
-
-
-
-fixed_point = torch.zeros(1, HIDDEN_SIZE * 2).to(device)
-input = torch.zeros(1, INPUT_SIZE).to(device)
-fixed_point[0,:] = fixed_points[2,:]
-
-J_input, J_hidden = compute_jacobian_alternate(a_rnn, input, fixed_point)
-J_input2, J_hidden2 = compute_jacobian_alternate(a_rnn, input, fixed_point)
-J_input3, J_hidden3 = compute_jacobian_alternate2(a_rnn, input, fixed_point)
-J_eval, J_evec = torch.linalg.eig(J_hidden)
-
-torch.real(J_eval).max()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
