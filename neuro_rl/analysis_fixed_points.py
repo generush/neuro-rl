@@ -225,11 +225,35 @@ torch.real(J_eval).max()
 
 
 
-
-
-
 # Create the plot
-plt.scatter(torch.real(J_eval), torch.imag(J_eval))
+fig, ax = plt.subplots()
+
+# Plot the eigenvalues with lighter color and black marker outline
+ax.scatter(torch.real(J_eval), torch.imag(J_eval), color='lightblue', edgecolor='black', label='Eigenvalues')
+
+# Add a unit circle
+unit_circle = plt.Circle((0,0), 1, color='r', fill=False, label='Unit Circle')
+ax.add_artist(unit_circle)
+
+# Ensure aspect ratio is equal to get a correct circle
+ax.set_aspect('equal')
+
+# Calculate buffer for x and y limits
+buffer = 0.1
+min_real = min(torch.real(J_eval))
+max_real = max(max(torch.real(J_eval)), 1.)
+min_imag = min(torch.imag(J_eval))
+max_imag = max(torch.imag(J_eval))
+
+
+min_eigenvalue = min(min(torch.real(J_eval)), min(torch.imag(J_eval)))
+max_eigenvalue = max(max(torch.real(J_eval)), max(torch.imag(J_eval)))
+max_abs_eigenvalue = max(abs(min_eigenvalue), abs(max_eigenvalue))
+
+# Setting x and y limits with buffer
+ax.set_xlim([min_real - buffer, max_real + buffer])
+ax.set_ylim([min_imag - buffer, max_imag + buffer])
+
 plt.title('Eigenvalues (Real vs Imaginary)')
 plt.xlabel('Real Part')
 plt.ylabel('Imaginary Part')
@@ -239,29 +263,10 @@ plt.show()
 
 
 
-
-### Not sure if this is correct...
-
-# For the scaler, we need to consider the square root of the variance 
-# as the standard deviation is used for scaling
-scaled_variance = np.sqrt(scl.var_ + 1e-10)  # adding a small value to avoid division by zero
-
-# Reshape the variance to match matrix multiplication requirements
-scaled_variance = scaled_variance.reshape((1, len(scaled_variance)))
-
-J_scaled_input = J_input / scaled_variance.T
-J_scaled_hidden = J_hidden / scaled_variance.T
-
-J_pca_input = np.matmul(pca.components_, J_scaled_input)
-J_pca_hidden = np.matmul(pca.components_, J_scaled_hidden)
+J_hidden_pc = np.matmul(np.linalg.inv(pca.components_), np.matmul(J_hidden, pca.components_))
 
 # Now, you can compute the eigenvalues and eigenvectors of the PCA-transformed Jacobian.
-eigvals_input, eigvecs_input = torch.linalg.eig(J_pca_input)
-eigvals_hidden, eigvecs_hidden = torch.linalg.eig(J_pca_hidden)
-
-# These are the eigenvalues and eigenvectors of the system in PCA space.
-
-
+J_eval_pc, J_evec_pc = torch.linalg.eig(J_hidden_pc)
 
 
 
@@ -304,15 +309,16 @@ hc_perturb_pc = pca.transform(scl.transform(torch.squeeze(hc_perturb).reshape(-1
 
 
 
+J_evec_pc[:3,0]
+fps_pc[1,0]
 
 
 
 
 
-
-input = torch.zeros((1, 100, INPUT_SIZE), device=device,  dtype=torch.float32)
-hc0 = 0.0 * torch.tensor(scl.inverse_transform(pca.inverse_transform(hc0_pc[:100,:])), dtype=torch.float32).unsqueeze(dim=0).to(device)
-hc = torch.zeros((1, 100, HIDDEN_SIZE * 2), device=device,  dtype=torch.float32)
+input = torch.zeros((1, 500, INPUT_SIZE), device=device,  dtype=torch.float32)
+hc0 = 10 * torch.tensor(scl.inverse_transform(pca.inverse_transform(hc0_pc[:500,:])), dtype=torch.float32).unsqueeze(dim=0).to(device)
+hc = torch.zeros((1, 500, HIDDEN_SIZE * 2), device=device,  dtype=torch.float32)
 hc[0,:,:] = hc0 + torch.tensor(fps[1,:]).to(device)
 
 desired_length = 100
@@ -340,13 +346,14 @@ fig = plt.figure()
 ax1 = fig.add_subplot(111, projection='3d')
 
 # Iterate over each line
-for i in range(1): # hc_hist_misc_zeroinput_pc.shape[1]
+for i in range(500): # hc_hist_misc_zeroinput_pc.shape[1]
     line = hc_hist_misc_zeroinput_pc[:, i, :]  # Get the current line
     
     # Plot the line
     ax1.plot(line[:, 0], line[:, 1], line[:, 2], c='k')
 
 # Scatter plot points for context
+ax1.plot([EV[0] + fps_pc[1,0],fps_pc[1,0]], [EV[1] + fps_pc[1,1], fps_pc[1,1]], [EV[2] + fps_pc[1,2],fps_pc[1,2]], c='g')
 ax1.scatter(cycle_pc1, cycle_pc2, cycle_pc3, c='r', s=1, label='cycle')
 ax1.scatter(hc_hist_fixedpt_tf_pc[:, 0], hc_hist_fixedpt_tf_pc[:, 1], hc_hist_fixedpt_tf_pc[:, 2], c='b', s=50, alpha=1.0, label='fixed points')
 # ax1.plot(hc_perturb_pc[:, 0], hc_perturb_pc[:, 1], hc_perturb_pc[:, 2], c='m')

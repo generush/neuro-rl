@@ -178,6 +178,7 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 # AnymalTerrain (3-#2) (perturb longer w/ noise) (with HC = (HC, CX)) (2nd model)
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-01_08-11-32_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/' # w/o noise
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-01_08-45-29_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/' # w/ noise
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-02_10-25-10_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/' # w/ noise
 
 
 
@@ -208,17 +209,17 @@ if AVG:
     df_avg = analyze_avg_traj(DATA_PATH)
     print('Finished analyze_traj', time.process_time() - start)
 
-    df_avg = analyze_cycle(DATA_PATH)
-    print('Finished analyze_cycle', time.process_time() - start)
+    # df_avg = analyze_cycle(DATA_PATH)
+    # print('Finished analyze_cycle', time.process_time() - start)
 
     data_w_tangling = analyze_tangling(DATA_PATH, DATASETS, '_AVG')
     print('Finished analyze_tangling', time.process_time() - start)
 
-    analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG_WITH_TANGLING')
-    print('Finished analyze_pca', time.process_time() - start)
-
-    # analyze_pca(DATA_PATH, DATASETS)
+    # analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG_WITH_TANGLING')
     # print('Finished analyze_pca', time.process_time() - start)
+
+    analyze_pca(DATA_PATH, DATASETS)
+    print('Finished analyze_pca', time.process_time() - start)
 
     run_dashboard(DATA_PATH)
 
