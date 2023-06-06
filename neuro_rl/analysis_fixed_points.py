@@ -268,38 +268,6 @@ max_real = torch.real(J_eval).max()
 min_imag = torch.imag(J_eval).min()
 max_imag = torch.imag(J_eval).max()
 
-for fp_idx, fixed_point in enumerate(fixed_points):
-
-    # Create the plot
-    fig, ax = plt.subplots()
-
-    # Plot the eigenvalues with lighter color and black marker outline
-    ax.scatter(torch.real(J_eval[fp_idx,:]), torch.imag(J_eval[fp_idx,:]), color='lightblue', edgecolor='black', label='Eigenvalues')
-
-    # Add a unit circle
-    unit_circle = plt.Circle((0,0), 1, color='r', fill=False, label='Unit Circle')
-    ax.add_artist(unit_circle)
-
-    # Ensure aspect ratio is equal to get a correct circle
-    ax.set_aspect('equal')
-
-    # Calculate buffer for x and y limits
-    buffer = 0.1
-
-    # Setting x and y limits with buffer
-    ax.set_xlim([min_real - buffer, max_real + buffer])
-    ax.set_ylim([min_imag - buffer, max_imag + buffer])
-
-    plt.xlabel('Real Part')
-    plt.ylabel('Imaginary Part')
-    # plt.grid(True)
-    plt.show()
-
-    filename = f"fixed_point_{fp_idx}"
-    fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
-
-
-
 
 cycle_pc1 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_x_by_speed.csv', index_col=0)
 cycle_pc2 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_y_by_speed.csv', index_col=0)
@@ -312,50 +280,13 @@ cycle_pc3 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_z1_by_speed.csv', index_col=
 # hc_perturb = torch.tensor(df_perturb.loc[:, df_perturb.columns.str.contains('A_LSTM_HC')].to_numpy())
 # hc_perturb_pc = pca.transform(scl.transform(torch.squeeze(hc_perturb).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy())).reshape(hc_perturb.shape)
 
-### STREAMPLOT
-TRAJ_TIME_LENGTH = 2
-TRAJ_XY_DENSITY = 100
-
-input = torch.zeros((1, TRAJ_XY_DENSITY * TRAJ_XY_DENSITY, INPUT_SIZE), device=device,  dtype=torch.float32)
-
-# Create the X and Y meshgrid using torch.meshgrid
-pc1_range = abs(cycle_pc1).max().max()
-pc2_range = abs(cycle_pc2).max().max()
-pc_range = max(pc1_range, pc2_range)
-X_RANGE = round(pc_range) + 1  # Adjust the value of X to set the range of the meshgrid
-x = torch.linspace(-X_RANGE, X_RANGE, TRAJ_XY_DENSITY)
-y = torch.linspace(-X_RANGE, X_RANGE, TRAJ_XY_DENSITY)
-Y, X = torch.meshgrid(x, y)
-
-# Reshape the X and Y meshgrid tensors into column vectors
-meshgrid_tensor = torch.stack((X.flatten(), Y.flatten()), dim=1)
-
-# Expand the meshgrid tensor with zeros in the remaining columns
-zeros_tensor = torch.zeros(meshgrid_tensor.shape[0], 256 - 2)
-hc_zeroinput_t0_pc = torch.cat((meshgrid_tensor, zeros_tensor), dim=1).numpy()
-hc_zeroinput_t0_pc[:,2:] = fps_pc[0,2:] # PC 3 of attractor
-
-hc = torch.tensor(scl.inverse_transform(pca.inverse_transform(hc_zeroinput_t0_pc)), dtype=torch.float32).unsqueeze(dim=0).to(device)
 
 
-# Extend hx_out in the first dimension
-hc_hist_zeroinput = torch.zeros((TRAJ_TIME_LENGTH,) + hc.shape[1:], dtype=hc.dtype)
-hc_hist_zeroinput[0,:,:] = hc
+    # Import libraries
+    import numpy as np
+    import matplotlib.pyplot as plt
 
-for i in range(TRAJ_TIME_LENGTH - 1):
-
-    # run step
-    _, (hx, cx) = a_rnn(input, (hc[:,:,:HIDDEN_SIZE].contiguous(), hc[:,:,HIDDEN_SIZE:].contiguous()))
-    hc = torch.cat((hx, cx), dim=2)
-
-    hc_hist_zeroinput[i+1,:,:] = hc
-
-hc_zeroinput_tf_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_zeroinput).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy())).reshape(hc_hist_zeroinput.shape)
-
-# Import libraries
-import numpy as np
-import matplotlib.pyplot as plt
-
+# https://www.geeksforgeeks.org/matplotlib-pyplot-streamplot-in-python/#
 def plot_2d_streamplot(fixed_pts_pc, cycle_pc1, cycle_pc2, X, Y, U, V):
 
     # Create a figure and subplots
@@ -368,20 +299,17 @@ def plot_2d_streamplot(fixed_pts_pc, cycle_pc1, cycle_pc2, X, Y, U, V):
 
     # Scatter plot points for context
     # ax1.plot([EV[0] + fps_pc[1,0],fps_pc[1,0]], [EV[1] + fps_pc[1,1], fps_pc[1,1]], [EV[2] + fps_pc[1,2],fps_pc[1,2]], c='g')
-    scatter2 = ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], c='b', s=50)
+    scatter2 = ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], c='k', s=50)
 
-    num_cols = cycle_pc1.shape[1]
-    cmap = plt.cm.get_cmap('Spectral')
-    colors = cmap(np.linspace(0, 1, num_cols))
 
     # Plot quivers using the extracted components
     speed = np.sqrt(U**2 + V**2)
     lw = 5 * speed / speed.max()
-    ax1.streamplot(X, Y, U, V, density=2, color ='k', linewidth = lw)
-    for i in range(num_cols):
-        ax1.plot(cycle_pc1.values[:, i], cycle_pc2.values[:, i], c=colors[i], label=f'Dataset {i+1}', linewidth = 3.0, alpha=0.5)
-        
+    strm = ax1.streamplot(X, Y, U, V, density=2, linewidth=lw, color=speed/0.005, cmap ='plasma')
+    plt.colorbar(strm.lines)
 
+    # cycle
+    ax1.plot(cycle_pc1.values[:, -1], cycle_pc2.values[:, -1], c="k", linewidth = 3.0, alpha=1)
 
     # Create a ScalarFormatter and set the desired format
     formatter = ticker.ScalarFormatter(useMathText=True)
@@ -395,20 +323,11 @@ def plot_2d_streamplot(fixed_pts_pc, cycle_pc1, cycle_pc2, X, Y, U, V):
     # Set labels and title
     ax1.set_xlabel('PC 1')
     ax1.set_ylabel('PC 2')
-    ax1.set_title('3D Line Plot of PC Values')
 
     # Show the legend
     # ax1.legend()
 
-    # Show the plot
-    plt.show()
-
-X = hc_zeroinput_t0_pc[:,0].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
-Y = hc_zeroinput_t0_pc[:,1].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
-U = hc_zeroinput_tf_pc[1,:,0].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY) - hc_zeroinput_tf_pc[0,:,0].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
-V = hc_zeroinput_tf_pc[1,:,1].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY) - hc_zeroinput_tf_pc[0,:,1].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
-
-plot_2d_streamplot(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, X, Y, U, V)
+    return fig
 
 def plot_2d_traj(fixed_pts_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc):
 
@@ -444,10 +363,6 @@ def plot_2d_traj(fixed_pts_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc):
     # Show the legend
     ax1.legend()
 
-    # Show the plot
-    plt.show()
-
-plot_2d_traj(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc)
 
 def plot_3d(fixed_pts_pc, cycle_pc1, cycle_pc2, cycle_pc3):
     
@@ -488,10 +403,94 @@ def plot_3d(fixed_pts_pc, cycle_pc1, cycle_pc2, cycle_pc3):
     # Show the legend
     ax1.legend()
 
-    # Show the plot
+plot_3d(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, cycle_pc3)
+
+
+
+
+for fp_idx, fp in enumerate(fps_pc):
+
+    # Create the plot
+    fig, ax = plt.subplots()
+
+    # Plot the eigenvalues with lighter color and black marker outline
+    ax.scatter(torch.real(J_eval[fp_idx,:]), torch.imag(J_eval[fp_idx,:]), color='lightblue', edgecolor='black', label='Eigenvalues')
+
+    # Add a unit circle
+    unit_circle = plt.Circle((0,0), 1, color='r', fill=False, label='Unit Circle')
+    ax.add_artist(unit_circle)
+
+    # Ensure aspect ratio is equal to get a correct circle
+    ax.set_aspect('equal')
+
+    # Calculate buffer for x and y limits
+    buffer = 0.1
+
+    # Setting x and y limits with buffer
+    ax.set_xlim([min_real - buffer, max_real + buffer])
+    ax.set_ylim([min_imag - buffer, max_imag + buffer])
+
+    plt.xlabel('Real Part')
+    plt.ylabel('Imaginary Part')
+    # plt.grid(True)
     plt.show()
 
-plot_3d(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, cycle_pc3)
+    filename = f"fixed_point_{fp_idx}"
+    fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
+
+
+
+    ### STREAMPLOT
+    TRAJ_TIME_LENGTH = 50
+    TRAJ_XY_DENSITY = 10
+
+    input = torch.zeros((1, TRAJ_XY_DENSITY * TRAJ_XY_DENSITY, INPUT_SIZE), device=device,  dtype=torch.float32)
+
+    # Create the X and Y meshgrid using torch.meshgrid
+    pc1_range = abs(cycle_pc1).max().max()
+    pc2_range = abs(cycle_pc2).max().max()
+    pc_range = max(pc1_range, pc2_range)
+    X_RANGE = round(pc_range) + 1  # Adjust the value of X to set the range of the meshgrid
+    x = torch.linspace(-X_RANGE, X_RANGE, TRAJ_XY_DENSITY)
+    y = torch.linspace(-X_RANGE, X_RANGE, TRAJ_XY_DENSITY)
+    Y, X = torch.meshgrid(x, y)
+
+    # Reshape the X and Y meshgrid tensors into column vectors
+    meshgrid_tensor = torch.stack((X.flatten(), Y.flatten()), dim=1)
+
+    # Expand the meshgrid tensor with zeros in the remaining columns
+    zeros_tensor = torch.zeros(meshgrid_tensor.shape[0], 256 - 2)
+    hc_zeroinput_t0_pc = torch.cat((meshgrid_tensor, zeros_tensor), dim=1).numpy()
+    hc_zeroinput_t0_pc[:,2:] = fps_pc[fp_idx,2:] # PC 3+ of fixed point (SLICE THROUGH PLANE PC1-PC2)
+
+    hc = torch.tensor(scl.inverse_transform(pca.inverse_transform(hc_zeroinput_t0_pc)), dtype=torch.float32).unsqueeze(dim=0).to(device)
+
+
+    # Extend hx_out in the first dimension
+    hc_hist_zeroinput = torch.zeros((TRAJ_TIME_LENGTH,) + hc.shape[1:], dtype=hc.dtype)
+    hc_hist_zeroinput[0,:,:] = hc
+
+    for i in range(TRAJ_TIME_LENGTH - 1):
+
+        # run step
+        _, (hx, cx) = a_rnn(input, (hc[:,:,:HIDDEN_SIZE].contiguous(), hc[:,:,HIDDEN_SIZE:].contiguous()))
+        hc = torch.cat((hx, cx), dim=2)
+
+        hc_hist_zeroinput[i+1,:,:] = hc
+
+    hc_zeroinput_tf_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_zeroinput).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy())).reshape(hc_hist_zeroinput.shape)
+
+    X = hc_zeroinput_t0_pc[:,0].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
+    Y = hc_zeroinput_t0_pc[:,1].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
+    U = hc_zeroinput_tf_pc[1,:,0].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY) - hc_zeroinput_tf_pc[0,:,0].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
+    V = hc_zeroinput_tf_pc[1,:,1].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY) - hc_zeroinput_tf_pc[0,:,1].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
+    fig = plot_2d_streamplot(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, X, Y, U, V)
+
+    filename = f"streamplot_slice_for_fixed_point_{fp_idx}"
+    fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
+
+
+    plot_2d_traj(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc)
 
 
 print('done')
