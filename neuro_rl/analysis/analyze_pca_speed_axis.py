@@ -170,7 +170,6 @@ def plot_data(x_data, y_data, z_data, c_data, cc_global_min, cc_global_max, data
         fig.savefig(path + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
 
 def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = ''):
-    N_COMPONENTS = 256
 
     # load DataFrame
     df = process_data(path + 'RAW_DATA' + file_suffix + '.parquet')
@@ -197,6 +196,7 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         df_tangling = tangl_data.loc[idx].reset_index(drop=True)
 
         N_DIMENSIONS = len(df_neuron.columns)
+        N_COMPONENTS = N_DIMENSIONS
         COLUMNS = np.char.mod(data_type + 'SPEED_PC_%03d', np.arange(N_COMPONENTS))
 
         if N_DIMENSIONS > 0:

@@ -70,6 +70,10 @@ lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isa
 # AnymalTerrain (3-#2) (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/ noise) (2nd model)
 lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_31-19-30-40/nn/last_AnymalTerrain_ep_7800_rew_20.086063.pth')
 
+# AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM16-DIST) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=horizon_length=16) (w/o bias)
+lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_04-15-37-26/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth')
+
+
 state_dict = {key.replace('a2c_network.a_rnn.rnn.', ''): value for key, value in lstm_model['model'].items() if key.startswith('a2c_network.a_rnn.rnn')}
 
 # get LSTM dimensions
@@ -109,6 +113,10 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 # AnymalTerrain (3-#2) (perturb longer w/ noise) (with HC = (HC, CX)) (2nd model)
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-01_08-11-32_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-01_08-45-29_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+
+# AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM-DIST) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=horizon_length=16) (w/o bias)
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-05_10-56-19_u[0.3,1.0,16]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/o noise
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-05_11-01-54_u[0.3,1.0,16]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/ noise
 
 
 # load scaler and pca transforms
@@ -187,7 +195,6 @@ for epoch in range(MAX_ITERATIONS):
     # Update the weights
     optimizer.step()
 
-
 # Convert lists to tensors
 hc_hist_fixedpt = torch.stack(hc_hist_fixedpt).squeeze()
 q_hist_fixedpt = torch.stack(q_hist_fixedpt).squeeze()
@@ -205,78 +212,91 @@ with h5py.File(DATA_PATH + 'q_hist_fixedpt.h5', 'w') as f:
     f.create_dataset('q_hist_fixedpt', data=q_hist_fixedpt.detach().numpy())
 
 
+import matplotlib.ticker as ticker
+import numpy as np
+import matplotlib.pyplot as plt
 
 ### cluster to get unique fixed points
 fps, cnt = find_clusters(hc_hist_fixedpt[-1:,:].squeeze().detach())
 fps_pc = pca.transform(scl.transform(fps))
-pd.DataFrame(fps).to_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/fixed_points2.csv')
+pd.DataFrame(fps).to_csv(DATA_PATH + 'fps.csv')
+pd.DataFrame(fps_pc).to_csv(DATA_PATH + 'fps_pc.csv')
 fixed_points = torch.Tensor(fps)
 
-### compute jacobian and 
-fixed_point = torch.zeros(1, HIDDEN_SIZE * 2).to(device)
+N_FIXED_POINTS = len(fps)
 input = torch.zeros(1, INPUT_SIZE).to(device)
-fixed_point[0,:] = fixed_points[1,:]
+J_input = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, INPUT_SIZE)
+J_hidden = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, HIDDEN_SIZE * 2)
+J_hidden_pc = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, HIDDEN_SIZE * 2)
+# J_hidden2 = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, HIDDEN_SIZE * 2)
+# J_hidden3 = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, HIDDEN_SIZE * 2)
+J_eval = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, dtype=torch.complex64)
+J_evec = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, HIDDEN_SIZE * 2, dtype=torch.complex64)
+J_eval_pc = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, dtype=torch.complex64)
+J_evec_pc = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, HIDDEN_SIZE * 2, dtype=torch.complex64)
 
-J_input, J_hidden = compute_jacobian_alternate(a_rnn, input, fixed_point)
-J_input2, J_hidden2 = compute_jacobian_alternate(a_rnn, input, fixed_point)
-J_input3, J_hidden3 = compute_jacobian_alternate2(a_rnn, input, fixed_point)
-J_eval, J_evec = torch.linalg.eig(J_hidden)
-torch.real(J_eval).max()
+for fp_idx, fixed_point in enumerate(fixed_points):
 
+    J_input[fp_idx,:,:], J_hidden[fp_idx,:,:] = compute_jacobian_alternate(a_rnn, input, fixed_point.unsqueeze(dim=0).to(device))
+    # J_input2[fixed_point,:,:], J_hidden2[fixed_point,:,:] = compute_jacobian_alternate(a_rnn, input, fixed_point)
+    # J_input3[fixed_point,:,:], J_hidden3[fixed_point,:,:] = compute_jacobian_alternate2(a_rnn, input, fixed_point)
+    eigenvalues, eigenvectors = torch.linalg.eig(J_hidden[fp_idx, :, :])
+    J_eval[fp_idx,:] = eigenvalues
+    J_evec[fp_idx,:,:] = eigenvectors
 
+    J_hidden_pc[fp_idx,:,:] = np.matmul(np.linalg.inv(pca.components_), np.matmul(J_hidden[fp_idx,:,:], pca.components_))
 
-# Create the plot
-fig, ax = plt.subplots()
-
-# Plot the eigenvalues with lighter color and black marker outline
-ax.scatter(torch.real(J_eval), torch.imag(J_eval), color='lightblue', edgecolor='black', label='Eigenvalues')
-
-# Add a unit circle
-unit_circle = plt.Circle((0,0), 1, color='r', fill=False, label='Unit Circle')
-ax.add_artist(unit_circle)
-
-# Ensure aspect ratio is equal to get a correct circle
-ax.set_aspect('equal')
-
-# Calculate buffer for x and y limits
-buffer = 0.1
-min_real = min(torch.real(J_eval))
-max_real = max(max(torch.real(J_eval)), 1.)
-min_imag = min(torch.imag(J_eval))
-max_imag = max(torch.imag(J_eval))
+    # Now, you can compute the eigenvalues and eigenvectors of the PCA-transformed Jacobian.
+    eigenvalues_pc, eigenvectors_pc = torch.linalg.eig(J_hidden_pc[fp_idx, :, :])
+    J_eval_pc[fp_idx,:] = eigenvalues_pc
+    J_evec_pc[fp_idx,:,:] = eigenvectors_pc
 
 
-min_eigenvalue = min(min(torch.real(J_eval)), min(torch.imag(J_eval)))
-max_eigenvalue = max(max(torch.real(J_eval)), max(torch.imag(J_eval)))
-max_abs_eigenvalue = max(abs(min_eigenvalue), abs(max_eigenvalue))
+# Get the real parts from the first PC of J_eval_pc
+real_parts = J_eval_pc[:, 0].real
 
-# Setting x and y limits with buffer
-ax.set_xlim([min_real - buffer, max_real + buffer])
-ax.set_ylim([min_imag - buffer, max_imag + buffer])
+# Find the index of the row with the smallest real part (dominant)
+min_index = torch.argmin(real_parts)
 
-plt.title('Eigenvalues (Real vs Imaginary)')
-plt.xlabel('Real Part')
-plt.ylabel('Imaginary Part')
-plt.grid(True)
-plt.show()
+# Get the row with the smallest real part (dominant eigenvalue)
+eval_dom_pc = J_eval_pc[min_index, :]
+fps_dom_pc = fps_pc[min_index, :]
 
+# find bounds of plots
+min_real = torch.real(J_eval).min()
+max_real = torch.real(J_eval).max()
+min_imag = torch.imag(J_eval).min()
+max_imag = torch.imag(J_eval).max()
 
+for fp_idx, fixed_point in enumerate(fixed_points):
 
+    # Create the plot
+    fig, ax = plt.subplots()
 
-J_hidden_pc = np.matmul(np.linalg.inv(pca.components_), np.matmul(J_hidden, pca.components_))
+    # Plot the eigenvalues with lighter color and black marker outline
+    ax.scatter(torch.real(J_eval[fp_idx,:]), torch.imag(J_eval[fp_idx,:]), color='lightblue', edgecolor='black', label='Eigenvalues')
 
-# Now, you can compute the eigenvalues and eigenvectors of the PCA-transformed Jacobian.
-J_eval_pc, J_evec_pc = torch.linalg.eig(J_hidden_pc)
+    # Add a unit circle
+    unit_circle = plt.Circle((0,0), 1, color='r', fill=False, label='Unit Circle')
+    ax.add_artist(unit_circle)
 
+    # Ensure aspect ratio is equal to get a correct circle
+    ax.set_aspect('equal')
 
+    # Calculate buffer for x and y limits
+    buffer = 0.1
 
+    # Setting x and y limits with buffer
+    ax.set_xlim([min_real - buffer, max_real + buffer])
+    ax.set_ylim([min_imag - buffer, max_imag + buffer])
 
+    plt.xlabel('Real Part')
+    plt.ylabel('Imaginary Part')
+    # plt.grid(True)
+    plt.show()
 
-
-
-
-
-
+    filename = f"fixed_point_{fp_idx}"
+    fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
 
 
 
@@ -284,102 +304,194 @@ J_eval_pc, J_evec_pc = torch.linalg.eig(J_hidden_pc)
 cycle_pc1 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_x_by_speed.csv', index_col=0)
 cycle_pc2 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_y_by_speed.csv', index_col=0)
 cycle_pc3 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_z1_by_speed.csv', index_col=0)
-cycle_pc1 = cycle_pc1.to_numpy().reshape(-1)
-cycle_pc2 = cycle_pc2.to_numpy().reshape(-1)
-cycle_pc3 = cycle_pc3.to_numpy().reshape(-1)
 
-df_perturb = pd.read_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_17-17-18_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/RAW_DATA_AVG.csv')
-df_perturb = pd.read_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_17-57-45_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/RAW_DATA_AVG.csv')
-df_perturb = pd.read_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_18-49-34_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/RAW_DATA_AVG.csv')
+# df_perturb = pd.read_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_17-17-18_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/RAW_DATA_AVG.csv')
+# df_perturb = pd.read_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_17-57-45_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/RAW_DATA_AVG.csv')
+# df_perturb = pd.read_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_18-49-34_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/RAW_DATA_AVG.csv')
 
-hc_perturb = torch.tensor(df_perturb.loc[:, df_perturb.columns.str.contains('A_LSTM_HC')].to_numpy())
-hc_perturb_pc = pca.transform(scl.transform(torch.squeeze(hc_perturb).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy())).reshape(hc_perturb.shape)
+# hc_perturb = torch.tensor(df_perturb.loc[:, df_perturb.columns.str.contains('A_LSTM_HC')].to_numpy())
+# hc_perturb_pc = pca.transform(scl.transform(torch.squeeze(hc_perturb).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy())).reshape(hc_perturb.shape)
 
+### STREAMPLOT
+TRAJ_TIME_LENGTH = 2
+TRAJ_XY_DENSITY = 100
 
+input = torch.zeros((1, TRAJ_XY_DENSITY * TRAJ_XY_DENSITY, INPUT_SIZE), device=device,  dtype=torch.float32)
 
+# Create the X and Y meshgrid using torch.meshgrid
+pc1_range = abs(cycle_pc1).max().max()
+pc2_range = abs(cycle_pc2).max().max()
+pc_range = max(pc1_range, pc2_range)
+X_RANGE = round(pc_range) + 1  # Adjust the value of X to set the range of the meshgrid
+x = torch.linspace(-X_RANGE, X_RANGE, TRAJ_XY_DENSITY)
+y = torch.linspace(-X_RANGE, X_RANGE, TRAJ_XY_DENSITY)
+Y, X = torch.meshgrid(x, y)
 
+# Reshape the X and Y meshgrid tensors into column vectors
+meshgrid_tensor = torch.stack((X.flatten(), Y.flatten()), dim=1)
 
+# Expand the meshgrid tensor with zeros in the remaining columns
+zeros_tensor = torch.zeros(meshgrid_tensor.shape[0], 256 - 2)
+hc_zeroinput_t0_pc = torch.cat((meshgrid_tensor, zeros_tensor), dim=1).numpy()
+hc_zeroinput_t0_pc[:,2:] = fps_pc[0,2:] # PC 3 of attractor
 
+hc = torch.tensor(scl.inverse_transform(pca.inverse_transform(hc_zeroinput_t0_pc)), dtype=torch.float32).unsqueeze(dim=0).to(device)
 
-
-
-
-
-
-
-
-
-J_evec_pc[:3,0]
-fps_pc[1,0]
-
-
-
-
-
-input = torch.zeros((1, 500, INPUT_SIZE), device=device,  dtype=torch.float32)
-hc0 = 10 * torch.tensor(scl.inverse_transform(pca.inverse_transform(hc0_pc[:500,:])), dtype=torch.float32).unsqueeze(dim=0).to(device)
-hc = torch.zeros((1, 500, HIDDEN_SIZE * 2), device=device,  dtype=torch.float32)
-hc[0,:,:] = hc0 + torch.tensor(fps[1,:]).to(device)
-
-desired_length = 100
 
 # Extend hx_out in the first dimension
-hc_hist_misc_zeroinput = torch.zeros((desired_length,) + hc.shape[1:], dtype=hc.dtype)
+hc_hist_zeroinput = torch.zeros((TRAJ_TIME_LENGTH,) + hc.shape[1:], dtype=hc.dtype)
+hc_hist_zeroinput[0,:,:] = hc
 
-for i in range(desired_length):
-
-    # add hidden state to history
-    hc_hist_misc_zeroinput[i,:,:] = hc
+for i in range(TRAJ_TIME_LENGTH - 1):
 
     # run step
     _, (hx, cx) = a_rnn(input, (hc[:,:,:HIDDEN_SIZE].contiguous(), hc[:,:,HIDDEN_SIZE:].contiguous()))
     hc = torch.cat((hx, cx), dim=2)
 
-hc_hist_misc_zeroinput_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_misc_zeroinput).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy())).reshape(hc_hist_misc_zeroinput.shape)
+    hc_hist_zeroinput[i+1,:,:] = hc
 
-import matplotlib.ticker as ticker
+hc_zeroinput_tf_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_zeroinput).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy())).reshape(hc_hist_zeroinput.shape)
+
+# Import libraries
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Create a figure and subplots
-fig = plt.figure()
-ax1 = fig.add_subplot(111, projection='3d')
+def plot_2d_streamplot(fixed_pts_pc, cycle_pc1, cycle_pc2, X, Y, U, V):
 
-# Iterate over each line
-for i in range(500): # hc_hist_misc_zeroinput_pc.shape[1]
-    line = hc_hist_misc_zeroinput_pc[:, i, :]  # Get the current line
+    # Create a figure and subplots
+    plt.ion()
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+
+    # Ensure aspect ratio is equal to get a correct circle
+    ax1.set_aspect('equal')
+
+    # Scatter plot points for context
+    # ax1.plot([EV[0] + fps_pc[1,0],fps_pc[1,0]], [EV[1] + fps_pc[1,1], fps_pc[1,1]], [EV[2] + fps_pc[1,2],fps_pc[1,2]], c='g')
+    scatter2 = ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], c='b', s=50)
+
+    num_cols = cycle_pc1.shape[1]
+    cmap = plt.cm.get_cmap('Spectral')
+    colors = cmap(np.linspace(0, 1, num_cols))
+
+    # Plot quivers using the extracted components
+    speed = np.sqrt(U**2 + V**2)
+    lw = 5 * speed / speed.max()
+    ax1.streamplot(X, Y, U, V, density=2, color ='k', linewidth = lw)
+    for i in range(num_cols):
+        ax1.plot(cycle_pc1.values[:, i], cycle_pc2.values[:, i], c=colors[i], label=f'Dataset {i+1}', linewidth = 3.0, alpha=0.5)
+        
+
+
+    # Create a ScalarFormatter and set the desired format
+    formatter = ticker.ScalarFormatter(useMathText=True)
+    formatter.set_scientific(False)
+    formatter.set_powerlimits((-3, 4))  # Adjust the power limits if needed
+
+    # Apply the formatter to the axis
+    ax1.xaxis.set_major_formatter(formatter)
+    ax1.yaxis.set_major_formatter(formatter)
+
+    # Set labels and title
+    ax1.set_xlabel('PC 1')
+    ax1.set_ylabel('PC 2')
+    ax1.set_title('3D Line Plot of PC Values')
+
+    # Show the legend
+    # ax1.legend()
+
+    # Show the plot
+    plt.show()
+
+X = hc_zeroinput_t0_pc[:,0].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
+Y = hc_zeroinput_t0_pc[:,1].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
+U = hc_zeroinput_tf_pc[1,:,0].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY) - hc_zeroinput_tf_pc[0,:,0].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
+V = hc_zeroinput_tf_pc[1,:,1].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY) - hc_zeroinput_tf_pc[0,:,1].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
+
+plot_2d_streamplot(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, X, Y, U, V)
+
+def plot_2d_traj(fixed_pts_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc):
+
+    # Create a figure and subplots
+    plt.ion()
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+
+    # Ensure aspect ratio is equal to get a correct circle
+    ax1.set_aspect('equal')
+
+    num_cols = cycle_pc1.shape[1]
+    cmap = plt.cm.get_cmap('Spectral')
+    colors = cmap(np.linspace(0, 1, num_cols))
+
+    for i in range(np.shape(hc_zeroinput_tf_pc)[1]):
+        # Plot the lines
+        line = hc_zeroinput_tf_pc[:, i, :]
+        ax1.plot(line[:, 0], line[:, 1], c='gray', alpha=0.5)
+
+    # Plot the cycle lines
+    for i in range(num_cols):
+        ax1.plot(cycle_pc1.values[:, i], cycle_pc2.values[:, i], c=colors[i], label=f'Dataset {i+1}')
+
+    # Scatter plot points for context
+    ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], c='b', s=50, zorder=10)
+
+    # Set labels and title
+    ax1.set_xlabel('PC 1')
+    ax1.set_ylabel('PC 2')
+    ax1.set_title('2D Line and Quiver Plot of PC Values')
+
+    # Show the legend
+    ax1.legend()
+
+    # Show the plot
+    plt.show()
+
+plot_2d_traj(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc)
+
+def plot_3d(fixed_pts_pc, cycle_pc1, cycle_pc2, cycle_pc3):
     
-    # Plot the line
-    ax1.plot(line[:, 0], line[:, 1], line[:, 2], c='k')
+    # Create a figure and subplots
+    plt.ion()
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111, projection='3d')
 
-# Scatter plot points for context
-ax1.plot([EV[0] + fps_pc[1,0],fps_pc[1,0]], [EV[1] + fps_pc[1,1], fps_pc[1,1]], [EV[2] + fps_pc[1,2],fps_pc[1,2]], c='g')
-ax1.scatter(cycle_pc1, cycle_pc2, cycle_pc3, c='r', s=1, label='cycle')
-ax1.scatter(hc_hist_fixedpt_tf_pc[:, 0], hc_hist_fixedpt_tf_pc[:, 1], hc_hist_fixedpt_tf_pc[:, 2], c='b', s=50, alpha=1.0, label='fixed points')
-# ax1.plot(hc_perturb_pc[:, 0], hc_perturb_pc[:, 1], hc_perturb_pc[:, 2], c='m')
+    # # Iterate over each line
+    # for i in range(500): # hc_hist_misc_zeroinput_pc.shape[1]
+    #     line = hc_hist_misc_zeroinput_pc[:, i, :]  # Get the current line
+        
+    #     # Plot the line
+    #     ax1.plot(line[:, 0], line[:, 1], line[:, 2], c='k')
 
-# Create a ScalarFormatter and set the desired format
-formatter = ticker.ScalarFormatter(useMathText=True)
-formatter.set_scientific(False)
-formatter.set_powerlimits((-3, 4))  # Adjust the power limits if needed
+    # Scatter plot points for context
+    # ax1.plot([EV[0] + fps_pc[1,0],fps_pc[1,0]], [EV[1] + fps_pc[1,1], fps_pc[1,1]], [EV[2] + fps_pc[1,2],fps_pc[1,2]], c='g')
+    scatter2 = ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], fixed_pts_pc[:, 2], c='b', s=50)
+    scatter1 = ax1.scatter(cycle_pc1, cycle_pc2, cycle_pc3, c='r', s=1)
 
-# Apply the formatter to the axis
-ax1.xaxis.set_major_formatter(formatter)
-ax1.yaxis.set_major_formatter(formatter)
-ax1.zaxis.set_major_formatter(formatter)
+    # Create a ScalarFormatter and set the desired format
+    formatter = ticker.ScalarFormatter(useMathText=True)
+    formatter.set_scientific(False)
+    formatter.set_powerlimits((-3, 4))  # Adjust the power limits if needed
 
-# Set labels and title
-ax1.set_xlabel('PC 1')
-ax1.set_ylabel('PC 2')
-ax1.set_zlabel('PC 3')
-ax1.set_title('3D Line Plot of PC Values')
+    ax1.view_init(20, 55)
 
-# Show the legend
-ax1.legend()
+    # Apply the formatter to the axis
+    ax1.xaxis.set_major_formatter(formatter)
+    ax1.yaxis.set_major_formatter(formatter)
+    ax1.zaxis.set_major_formatter(formatter)
 
-# Show the plot
-plt.show()
+    # Set labels and title
+    ax1.set_xlabel('PC 1')
+    ax1.set_ylabel('PC 2')
+    ax1.set_zlabel('PC 3')
+
+    # Show the legend
+    ax1.legend()
+
+    # Show the plot
+    plt.show()
+
+plot_3d(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, cycle_pc3)
+
 
 print('done')
-
-
