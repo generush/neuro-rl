@@ -44,6 +44,9 @@ import pandas as pd
 # https://datascience.stackexchange.com/questions/55066/how-to-export-pca-to-use-in-another-program
 import pickle as pk
 
+import matplotlib.ticker as ticker
+import matplotlib.pyplot as plt
+
 
 ### SET LSTM MODEL PATH
 
@@ -72,6 +75,9 @@ lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isa
 
 # AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM16-DIST) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=horizon_length=16) (w/o bias)
 lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_04-15-37-26/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth')
+
+# AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM4-DIST500) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=4, horizon_length=16) (w/o bias)
+lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_06-00-14-59/nn/last_AnymalTerrain_ep_6700_rew_20.21499.pth')
 
 
 state_dict = {key.replace('a2c_network.a_rnn.rnn.', ''): value for key, value in lstm_model['model'].items() if key.startswith('a2c_network.a_rnn.rnn')}
@@ -116,7 +122,11 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 
 # AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM-DIST) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=horizon_length=16) (w/o bias)
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-05_10-56-19_u[0.3,1.0,16]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/o noise
-# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-05_11-01-54_u[0.3,1.0,16]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/ noise
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-05_11-01-54_u[0.3,1.0,16]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/ noise
+
+# AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM4-DIST500) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=4, horizon_length=16) (w/o bias)
+DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_08-53-16_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/o noise
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_09-42-13_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/o noise early
 
 
 # load scaler and pca transforms
@@ -212,10 +222,6 @@ with h5py.File(DATA_PATH + 'q_hist_fixedpt.h5', 'w') as f:
     f.create_dataset('q_hist_fixedpt', data=q_hist_fixedpt.detach().numpy())
 
 
-import matplotlib.ticker as ticker
-import numpy as np
-import matplotlib.pyplot as plt
-
 ### cluster to get unique fixed points
 fps, cnt = find_clusters(hc_hist_fixedpt[-1:,:].squeeze().detach())
 fps_pc = pca.transform(scl.transform(fps))
@@ -230,43 +236,43 @@ J_hidden = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, HIDDEN_SIZE * 2)
 J_hidden_pc = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, HIDDEN_SIZE * 2)
 # J_hidden2 = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, HIDDEN_SIZE * 2)
 # J_hidden3 = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, HIDDEN_SIZE * 2)
-J_eval = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, dtype=torch.complex64)
-J_evec = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, HIDDEN_SIZE * 2, dtype=torch.complex64)
-J_eval_pc = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, dtype=torch.complex64)
-J_evec_pc = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, HIDDEN_SIZE * 2, dtype=torch.complex64)
+eval = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, dtype=torch.complex64)
+evec = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, HIDDEN_SIZE * 2, dtype=torch.complex64)
+eval_pc = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, dtype=torch.complex64)
+evec_pc = torch.zeros(N_FIXED_POINTS, HIDDEN_SIZE * 2, HIDDEN_SIZE * 2, dtype=torch.complex64)
 
 for fp_idx, fixed_point in enumerate(fixed_points):
 
-    J_input[fp_idx,:,:], J_hidden[fp_idx,:,:] = compute_jacobian_alternate(a_rnn, input, fixed_point.unsqueeze(dim=0).to(device))
+    J_input[fp_idx,:,:], J_hidden[fp_idx,:,:] = compute_jacobian_alternate2(a_rnn, input, fixed_point.unsqueeze(dim=0).to(device))
     # J_input2[fixed_point,:,:], J_hidden2[fixed_point,:,:] = compute_jacobian_alternate(a_rnn, input, fixed_point)
     # J_input3[fixed_point,:,:], J_hidden3[fixed_point,:,:] = compute_jacobian_alternate2(a_rnn, input, fixed_point)
     eigenvalues, eigenvectors = torch.linalg.eig(J_hidden[fp_idx, :, :])
-    J_eval[fp_idx,:] = eigenvalues
-    J_evec[fp_idx,:,:] = eigenvectors
+    eval[fp_idx,:] = eigenvalues
+    evec[fp_idx,:,:] = eigenvectors
 
     J_hidden_pc[fp_idx,:,:] = np.matmul(np.linalg.inv(pca.components_), np.matmul(J_hidden[fp_idx,:,:], pca.components_))
 
     # Now, you can compute the eigenvalues and eigenvectors of the PCA-transformed Jacobian.
     eigenvalues_pc, eigenvectors_pc = torch.linalg.eig(J_hidden_pc[fp_idx, :, :])
-    J_eval_pc[fp_idx,:] = eigenvalues_pc
-    J_evec_pc[fp_idx,:,:] = eigenvectors_pc
+    eval_pc[fp_idx,:] = eigenvalues_pc
+    evec_pc[fp_idx,:,:] = eigenvectors_pc
 
 
-# Get the real parts from the first PC of J_eval_pc
-real_parts = J_eval_pc[:, 0].real
+# Get the real parts from the first PC of val_pc
+real_parts = eval_pc[:, 0].real
 
 # Find the index of the row with the smallest real part (dominant)
 min_index = torch.argmin(real_parts)
 
 # Get the row with the smallest real part (dominant eigenvalue)
-eval_dom_pc = J_eval_pc[min_index, :]
+eval_dom_pc = eval_pc[min_index, :]
 fps_dom_pc = fps_pc[min_index, :]
 
 # find bounds of plots
-min_real = torch.real(J_eval).min()
-max_real = torch.real(J_eval).max()
-min_imag = torch.imag(J_eval).min()
-max_imag = torch.imag(J_eval).max()
+min_real = torch.real(eval).min()
+max_real = torch.real(eval).max()
+min_imag = torch.imag(eval).min()
+max_imag = torch.imag(eval).max()
 
 
 cycle_pc1 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_x_by_speed.csv', index_col=0)
@@ -277,14 +283,18 @@ cycle_pc3 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_z1_by_speed.csv', index_col=
 # df_perturb = pd.read_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_17-57-45_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/RAW_DATA_AVG.csv')
 # df_perturb = pd.read_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_18-49-34_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/RAW_DATA_AVG.csv')
 
-# hc_perturb = torch.tensor(df_perturb.loc[:, df_perturb.columns.str.contains('A_LSTM_HC')].to_numpy())
-# hc_perturb_pc = pca.transform(scl.transform(torch.squeeze(hc_perturb).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy())).reshape(hc_perturb.shape)
+
+# AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM4-DIST500) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=4, horizon_length=16) (w/o bias) DIST1000
+df = pd.read_parquet('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_14-00-59_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/RAW_DATA.parquet')
+
+# Assuming you have the data in a pandas DataFrame named 'df'
+result = df[(df['TIME'] >= 200*0.005) & (df['TIME'] < 400*0.005)]
+df_perturb = result.loc[:, result.columns.str.contains('A_LSTM_HC_RAW')]
+hc_perturb = torch.tensor(df_perturb.to_numpy())
+hc_perturb_pc = pca.transform(scl.transform(torch.squeeze(hc_perturb).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy())).reshape(hc_perturb.shape)
 
 
 
-    # Import libraries
-    import numpy as np
-    import matplotlib.pyplot as plt
 
 # https://www.geeksforgeeks.org/matplotlib-pyplot-streamplot-in-python/#
 def plot_2d_streamplot(fixed_pts_pc, cycle_pc1, cycle_pc2, X, Y, U, V):
@@ -329,7 +339,7 @@ def plot_2d_streamplot(fixed_pts_pc, cycle_pc1, cycle_pc2, X, Y, U, V):
 
     return fig
 
-def plot_2d_traj(fixed_pts_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc):
+def plot_2d_traj(fixed_pts_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc, hc_perturb_pc):
 
     # Create a figure and subplots
     plt.ion()
@@ -348,12 +358,14 @@ def plot_2d_traj(fixed_pts_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc):
         line = hc_zeroinput_tf_pc[:, i, :]
         ax1.plot(line[:, 0], line[:, 1], c='gray', alpha=0.5)
 
-    # Plot the cycle lines
-    for i in range(num_cols):
-        ax1.plot(cycle_pc1.values[:, i], cycle_pc2.values[:, i], c=colors[i], label=f'Dataset {i+1}')
+    # cycle
+    ax1.plot(cycle_pc1.values[:, -1], cycle_pc2.values[:, -1], c="k", linewidth = 3.0, alpha=1)
 
     # Scatter plot points for context
-    ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], c='b', s=50, zorder=10)
+    ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], c='k', s=1, zorder=10)
+
+    ax1.scatter(hc_perturb_pc[:, 0], hc_perturb_pc[:, 1], c='b', s=50, zorder=10)
+    
 
     # Set labels and title
     ax1.set_xlabel('PC 1')
@@ -361,10 +373,9 @@ def plot_2d_traj(fixed_pts_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc):
     ax1.set_title('2D Line and Quiver Plot of PC Values')
 
     # Show the legend
-    ax1.legend()
+    # ax1.legend()
 
-
-def plot_3d(fixed_pts_pc, cycle_pc1, cycle_pc2, cycle_pc3):
+def plot_3d(fixed_pts_pc, cycle_pc1, cycle_pc2, cycle_pc3, hc_perturb_pc):
     
     # Create a figure and subplots
     plt.ion()
@@ -380,8 +391,10 @@ def plot_3d(fixed_pts_pc, cycle_pc1, cycle_pc2, cycle_pc3):
 
     # Scatter plot points for context
     # ax1.plot([EV[0] + fps_pc[1,0],fps_pc[1,0]], [EV[1] + fps_pc[1,1], fps_pc[1,1]], [EV[2] + fps_pc[1,2],fps_pc[1,2]], c='g')
-    scatter2 = ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], fixed_pts_pc[:, 2], c='b', s=50)
-    scatter1 = ax1.scatter(cycle_pc1, cycle_pc2, cycle_pc3, c='r', s=1)
+    scatter1 = ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], fixed_pts_pc[:, 2], c='b', s=50)
+
+    scatter2 = ax1.scatter(hc_perturb_pc[:, 0], hc_perturb_pc[:, 1], hc_perturb_pc[:, 2], c='k', s=1)
+    scatter3 = ax1.scatter(cycle_pc1, cycle_pc2, cycle_pc3, c='r', s=1)
 
     # Create a ScalarFormatter and set the desired format
     formatter = ticker.ScalarFormatter(useMathText=True)
@@ -403,7 +416,7 @@ def plot_3d(fixed_pts_pc, cycle_pc1, cycle_pc2, cycle_pc3):
     # Show the legend
     ax1.legend()
 
-plot_3d(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, cycle_pc3)
+plot_3d(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, cycle_pc3, hc_perturb_pc)
 
 
 
@@ -414,7 +427,7 @@ for fp_idx, fp in enumerate(fps_pc):
     fig, ax = plt.subplots()
 
     # Plot the eigenvalues with lighter color and black marker outline
-    ax.scatter(torch.real(J_eval[fp_idx,:]), torch.imag(J_eval[fp_idx,:]), color='lightblue', edgecolor='black', label='Eigenvalues')
+    ax.scatter(torch.real(eval[fp_idx,:]), torch.imag(eval[fp_idx,:]), color='lightblue', edgecolor='black', label='Eigenvalues')
 
     # Add a unit circle
     unit_circle = plt.Circle((0,0), 1, color='r', fill=False, label='Unit Circle')
@@ -441,8 +454,8 @@ for fp_idx, fp in enumerate(fps_pc):
 
 
     ### STREAMPLOT
-    TRAJ_TIME_LENGTH = 50
-    TRAJ_XY_DENSITY = 10
+    TRAJ_TIME_LENGTH = 2
+    TRAJ_XY_DENSITY = 50
 
     input = torch.zeros((1, TRAJ_XY_DENSITY * TRAJ_XY_DENSITY, INPUT_SIZE), device=device,  dtype=torch.float32)
 
@@ -453,10 +466,11 @@ for fp_idx, fp in enumerate(fps_pc):
     X_RANGE = round(pc_range) + 1  # Adjust the value of X to set the range of the meshgrid
     x = torch.linspace(-X_RANGE, X_RANGE, TRAJ_XY_DENSITY)
     y = torch.linspace(-X_RANGE, X_RANGE, TRAJ_XY_DENSITY)
-    Y, X = torch.meshgrid(x, y)
+    YY, XX = torch.meshgrid(x, y)  # switch places of x and y
 
     # Reshape the X and Y meshgrid tensors into column vectors
-    meshgrid_tensor = torch.stack((X.flatten(), Y.flatten()), dim=1)
+    # meshgrid_tensor = torch.stack((XX.flatten(), XX.flatten()), dim=1)
+    meshgrid_tensor = torch.stack((XX.flatten(), YY.flatten()), dim=1)
 
     # Expand the meshgrid tensor with zeros in the remaining columns
     zeros_tensor = torch.zeros(meshgrid_tensor.shape[0], 256 - 2)
@@ -464,7 +478,6 @@ for fp_idx, fp in enumerate(fps_pc):
     hc_zeroinput_t0_pc[:,2:] = fps_pc[fp_idx,2:] # PC 3+ of fixed point (SLICE THROUGH PLANE PC1-PC2)
 
     hc = torch.tensor(scl.inverse_transform(pca.inverse_transform(hc_zeroinput_t0_pc)), dtype=torch.float32).unsqueeze(dim=0).to(device)
-
 
     # Extend hx_out in the first dimension
     hc_hist_zeroinput = torch.zeros((TRAJ_TIME_LENGTH,) + hc.shape[1:], dtype=hc.dtype)
@@ -482,15 +495,14 @@ for fp_idx, fp in enumerate(fps_pc):
 
     X = hc_zeroinput_t0_pc[:,0].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
     Y = hc_zeroinput_t0_pc[:,1].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
-    U = hc_zeroinput_tf_pc[1,:,0].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY) - hc_zeroinput_tf_pc[0,:,0].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
-    V = hc_zeroinput_tf_pc[1,:,1].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY) - hc_zeroinput_tf_pc[0,:,1].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
+    U = (hc_zeroinput_tf_pc[1,:,0] - hc_zeroinput_tf_pc[0,:,0]).reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
+    V = (hc_zeroinput_tf_pc[1,:,1] - hc_zeroinput_tf_pc[0,:,1]).reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
     fig = plot_2d_streamplot(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, X, Y, U, V)
 
     filename = f"streamplot_slice_for_fixed_point_{fp_idx}"
     fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
 
-
-    plot_2d_traj(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc)
-
+    plot_2d_traj(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc, hc_perturb_pc)
+    plot_3d_traj(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc, hc_perturb_pc)
 
 print('done')
