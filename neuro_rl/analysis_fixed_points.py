@@ -285,14 +285,7 @@ cycle_pc3 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_z1_by_speed.csv', index_col=
 
 
 # AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM4-DIST500) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=4, horizon_length=16) (w/o bias) DIST1000
-df = pd.read_parquet('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_14-00-59_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/RAW_DATA.parquet')
-
-# Assuming you have the data in a pandas DataFrame named 'df'
-result = df[(df['TIME'] >= 200*0.005) & (df['TIME'] < 400*0.005)]
-df_perturb = result.loc[:, result.columns.str.contains('A_LSTM_HC_RAW')]
-hc_perturb = torch.tensor(df_perturb.to_numpy())
-hc_perturb_pc = pca.transform(scl.transform(torch.squeeze(hc_perturb).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy())).reshape(hc_perturb.shape)
-
+df = pd.read_parquet('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_17-07-25_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/RAW_DATA.parquet')
 
 
 
