@@ -229,8 +229,8 @@ for axs in axs_arr:
     for ax in axs:
         ax.fill_between([2, 2.25], ax.get_ylim()[0], ax.get_ylim()[1], color=mcolors.to_rgba('gray', alpha=0.2))  # adjust alpha for transparency
 
-SAVE_PATH = ['/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/']
-FIGS = ['HC', 'OBS_BODY_VEL_ORIENT', 'OBS_BODY', 'ACT', 'OBS_JOINT_POS', 'OBS_JOINT_VEL', 'DELTA_OBS_BODY_VEL_ORIENT']
+SAVE_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/'
+FIGS = ['HC', 'OBS_BODY_VEL_ORIENT', 'ACT', 'OBS_JOINT_POS', 'OBS_JOINT_VEL', 'DELTA_OBS_BODY_VEL_ORIENT']
 i = 0
 # Show the figures
 for fig in figs:
