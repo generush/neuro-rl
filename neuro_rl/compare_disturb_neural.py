@@ -51,7 +51,7 @@ import matplotlib.colors as mcolors
 HIDDEN_SIZE = 128
 
 
-def plot_data(df, hc_perturb, obs_perturb, act_perturb, color, axs_arr, ylabel_arr, scl, pca):
+def plot_data(df, hc_perturb, obs_perturb, act_perturb, color, linestyle, axs_arr, ylabel_arr, scl, pca):
     averaged_data = df.groupby('TIME').mean()
     averaged_data.reset_index(inplace=True)
     averaged_data.set_index('TIME', inplace=True)
@@ -86,9 +86,9 @@ def plot_data(df, hc_perturb, obs_perturb, act_perturb, color, axs_arr, ylabel_a
     IDX_BEGIN = 0
     IDX_END = 12
     for idx, column in enumerate(hc_perturb_avg_pc_df.columns[IDX_BEGIN:IDX_END]):
-        for j in range(np.shape(hc_perturb_pc[:,:,idx + IDX_BEGIN])[0]):
-            axs_arr[0][idx].plot(time_idx, hc_perturb_pc[j,:L_TIME,idx + IDX_BEGIN], lw=1, c=color)
-        axs_arr[0][idx].plot(time_idx, hc_perturb_avg_pc_df[column].values[0:tf], lw=2, c=color)
+        # for j in range(np.shape(hc_perturb_pc[:,:,idx + IDX_BEGIN])[0]):
+        #     axs_arr[0][idx].plot(time_idx, hc_perturb_pc[j,:L_TIME,idx + IDX_BEGIN], lw=1, c=color, linestyle=linestyle)
+        axs_arr[0][idx].plot(time_idx, hc_perturb_avg_pc_df[column].values[0:tf], lw=2, c=color, linestyle=linestyle)
         # axs_arr[0][idx].set_title(f"{column}")
         axs_arr[0][idx].set_ylabel(ylabel_arr[0][idx])  # Set the ylabel here
 
@@ -96,9 +96,9 @@ def plot_data(df, hc_perturb, obs_perturb, act_perturb, color, axs_arr, ylabel_a
     IDX_BEGIN = 0
     IDX_END = 12
     for idx, column in enumerate(obs_perturb_avg_df.columns[IDX_BEGIN:IDX_END]):
-        for j in range(np.shape(obs_perturb[:,:,idx + IDX_BEGIN])[0]):
-            axs_arr[1][idx].plot(time_idx, obs_perturb[j,:L_TIME,idx + IDX_BEGIN], lw=1, c=color)
-        axs_arr[1][idx].plot(time_idx, obs_perturb_avg_df[column].values[0:tf], lw=2, c=color)
+        # for j in range(np.shape(obs_perturb[:,:,idx + IDX_BEGIN])[0]):
+        #     axs_arr[1][idx].plot(time_idx, obs_perturb[j,:L_TIME,idx + IDX_BEGIN], lw=1, c=color, linestyle=linestyle)
+        axs_arr[1][idx].plot(time_idx, obs_perturb_avg_df[column].values[0:tf], lw=2, c=color, linestyle=linestyle)
         # axs_arr[1][idx].set_title(f"{column}")
         axs_arr[1][idx].set_ylabel(ylabel_arr[1][idx])  # Set the ylabel here
 
@@ -106,9 +106,9 @@ def plot_data(df, hc_perturb, obs_perturb, act_perturb, color, axs_arr, ylabel_a
     IDX_BEGIN = 0
     IDX_END = 12
     for idx, column in enumerate(act_perturb_avg_df.columns[IDX_BEGIN:IDX_END]):
-        for j in range(np.shape(act_perturb[:,:,idx + IDX_BEGIN])[0]):
-            axs_arr[2][idx].plot(time_idx, act_perturb[j,:L_TIME,idx + IDX_BEGIN], lw=1, c=color)
-        axs_arr[2][idx].plot(time_idx, act_perturb_avg_df[column].values[0:tf], lw=2, c=color)
+        # for j in range(np.shape(act_perturb[:,:,idx + IDX_BEGIN])[0]):
+        #     axs_arr[2][idx].plot(time_idx, act_perturb[j,:L_TIME,idx + IDX_BEGIN], lw=1, c=color, linestyle=linestyle)
+        axs_arr[2][idx].plot(time_idx, act_perturb_avg_df[column].values[0:tf], lw=2, c=color, linestyle=linestyle)
         # axs_arr[1][idx].set_title(f"{column}")
         axs_arr[2][idx].set_ylabel(ylabel_arr[2][idx])  # Set the ylabel here
 
@@ -116,9 +116,9 @@ def plot_data(df, hc_perturb, obs_perturb, act_perturb, color, axs_arr, ylabel_a
     IDX_BEGIN = 12
     IDX_END = 24
     for idx, column in enumerate(obs_perturb_avg_df.columns[IDX_BEGIN:IDX_END]):
-        for j in range(np.shape(obs_perturb[:,:,idx + IDX_BEGIN])[0]):
-            axs_arr[3][idx].plot(time_idx, obs_perturb[j,:L_TIME,idx + IDX_BEGIN], lw=1, c=color)
-        axs_arr[3][idx].plot(time_idx, obs_perturb_avg_df[column].values[0:tf], lw=2, c=color)
+        # for j in range(np.shape(obs_perturb[:,:,idx + IDX_BEGIN])[0]):
+        #     axs_arr[3][idx].plot(time_idx, obs_perturb[j,:L_TIME,idx + IDX_BEGIN], lw=1, c=color, linestyle=linestyle)
+        axs_arr[3][idx].plot(time_idx, obs_perturb_avg_df[column].values[0:tf], lw=2, c=color, linestyle=linestyle)
         # axs_arr[2][idx].set_title(f"{column}")
         axs_arr[3][idx].set_ylabel(ylabel_arr[3][idx])  # Set the ylabel here
 
@@ -126,9 +126,9 @@ def plot_data(df, hc_perturb, obs_perturb, act_perturb, color, axs_arr, ylabel_a
     IDX_BEGIN = 24
     IDX_END = 36
     for idx, column in enumerate(obs_perturb_avg_df.columns[IDX_BEGIN:IDX_END]):
-        for j in range(np.shape(obs_perturb[:,:,idx + IDX_BEGIN])[0]):
-            axs_arr[4][idx].plot(time_idx, obs_perturb[j,:L_TIME,idx + IDX_BEGIN], lw=1, c=color)
-        axs_arr[4][idx].plot(time_idx, obs_perturb_avg_df[column].values[0:tf], lw=2, c=color)
+        # for j in range(np.shape(obs_perturb[:,:,idx + IDX_BEGIN])[0]):
+        #     axs_arr[4][idx].plot(time_idx, obs_perturb[j,:L_TIME,idx + IDX_BEGIN], lw=1, c=color, linestyle=linestyle)
+        axs_arr[4][idx].plot(time_idx, obs_perturb_avg_df[column].values[0:tf], lw=2, c=color, linestyle=linestyle)
         # axs_arr[3][idx].set_title(f"{column}")
         axs_arr[4][idx].set_ylabel(ylabel_arr[4][idx])  # Set the ylabel here
 
@@ -141,21 +141,13 @@ def plot_data(df, hc_perturb, obs_perturb, act_perturb, color, axs_arr, ylabel_a
     IDX_BEGIN = 0
     IDX_END = 12
     for idx, column in enumerate(del_obs_perturb_avg_df.columns[IDX_BEGIN:IDX_END]):
-        for j in range(np.shape(del_obs_perturb[:,:,idx + IDX_BEGIN])[0]):
-            axs_arr[5][idx].plot(time_idx, del_obs_perturb[j,:L_TIME,idx + IDX_BEGIN], lw=1, c=color)
-        axs_arr[5][idx].plot(time_idx, del_obs_perturb_avg_df[column].values[0:tf], lw=2, c=color)
+        # for j in range(np.shape(del_obs_perturb[:,:,idx + IDX_BEGIN])[0]):
+        #     axs_arr[5][idx].plot(time_idx, del_obs_perturb[j,:L_TIME,idx + IDX_BEGIN], lw=1, c=color, linestyle=linestyle)
+        axs_arr[5][idx].plot(time_idx, del_obs_perturb_avg_df[column].values[0:tf], lw=2, c=color, linestyle=linestyle)
         # axs_arr[4][idx].set_title(f"delta {column}")
         axs_arr[5][idx].set_ylabel(ylabel_arr[5][idx])  # Set the ylabel here
 
 
-
-
-# Create the figures and axes for each dataframe
-figs, axs_arr = [], []
-for _ in range(6):
-    fig, axs = plt.subplots(nrows=12, ncols=1, figsize=[4,15])
-    figs.append(fig)
-    axs_arr.append(axs.flatten())
 
 # SCL and PCA
 NOM_DATA_PATHS = [
@@ -163,30 +155,16 @@ NOM_DATA_PATHS = [
     '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_20-19-14_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]_LSTM16-DIST500-noperturb/'
 ]
 
-# lateral push: -2500
-DIST_DATA_PATHS = [
-    '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-07_00-22-38_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]]_LSTM4_DIST500-minus2500v/',
-    '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_20-05-52_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]_LSTM16-DIST500-minus2500v/'
+# SCL and PCA
+NOM_DATA_PATHS = [
+    '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_20-19-14_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]_LSTM16-DIST500-noperturb/',
+    '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_20-19-14_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]_LSTM16-DIST500-noperturb/'
 ]
-
-# lateral push: -2.5 x BW
-DIST_DATA_PATHS = [
-    '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-08_02-28-06_u[0.0,0.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]_LSTM4_DIST500_u0_perturb_-3.5xBW/',
-    '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-08_02-27-18_u[0.0,0.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]_LSTM16_DIST500_u0_perturb_-3.5xBW/'
-]
-
-# lateral push: 0 x BW
-DIST_DATA_PATHS = [
-    '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-08_02-37-28_u[0.0,0.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]_LSTM4_DIST500_u0_perturb_0xBW/',
-    '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-08_02-36-03_u[0.0,0.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]_LSTM16_DIST500_u0_perturb_0xBW/'
-]
-
-
 
 # +10% obs perturb
 DIST_DATA_PATHS = [
-    '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-08_13-39-22_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/',
-    '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-08_13-41-14_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+    '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-08_16-49-59_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[256]_PC1-PC10_+25perturb_2.6s_one_step_LSTM16/',
+    '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-08_18-18-49_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 ]
 
 
@@ -197,72 +175,78 @@ pcas = [pk.load(open(path + 'A_LSTM_HC_SPEED_PCA.pkl','rb')) for path in NOM_DAT
 # load dataframes
 df_raws = [pd.read_parquet(path + 'RAW_DATA.parquet') for path in DIST_DATA_PATHS]
 
-# For each dataframe
-for idx, df_raw in enumerate(df_raws):
-    scl = scls[idx]
-    pca = pcas[idx]
-    
-    color_light = 'pink' if idx == 0 else 'gray'  # Choose a color based on the dataframe
-    color = 'red' if idx == 0 else 'black'  # Choose a color based on the dataframe
+T_BEGIN = 2.1
+T_END = 2.9
+N_ENVS = 10
 
-    T_BEGIN = 2
-    T_END = 3
-    N_ENVS = 10
+# For each unique environment
+for ENV in range(N_ENVS):
 
-    df = df_raw.loc[(df_raw['TIME'] >= T_BEGIN) & (df_raw['TIME'] < T_END) & (df_raw['ENV'] < N_ENVS)]
+    # Create the figures and axes for each dataframe
+    fig, axs = plt.subplots(nrows=12, ncols=6, figsize=[18,14])
+    axs_arr = axs.T  # Transpose the axes array so that the subplots are in 6 columns
+    plt.subplots_adjust(hspace=0.5, wspace=0.75)
 
-    hc_perturb_df = df.loc[:, df.columns.str.contains('A_LSTM_HC_RAW')]
-    obs_perturb_df = df.loc[:, df.columns.str.contains('OBS_RAW')]
-    act_perturb_df = df.loc[:, df.columns.str.contains('ACT_RAW')]
+    for idx, df_raw in enumerate(df_raws):
+        scl = scls[idx]
+        pca = pcas[idx]
+        
+        color = 'red' if idx == 0 else 'black'  # Choose a color based on the dataframe
+        linestyle='solid' if idx == 0 else 'dashed'  # Choose a color based on the dataframe
 
-    # Reshape HC
-    env_length = len(df['ENV'].unique())
-    time_length = len(df['TIME'].unique())
-    feature_length = np.array(hc_perturb_df).shape[1]
-    hc_perturb = np.array(hc_perturb_df).reshape(env_length, time_length, feature_length)
+        figs = ['HC', 'OBS_BODY_VEL_ORIENT', 'ACT', 'OBS_JOINT_POS', 'OBS_JOINT_VEL', 'DELTA_OBS_BODY_VEL_ORIENT']
 
-    # Reshape OBS
-    env_length = len(df['ENV'].unique())
-    time_length = len(df['TIME'].unique())
-    feature_length = np.array(obs_perturb_df).shape[1]
-    obs_perturb = np.array(obs_perturb_df).reshape(env_length, time_length, feature_length)
+        for i in range(6):
+            axs_arr[i][0].set_title(figs[i])
 
-    # Reshape OBS
-    env_length = len(df['ENV'].unique())
-    time_length = len(df['TIME'].unique())
-    feature_length = np.array(act_perturb_df).shape[1]
-    act_perturb = np.array(act_perturb_df).reshape(env_length, time_length, feature_length)
+        df = df_raw.loc[(df_raw['TIME'] >= T_BEGIN) & (df_raw['TIME'] < T_END) & (df_raw['ENV'] == ENV)]
 
-    ylabel_arr = [
-        ['PC 1','PC 2','PC 3','PC 4','PC 5','PC 6','PC 7','PC 8','PC 9','PC 10','PC 11','PC 12'],
-        [r'$u$', r'$v$', r'$w$', r'$p$', r'$q$', r'$r$', r'$\phi$', r'$\theta$', r'$\psi$', r'$u*$', r'$v*$', r'$w*$'],
-        ['','','','','','','','','','','',''],
-        ['','','','','','','','','','','',''],
-        ['','','','','','','','','','','',''],
-        [r'$\dot{u}$', r'$\dot{v}$', r'$\dot{w}$', r'$\dot{p}$', r'$\dot{q}$', r'$\dot{r}$', r'$\dot{\phi}$', r'$\dot{\theta}$', r'$\dot{\psi}$', r'$\dot{u}*$', r'$\dot{v}*$', r'$\dot{w}*$'],
-    ]
+        hc_perturb_df = df.loc[:, df.columns.str.contains('A_LSTM_HC_RAW')]
+        obs_perturb_df = df.loc[:, df.columns.str.contains('OBS_RAW')]
+        act_perturb_df = df.loc[:, df.columns.str.contains('ACT_RAW')]
 
-    # Plot the data
-    plot_data(df, hc_perturb, obs_perturb, act_perturb, color, axs_arr, ylabel_arr, scl, pca)
+        # Reshape HC
+        env_length = len(df['ENV'].unique())
+        time_length = len(df['TIME'].unique())
+        feature_length = np.array(hc_perturb_df).shape[1]
+        hc_perturb = np.array(hc_perturb_df).reshape(env_length, time_length, feature_length)
 
-# plot the background color
-# for axs in axs_arr:
-#     for ax in axs:
-#         ax.fill_between([2, 2.25], ax.get_ylim()[0], ax.get_ylim()[1], color=mcolors.to_rgba('gray', alpha=0.2))  # adjust alpha for transparency
+        # Reshape OBS
+        env_length = len(df['ENV'].unique())
+        time_length = len(df['TIME'].unique())
+        feature_length = np.array(obs_perturb_df).shape[1]
+        obs_perturb = np.array(obs_perturb_df).reshape(env_length, time_length, feature_length)
 
-SAVE_PATH = DIST_DATA_PATHS[0]
-FIGS = ['HC', 'OBS_BODY_VEL_ORIENT', 'ACT', 'OBS_JOINT_POS', 'OBS_JOINT_VEL', 'DELTA_OBS_BODY_VEL_ORIENT']
-i = 0
-# Show the figures
-for fig in figs:
-    fig.tight_layout()  # Add this line here
+        # Reshape OBS
+        env_length = len(df['ENV'].unique())
+        time_length = len(df['TIME'].unique())
+        feature_length = np.array(act_perturb_df).shape[1]
+        act_perturb = np.array(act_perturb_df).reshape(env_length, time_length, feature_length)
 
-    filename = f"{FIGS[i]}"
+        ylabel_arr = [
+            ['PC 1','PC 2','PC 3','PC 4','PC 5','PC 6','PC 7','PC 8','PC 9','PC 10','PC 11','PC 12'],
+            [r'$u$', r'$v$', r'$w$', r'$p$', r'$q$', r'$r$', r'$\phi$', r'$\theta$', r'$\psi$', r'$u*$', r'$v*$', r'$w*$'],
+            ['','','','','','','','','','','',''],
+            ['','','','','','','','','','','',''],
+            ['','','','','','','','','','','',''],
+            [r'$\dot{u}$', r'$\dot{v}$', r'$\dot{w}$', r'$\dot{p}$', r'$\dot{q}$', r'$\dot{r}$', r'$\dot{\phi}$', r'$\dot{\theta}$', r'$\dot{\psi}$', r'$\dot{u}*$', r'$\dot{v}*$', r'$\dot{w}*$'],
+        ]
+
+        # Plot the data
+        plot_data(df, hc_perturb, obs_perturb, act_perturb, color, linestyle, axs_arr, ylabel_arr, scl, pca)
+
+    # plot the background color
+    for axs in axs_arr:
+        for ax in axs:
+            ax.fill_between([2.58, 2.6], ax.get_ylim()[0], ax.get_ylim()[1], color=mcolors.to_rgba('gray', alpha=0.2))  # adjust alpha for transparency
+
+    SAVE_PATH = DIST_DATA_PATHS[0]
+    FIGS = ['HC', 'OBS_BODY_VEL_ORIENT', 'ACT', 'OBS_JOINT_POS', 'OBS_JOINT_VEL', 'DELTA_OBS_BODY_VEL_ORIENT']
+
+    filename = f'perturb_neural_ENV{ENV}'
     fig.savefig(SAVE_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
 
     fig.show()
-
-    i+=1
 
 print('hi')
 

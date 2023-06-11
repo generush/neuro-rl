@@ -77,7 +77,7 @@ lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isa
 lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_04-15-37-26/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth')
 
 # AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM4-DIST500) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=4, horizon_length=16) (w/o bias)
-lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_06-00-14-59/nn/last_AnymalTerrain_ep_6700_rew_20.21499.pth')
+# lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_06-00-14-59/nn/last_AnymalTerrain_ep_6700_rew_20.21499.pth')
 
 
 state_dict = {key.replace('a2c_network.a_rnn.rnn.', ''): value for key, value in lstm_model['model'].items() if key.startswith('a2c_network.a_rnn.rnn')}
@@ -120,14 +120,13 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-01_08-11-32_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-01_08-45-29_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
-# AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM-DIST) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=horizon_length=16) (w/o bias)
+# AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM16-DIST500) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=horizon_length=16) (w/o bias)
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-05_11-01-54_u[0.3,1.0,16]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/ noise
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-05_10-56-19_u[0.3,1.0,16]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/o noise
-DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-05_11-01-54_u[0.3,1.0,16]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/ noise
 
 # AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM4-DIST500) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=4, horizon_length=16) (w/o bias)
-DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_08-53-16_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/o noise
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_09-42-13_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/o noise early
-
+# DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_08-53-16_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/o noise
 
 # load scaler and pca transforms
 scl = pk.load(open(DATA_PATH + 'A_LSTM_HC_SPEED_SCL.pkl','rb'))
@@ -290,7 +289,7 @@ df = pd.read_parquet('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacg
 
 
 # https://www.geeksforgeeks.org/matplotlib-pyplot-streamplot-in-python/#
-def plot_2d_streamplot(fixed_pts_pc, cycle_pc1, cycle_pc2, X, Y, U, V):
+def plot_2d_streamplot(fp_idx, fixed_pts_pc, cycle_pc1, cycle_pc2, X, Y, U, V):
 
     # Create a figure and subplots
     plt.ion()
@@ -300,16 +299,19 @@ def plot_2d_streamplot(fixed_pts_pc, cycle_pc1, cycle_pc2, X, Y, U, V):
     # Ensure aspect ratio is equal to get a correct circle
     ax1.set_aspect('equal')
 
-    # Scatter plot points for context
-    # ax1.plot([EV[0] + fps_pc[1,0],fps_pc[1,0]], [EV[1] + fps_pc[1,1], fps_pc[1,1]], [EV[2] + fps_pc[1,2],fps_pc[1,2]], c='g')
-    scatter2 = ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], c='k', s=50)
-
 
     # Plot quivers using the extracted components
     speed = np.sqrt(U**2 + V**2)
     lw = 5 * speed / speed.max()
     strm = ax1.streamplot(X, Y, U, V, density=2, linewidth=lw, color=speed/0.005, cmap ='plasma')
     plt.colorbar(strm.lines)
+
+
+    # Scatter plot points for context
+    # ax1.plot([EV[0] + fps_pc[1,0],fps_pc[1,0]], [EV[1] + fps_pc[1,1], fps_pc[1,1]], [EV[2] + fps_pc[1,2],fps_pc[1,2]], c='g')
+    scatter2 = ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], c='gray', s=50, zorder=10)
+    scatter3 = ax1.scatter(fixed_pts_pc[fp_idx, 0], fixed_pts_pc[fp_idx, 1], c='k', s=60, zorder=11)
+
 
     # cycle
     ax1.plot(cycle_pc1.values[:, -1], cycle_pc2.values[:, -1], c="k", linewidth = 3.0, alpha=1)
@@ -332,7 +334,7 @@ def plot_2d_streamplot(fixed_pts_pc, cycle_pc1, cycle_pc2, X, Y, U, V):
 
     return fig
 
-def plot_2d_traj(fixed_pts_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc, hc_perturb_pc):
+def plot_2d_traj(fp_idx, fixed_pts_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc):
 
     # Create a figure and subplots
     plt.ion()
@@ -349,15 +351,16 @@ def plot_2d_traj(fixed_pts_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc, hc_pert
     for i in range(np.shape(hc_zeroinput_tf_pc)[1]):
         # Plot the lines
         line = hc_zeroinput_tf_pc[:, i, :]
-        ax1.plot(line[:, 0], line[:, 1], c='gray', alpha=0.5)
+        ax1.plot(line[:, 0], line[:, 1], c='blue', alpha=0.5)
 
     # cycle
     ax1.plot(cycle_pc1.values[:, -1], cycle_pc2.values[:, -1], c="k", linewidth = 3.0, alpha=1)
 
     # Scatter plot points for context
-    ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], c='k', s=1, zorder=10)
+    ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], c='gray', s=50, zorder=10)
+    ax1.scatter(fixed_pts_pc[fp_idx, 0], fixed_pts_pc[fp_idx, 1], c='k', s=60, zorder=11)
 
-    ax1.scatter(hc_perturb_pc[:, 0], hc_perturb_pc[:, 1], c='b', s=50, zorder=10)
+    # ax1.scatter(hc_perturb_pc[:, 0], hc_perturb_pc[:, 1], c='b', s=50, zorder=10)
     
 
     # Set labels and title
@@ -368,7 +371,9 @@ def plot_2d_traj(fixed_pts_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc, hc_pert
     # Show the legend
     # ax1.legend()
 
-def plot_3d(fixed_pts_pc, cycle_pc1, cycle_pc2, cycle_pc3, hc_perturb_pc):
+    return fig
+
+def plot_3d(fixed_pts_pc, cycle_pc1, cycle_pc2, cycle_pc3):
     
     # Create a figure and subplots
     plt.ion()
@@ -384,10 +389,10 @@ def plot_3d(fixed_pts_pc, cycle_pc1, cycle_pc2, cycle_pc3, hc_perturb_pc):
 
     # Scatter plot points for context
     # ax1.plot([EV[0] + fps_pc[1,0],fps_pc[1,0]], [EV[1] + fps_pc[1,1], fps_pc[1,1]], [EV[2] + fps_pc[1,2],fps_pc[1,2]], c='g')
-    scatter1 = ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], fixed_pts_pc[:, 2], c='b', s=50)
+    scatter1 = ax1.scatter(fixed_pts_pc[:, 0], fixed_pts_pc[:, 1], fixed_pts_pc[:, 2], c='k', s=50, zorder=10)
 
-    scatter2 = ax1.scatter(hc_perturb_pc[:, 0], hc_perturb_pc[:, 1], hc_perturb_pc[:, 2], c='k', s=1)
-    scatter3 = ax1.scatter(cycle_pc1, cycle_pc2, cycle_pc3, c='r', s=1)
+    # scatter2 = ax1.scatter(hc_perturb_pc[:, 0], hc_perturb_pc[:, 1], hc_perturb_pc[:, 2], c='k', s=1)
+    scatter2 = ax1.scatter(cycle_pc1, cycle_pc2, cycle_pc3, c='r', s=1)
 
     # Create a ScalarFormatter and set the desired format
     formatter = ticker.ScalarFormatter(useMathText=True)
@@ -409,8 +414,12 @@ def plot_3d(fixed_pts_pc, cycle_pc1, cycle_pc2, cycle_pc3, hc_perturb_pc):
     # Show the legend
     ax1.legend()
 
-plot_3d(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, cycle_pc3, hc_perturb_pc)
+    return fig
 
+fig = plot_3d(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, cycle_pc3)
+
+filename = f"3d"
+fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
 
 
 
@@ -444,11 +453,9 @@ for fp_idx, fp in enumerate(fps_pc):
     filename = f"fixed_point_{fp_idx}"
     fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
 
-
-
     ### STREAMPLOT
-    TRAJ_TIME_LENGTH = 2
-    TRAJ_XY_DENSITY = 50
+    TRAJ_TIME_LENGTH = 100
+    TRAJ_XY_DENSITY = 10
 
     input = torch.zeros((1, TRAJ_XY_DENSITY * TRAJ_XY_DENSITY, INPUT_SIZE), device=device,  dtype=torch.float32)
 
@@ -456,7 +463,7 @@ for fp_idx, fp in enumerate(fps_pc):
     pc1_range = abs(cycle_pc1).max().max()
     pc2_range = abs(cycle_pc2).max().max()
     pc_range = max(pc1_range, pc2_range)
-    X_RANGE = round(pc_range) + 1  # Adjust the value of X to set the range of the meshgrid
+    X_RANGE = round(pc_range) + 5  # Adjust the value of X to set the range of the meshgrid
     x = torch.linspace(-X_RANGE, X_RANGE, TRAJ_XY_DENSITY)
     y = torch.linspace(-X_RANGE, X_RANGE, TRAJ_XY_DENSITY)
     YY, XX = torch.meshgrid(x, y)  # switch places of x and y
@@ -490,12 +497,16 @@ for fp_idx, fp in enumerate(fps_pc):
     Y = hc_zeroinput_t0_pc[:,1].reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
     U = (hc_zeroinput_tf_pc[1,:,0] - hc_zeroinput_tf_pc[0,:,0]).reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
     V = (hc_zeroinput_tf_pc[1,:,1] - hc_zeroinput_tf_pc[0,:,1]).reshape(TRAJ_XY_DENSITY, TRAJ_XY_DENSITY)
-    fig = plot_2d_streamplot(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, X, Y, U, V)
+    fig = plot_2d_streamplot(fp_idx, fps_pc, cycle_pc1, cycle_pc2, X, Y, U, V)
 
     filename = f"streamplot_slice_for_fixed_point_{fp_idx}"
     fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
 
-    plot_2d_traj(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc, hc_perturb_pc)
-    plot_3d_traj(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc, hc_perturb_pc)
+    fig = plot_2d_traj(fp_idx, fps_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc)
+
+    filename = f"2d_traj_for_fixed_point_{fp_idx}"
+    fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
+
+    # plot_3d_traj(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc)
 
 print('done')
