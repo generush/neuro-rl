@@ -1,3 +1,3 @@
 readme
 
-Analysis and visualization code
+Analysis and visualization code, CoRL submission
