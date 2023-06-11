@@ -5,7 +5,7 @@ import dask.dataframe as dd
 from pathlib import Path
 
 def process_data(file: str):
-    return dd.read_csv(file)
+    return dd.read_parquet(file)
 
 def format_df(data: np.array):
     df = pd.DataFrame(data)

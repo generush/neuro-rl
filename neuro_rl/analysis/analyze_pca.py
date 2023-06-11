@@ -38,8 +38,8 @@ def compute_pca(df_raw, n_components, columns):
 
     # added scaling since dimensions might have different magnitudes
     
-    scaler = sklearn.preprocessing.StandardScaler()
-    df_scaled = scaler.fit_transform(df_raw)
+    scl = sklearn.preprocessing.StandardScaler()
+    df_scaled = scl.fit_transform(df_raw)
 
     # create PCA object
     pca = sklearn.decomposition.PCA(n_components=n_components)
@@ -53,10 +53,14 @@ def compute_pca(df_raw, n_components, columns):
     # name DataFrame columns
     df_pc.columns = columns
 
-    return pca, df_pc
+    return scl, pca, df_pc
 
 # https://datascience.stackexchange.com/questions/55066/how-to-export-pca-to-use-in-another-program
 import pickle as pk
+
+
+def export_scl(scl: sklearn.preprocessing.StandardScaler, path: str):
+    pk.dump(scl, open(path,"wb"))
 
 def export_pca(pca: sklearn.decomposition.PCA, path: str):
     pk.dump(pca, open(path,"wb"))
@@ -69,12 +73,17 @@ def analyze_pca(path: str, data_names: List[str], file_suffix: str = ''):
     N_COMPONENTS = 10
 
     # load DataFrame
-    data = process_data(path + 'NORM_DATA' + file_suffix + '.csv')
+    data = process_data(path + 'RAW_DATA' + file_suffix + '.parquet')
+    data['TIME']
+
+    meta_data = data.loc[:,~data.columns.str.contains('_RAW')].compute()
+    meta_data.to_csv(path + 'META_DATA' + file_suffix + '.csv')
 
     for idx, data_type in enumerate(data_names):
 
         # select data for PCA analysis (only raw data)
         filt_data = data.loc[:,data.columns.str.contains(data_type + '_RAW')]
+
 
         # get number of dimensions of DataFrame
         N_DIMENSIONS = len(filt_data.columns)
@@ -85,10 +94,11 @@ def analyze_pca(path: str, data_names: List[str], file_suffix: str = ''):
         if N_DIMENSIONS > 0:
 
             # computa pca
-            pca, pc_df = compute_pca(filt_data, N_COMPONENTS, COLUMNS)
+            scl, pca, pc_df = compute_pca(filt_data, N_COMPONENTS, COLUMNS)
 
             # export PCA object
             export_pca(pca, path + data_type +'_PCA' + '.pkl')
+            export_scl(scl, path + data_type +'_SCL' + '.pkl')
 
             # export DataFrame
             pc_df.to_csv(path + data_type + '_' + 'PC_DATA' + file_suffix + '.csv')

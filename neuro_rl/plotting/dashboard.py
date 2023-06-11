@@ -19,8 +19,6 @@ import sklearn.metrics
 
 def run_dashboard(folder_path: str, file_suffix: str = ''):
 
-    DIMS = None # 5
-
     # obs = Embeddings(
     #     data=Data(process_data('obs')),
     #     embeddings={

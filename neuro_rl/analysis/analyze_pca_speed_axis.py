@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 
 from utils.data_processing import process_data
-from analysis.analyze_pca import compute_pca, export_pca
+from analysis.analyze_pca import compute_pca, export_pca, export_scl
 from plotting.generation import generate_dropdown, generate_graph
 from plotting.plot import plot_scatter3_ti_tf
 from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
@@ -21,7 +21,11 @@ import sklearn.decomposition
 import sklearn.manifold
 import sklearn.metrics
 
+import matplotlib
+matplotlib.use('TkAgg')  # Replace 'TkAgg' with another backend if needed
+
 import matplotlib.pyplot as plt
+
 from scipy.interpolate import CubicSpline
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 import matplotlib.colors as mcolors
@@ -166,10 +170,9 @@ def plot_data(x_data, y_data, z_data, c_data, cc_global_min, cc_global_max, data
         fig.savefig(path + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
 
 def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = ''):
-    N_COMPONENTS = 12
 
     # load DataFrame
-    df = process_data(path + 'RAW_DATA' + file_suffix + '.csv')
+    df = process_data(path + 'RAW_DATA' + file_suffix + '.parquet')
     dt = df['TIME'][1].compute().to_numpy() - df['TIME'][0].compute().to_numpy()
 
     x_data = []
@@ -193,12 +196,14 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         df_tangling = tangl_data.loc[idx].reset_index(drop=True)
 
         N_DIMENSIONS = len(df_neuron.columns)
-        COLUMNS = np.char.mod(data_type + 'SPEED_U_PC_%03d', np.arange(N_COMPONENTS))
+        N_COMPONENTS = N_DIMENSIONS
+        COLUMNS = np.char.mod(data_type + 'SPEED_PC_%03d', np.arange(N_COMPONENTS))
 
         if N_DIMENSIONS > 0:
-            pca, pc_df = compute_pca(df_neuron, N_COMPONENTS, COLUMNS)
-            export_pca(pca, path + data_type + '_SPEED_U_PCA.pkl')
-            pc_df.to_csv(path + data_type + '_SPEED_U_PC_DATA' + file_suffix + '.csv')
+            scl, pca, pc_df = compute_pca(df_neuron, N_COMPONENTS, COLUMNS)
+            export_scl(scl, path + data_type + '_SPEED_SCL.pkl')
+            export_pca(pca, path + data_type + '_SPEED_PCA.pkl')
+            pc_df.to_csv(path + data_type + '_SPEED_PC_DATA' + file_suffix + '.csv')
         
         x_s = pc_df.iloc[:, 2:]
         v_bar = df_speed_cmd.unique()
@@ -251,8 +256,13 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         pd.DataFrame(pc_12speed_tf).to_csv(path + 'info_' + data_type + '_pc_12speed_tf.csv')
         pd.DataFrame(pc_123_tf).to_csv(path + 'info_' + data_type + '_pc_123_tf.csv')
         pd.DataFrame(pca.explained_variance_ratio_.cumsum()).to_csv(path + 'info_' + data_type + '_cumvar.csv')
+        pd.DataFrame(x).to_csv(path + 'info_' + data_type + '_x_by_speed.csv')
+        pd.DataFrame(y).to_csv(path + 'info_' + data_type + '_y_by_speed.csv')
+        pd.DataFrame(z1).to_csv(path + 'info_' + data_type + '_z1_by_speed.csv')
+        pd.DataFrame(z2).to_csv(path + 'info_' + data_type + '_z2_by_speed.csv')
         pd.DataFrame(t).to_csv(path + 'info_' + data_type + '_tangling_by_speed.csv')
         pd.DataFrame(d_opt).to_csv(path + 'info_' + data_type + '_dopt.csv')
+        export_scl(scl, path + 'info_' + data_type +'_SCL' + '.pkl')
         export_pca(pca, path + 'info_' + data_type +'_PCA' + '.pkl')
 
     s_global_min = np.min(s_data)
