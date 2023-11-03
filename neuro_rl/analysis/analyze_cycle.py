@@ -17,10 +17,10 @@ import sklearn.decomposition
 import sklearn.manifold
 import sklearn.metrics
 
-def analyze_cycle(path: str):
+def analyze_cycle(path: str, file: str):
 
     # load DataFrame
-    df = pd.read_parquet(path + 'RAW_DATA' + '.parquet')
+    df = pd.read_parquet(path + file + '.parquet')
 
     # get dt time step
     DT = df['TIME'][1] - df['TIME'][0]
@@ -60,7 +60,7 @@ def analyze_cycle(path: str):
     # create a new DataFrame that only includes data that matches the mode of the maximum value
     filtered_df = df[df['CYCLE_PERIOD'] == df['Mode_of_Max_Value']].reset_index(drop=True)
 
-    # average cycles based on the u, v, r commands
+    # AVERAGE cycles based on the u, v, r commands
     avg_df = filtered_df.groupby(['CYCLE_TIME', 'OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star']).mean().reset_index()
 
     # sort by condition and then by time
@@ -75,11 +75,32 @@ def analyze_cycle(path: str):
     # recompute actual time based on cycle_time
     avg_sorted_df.insert(loc=0, column='TIME', value=avg_sorted_df['CYCLE_TIME'] * DT)
 
-
     # The 'CONDITION' column will contain the unique indices based on commands u, v, r
     avg_sorted_df['CONDITION'] = avg_sorted_df.groupby(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star'], sort=True).ngroup()
 
     # export trial-averaged data (1 cycle per CONDITION) !!!
-    avg_sorted_df.to_csv(path + 'RAW_DATA_AVG' + '.csv')
+    avg_sorted_df.to_csv(path + file + '_AVG' + '.csv')
+
+    # COVARIANCE of cycles based on the u, v, r commands
+    var_df = filtered_df.groupby(['CYCLE_TIME', 'OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star']).var().reset_index()
+
+    # sort by condition and then by time
+    var_sorted_df = var_df.sort_values(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star', 'CYCLE_TIME'], ascending=[True, True, True, True]).reset_index(drop=True)
+
+    # delete unnecessary columns
+    var_sorted_df = var_sorted_df.drop('ENV', axis=1)
+    var_sorted_df = var_sorted_df.drop('TIME', axis=1)
+    var_sorted_df = var_sorted_df.drop('CYCLE_NUM', axis=1)
+    var_sorted_df = var_sorted_df.drop('Mode_of_Max_Value', axis=1)
+
+    # recompute actual time based on cycle_time
+    var_sorted_df.insert(loc=0, column='TIME', value=var_sorted_df['CYCLE_TIME'] * DT)
+
+    # The 'CONDITION' column will contain the unique indices based on commands u, v, r
+    var_sorted_df['CONDITION'] = var_sorted_df.groupby(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star'], sort=True).ngroup()
+
+    # export trial-averaged data (1 cycle per CONDITION) !!!
+    var_sorted_df.to_csv(path + file + '_VAR' + '.csv')
 
     return avg_sorted_df
+    

@@ -7,6 +7,9 @@ from pathlib import Path
 def process_data(file: str):
     return dd.read_parquet(file)
 
+def process_csv(file: str):
+    return dd.read_csv(file)
+
 def format_df(data: np.array):
     df = pd.DataFrame(data)
     df.columns = df.columns.astype(str)

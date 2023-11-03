@@ -14,10 +14,11 @@ from plotting.plot import plot_scatter3_ti_tf
 from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
 
 from analysis.analyze_cycle import analyze_cycle
-from analysis.analyze_traj import analyze_avg_traj
+from analysis.analyze_traj import analyze_traj
 from analysis.analyze_pca import analyze_pca
 from analysis.analyze_pca_speed_axis import analyze_pca_speed_axis
 from analysis.analyze_tangling import analyze_tangling
+from analysis.append_pc_data import append_pc_data
 from plotting.dashboard import run_dashboard
 
 import sklearn.decomposition
@@ -205,12 +206,56 @@ DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/da
 # AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (1-FF-NODIST)
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_20-26-29_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]_FF-NODIST-noperturb/' 
 
+# post_corl_fix
+DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-25_13-14-15_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
+
+
+# **LSTM16-DIST500 4/4 steps, W/ TERRAIN ()
+# lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
+DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-27-16-41_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
+
+# **LSTM16-NODIST 1/4 steps (CoRL), W/ TERRAIN ()
+# lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_07-03-29-04/nn/last_AnymalTerrain_ep_3800_rew_20.163399.pth')
+# DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-27-16-52_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
+
+# **LSTM16-NODIST 4/4 steps, W/ TERRAIN ()
+# lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/2023-08-27-17-23_AnymalTerrain/nn/last_AnymalTerrain_ep_2900_rew_20.2482.pth')
+# DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-28-08-46_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
+
+# *LSTM16-DIST500 4/4 steps, NO TERRAIN (LESS ROBUST W/O TERRAIN!!!)
+# lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_14-17-13/nn/last_AnymalTerrain_ep_900_rew_20.139568.pth')
+# DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-27-16-56_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
+
+
+
+
+
+# **LSTM16-DIST500 4/4 steps, W/ TERRAIN () -3.58xBW 100ms disturbance!
+# lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
+DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-09-05-14-36_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/'
+
+# **LSTM16-DIST500 4/4 steps, W/ TERRAIN () -3.58xBW 100ms disturbance!
+# lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
+DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-09-05-15-42_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[2]/'
+
+# **LSTM16-DIST500 4/4 steps, W/ TERRAIN () -3.58xBW 100ms disturbance!
+# lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
+DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-09-05-15-47_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[4]/'
+
+# **LSTM16-DIST500 4/4 steps, W/ TERRAIN () -3.58xBW 100ms disturbance!
+# lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
+DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-09-05-15-52_u[0.4,1.0,4]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/'
+
+# FRONTIERS
+# **LSTM16-DIST500 4/4 steps, W/ TERRAIN () -3.58xBW 100ms disturbance!
+# lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
+DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-09-27-15-49_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
 DATASETS = [
     'OBS',
     'ACT',
     'A_MLP_XX',
-    # 'A_LSTM_HC',
+    'A_LSTM_HC',
     # 'A_LSTM_CX',
     # 'A_LSTM_HX',
     # 'A_LSTM_C1X',
@@ -228,22 +273,33 @@ start = time.process_time()
 
 if AVG:
 
-    df_avg = analyze_avg_traj(DATA_PATH)
-    print('Finished analyze_traj', time.process_time() - start)
+    # df_avg = analyze_traj(DATA_PATH)
+    # print('Finished analyze_traj', time.process_time() - start)
 
-    df_avg = analyze_cycle(DATA_PATH)
-    print('Finished analyze_cycle', time.process_time() - start)
+    # # Compute cycle-average and variance for raw data
+    # # df_raw_avg_var = analyze_cycle(DATA_PATH, 'RAW_DATA')
+    # print('Finished analyze_cycle', time.process_time() - start)
 
-    data_w_tangling = analyze_tangling(DATA_PATH, DATASETS, '_AVG')
-    print('Finished analyze_tangling', time.process_time() - start)
-
-    analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG_WITH_TANGLING')
+    # Compute PCA of the average cycles
+    analyze_pca(DATA_PATH, 'RAW_DATA', DATASETS)
     print('Finished analyze_pca', time.process_time() - start)
 
-    analyze_pca(DATA_PATH, DATASETS)
-    print('Finished analyze_pca', time.process_time() - start)
+    # # Append pc data to raw data
+    # append_pc_data(DATA_PATH, 'RAW_DATA', DATASETS)
+
+    # # Compute cycle-average and varance for raw data and pc data
+    # df_pc_avg_var = analyze_cycle(DATA_PATH, 'RAW_AND_PC_DATA')
+    # print('Finished analyze_cycle', time.process_time() - start)
+
+    # # data_w_tangling = analyze_tangling(DATA_PATH, DATASETS, '_AVG')
+    # # print('Finished analyze_tangling', time.process_time() - start)
+
+    # # analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG_WITH_TANGLING')
+    # # print('Finished analyze_pca', time.process_time() - start)
 
     run_dashboard(DATA_PATH)
+
+    print('done')
 
 else:
     analyze_pca(DATA_PATH, DATASETS)

@@ -17,7 +17,7 @@ import sklearn.decomposition
 import sklearn.manifold
 import sklearn.metrics
 
-def analyze_avg_traj(path: str):
+def analyze_traj(path: str):
 
     # load DataFrame
     df = pd.read_parquet(path + 'RAW_DATA' + '.parquet')

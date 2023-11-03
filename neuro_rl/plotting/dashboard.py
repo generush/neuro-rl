@@ -17,7 +17,7 @@ import sklearn.decomposition
 import sklearn.manifold
 import sklearn.metrics
 
-def run_dashboard(folder_path: str, file_suffix: str = ''):
+def run_dashboard(path: str, file_suffix: str = ''):
 
     # obs = Embeddings(
     #     data=Data(process_data('obs')),
@@ -32,7 +32,7 @@ def run_dashboard(folder_path: str, file_suffix: str = ''):
     #     }
     # )
 
-    data = process_data_to_pd(folder_path, 'DATA' + file_suffix)
+    data = process_data_to_pd(path, 'DATA' + file_suffix)
 
     # obs = Embeddings(
     #     data=Data(process_data(DATA_PATH + '*-OBS' + '.csv')),
@@ -180,33 +180,53 @@ def run_dashboard(folder_path: str, file_suffix: str = ''):
     dd_options = data.columns.values
 
     dd_defaults = np.zeros((NUM_PLOTS,4), dtype=object)
-    # dd_defaults[0] = ['OBS_RAW_018_obj_qx', 'OBS_RAW_019_obj_qy', 'OBS_RAW_020_obj_qz', 'CONDITION']
-    # dd_defaults[1] = ['ACT_RAW_000_WRJ1', 'ACT_RAW_001_WRJ0', 'ACT_RAW_002_FFJ3', 'CONDITION']
-    # dd_defaults[2] = ['AHX_RAW_000', 'AHX_RAW_001', 'AHX_RAW_002', 'CONDITION']
-    # dd_defaults[3] = ['CHX_RAW_000', 'CHX_RAW_001', 'CHX_RAW_002', 'CONDITION']
 
-    # dd_defaults[4] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'CONDITION']
-    # dd_defaults[5] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'CONDITION']
-    # dd_defaults[6] = ['AHX_PC_000', 'AHX_PC_001', 'AHX_PC_002', 'CONDITION']
-    # dd_defaults[7] = ['CHX_PC_000', 'CHX_PC_001', 'CHX_PC_002', 'CONDITION']
 
-    # dd_defaults[0] = ['OBS_RAW_000_u', 'OBS_RAW_001_v', 'OBS_RAW_005_r', 'OBS_RAW_011_r_star']
-    dd_defaults[0] = ['ACT_RAW_000_LF_HAA', 'ACT_RAW_001_LF_HFE', 'ACT_RAW_002_LF_KFE', 'ACT_RAW_002_LF_KFE']
 
-    dd_defaults[1] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'ENV']
-    dd_defaults[2] = ['A_MLP_XX_PC_000', 'A_MLP_XX_PC_001', 'A_MLP_XX_PC_002', 'ENV']
-    dd_defaults[3] = ['A_LSTM_CX_PC_000', 'A_LSTM_CX_PC_001', 'A_LSTM_CX_PC_002', 'ENV']
-    dd_defaults[4] = ['A_LSTM_C1X_PC_000', 'A_LSTM_C1X_PC_001', 'A_LSTM_C1X_PC_002', 'ENV']
-    dd_defaults[5] = ['A_LSTM_C2X_PC_000', 'A_LSTM_C2X_PC_001', 'A_LSTM_C2X_PC_002', 'ENV']
-    dd_defaults[6] = ['A_LSTM_HX_PC_000', 'A_LSTM_HX_PC_001', 'A_LSTM_HX_PC_002', 'ENV']
-    dd_defaults[7] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'ENV']
 
-    # dd_defaults[2] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'OBS_TANGLING']
-    # dd_defaults[3] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'ACT_TANGLING']
-    # dd_defaults[4] = ['ALSTM_HX_PC_000', 'ALSTM_HX_PC_001', 'ALSTM_HX_PC_002', 'ALSTM_HX_TANGLING']
-    # dd_defaults[5] = ['ALSTM_CX_PC_000', 'ALSTM_CX_PC_001', 'ALSTM_CX_PC_002', 'ALSTM_CX_TANGLING']
-    # dd_defaults[6] = ['CLSTM_HX_PC_000', 'CLSTM_HX_PC_001', 'CLSTM_HX_PC_002', 'CLSTM_HX_TANGLING']
-    # dd_defaults[7] = ['CLSTM_CX_PC_000', 'CLSTM_CX_PC_001', 'CLSTM_CX_PC_002', 'CLSTM_CX_TANGLING']
+    dd_defaults[0] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'TIME']
+    dd_defaults[1] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'ENV']
+    dd_defaults[2] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'ACT_PC_002']
+    dd_defaults[3] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'ACT_PC_002']
+    dd_defaults[4] = ['A_LSTM_HC_PC_000', 'A_LSTM_HC_PC_001', 'A_LSTM_HC_PC_002', 'TIME']
+    dd_defaults[5] = ['A_LSTM_HC_PC_000', 'A_LSTM_HC_PC_001', 'A_LSTM_HC_PC_002', 'ENV']
+    dd_defaults[6] = ['A_LSTM_HC_PC_000', 'A_LSTM_HC_PC_001', 'A_LSTM_HC_PC_002', 'A_LSTM_HC_PC_002']
+    dd_defaults[7] = ['A_LSTM_HC_PC_000', 'A_LSTM_HC_PC_001', 'A_LSTM_HC_PC_002', 'A_LSTM_HC_PC_002']
+
+
+
+
+
+
+
+
+    # # dd_defaults[0] = ['OBS_RAW_018_obj_qx', 'OBS_RAW_019_obj_qy', 'OBS_RAW_020_obj_qz', 'CONDITION']
+    # # dd_defaults[1] = ['ACT_RAW_000_WRJ1', 'ACT_RAW_001_WRJ0', 'ACT_RAW_002_FFJ3', 'CONDITION']
+    # # dd_defaults[2] = ['AHX_RAW_000', 'AHX_RAW_001', 'AHX_RAW_002', 'CONDITION']
+    # # dd_defaults[3] = ['CHX_RAW_000', 'CHX_RAW_001', 'CHX_RAW_002', 'CONDITION']
+
+    # # dd_defaults[4] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'CONDITION']
+    # # dd_defaults[5] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'CONDITION']
+    # # dd_defaults[6] = ['AHX_PC_000', 'AHX_PC_001', 'AHX_PC_002', 'CONDITION']
+    # # dd_defaults[7] = ['CHX_PC_000', 'CHX_PC_001', 'CHX_PC_002', 'CONDITION']
+
+    # # dd_defaults[0] = ['OBS_RAW_000_u', 'OBS_RAW_001_v', 'OBS_RAW_005_r', 'OBS_RAW_011_r_star']
+    # dd_defaults[0] = ['ACT_RAW_000_LF_HAA', 'ACT_RAW_001_LF_HFE', 'ACT_RAW_002_LF_KFE', 'ACT_RAW_002_LF_KFE']
+
+    # dd_defaults[1] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'ENV']
+    # dd_defaults[2] = ['A_MLP_XX_PC_000', 'A_MLP_XX_PC_001', 'A_MLP_XX_PC_002', 'ENV']
+    # dd_defaults[3] = ['A_LSTM_CX_PC_000', 'A_LSTM_CX_PC_001', 'A_LSTM_CX_PC_002', 'ENV']
+    # dd_defaults[4] = ['A_LSTM_C1X_PC_000', 'A_LSTM_C1X_PC_001', 'A_LSTM_C1X_PC_002', 'ENV']
+    # dd_defaults[5] = ['A_LSTM_C2X_PC_000', 'A_LSTM_C2X_PC_001', 'A_LSTM_C2X_PC_002', 'ENV']
+    # dd_defaults[6] = ['A_LSTM_HX_PC_000', 'A_LSTM_HX_PC_001', 'A_LSTM_HX_PC_002', 'ENV']
+    # dd_defaults[7] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'ENV']
+
+    # # dd_defaults[2] = ['OBS_PC_000', 'OBS_PC_001', 'OBS_PC_002', 'OBS_TANGLING']
+    # # dd_defaults[3] = ['ACT_PC_000', 'ACT_PC_001', 'ACT_PC_002', 'ACT_TANGLING']
+    # # dd_defaults[4] = ['ALSTM_HX_PC_000', 'ALSTM_HX_PC_001', 'ALSTM_HX_PC_002', 'ALSTM_HX_TANGLING']
+    # # dd_defaults[5] = ['ALSTM_CX_PC_000', 'ALSTM_CX_PC_001', 'ALSTM_CX_PC_002', 'ALSTM_CX_TANGLING']
+    # # dd_defaults[6] = ['CLSTM_HX_PC_000', 'CLSTM_HX_PC_001', 'CLSTM_HX_PC_002', 'CLSTM_HX_TANGLING']
+    # # dd_defaults[7] = ['CLSTM_CX_PC_000', 'CLSTM_CX_PC_001', 'CLSTM_CX_PC_002', 'CLSTM_CX_TANGLING']
 
     # Define the layout as a grid with M rows and N columns
     grid_layout = []
@@ -290,7 +310,7 @@ def run_dashboard(folder_path: str, file_suffix: str = ''):
         )
 
         def repeated_callback(t0, twidth, ddx, ddy, ddz, ddc):
-            return plot_scatter3_ti_tf(plot_name, plot_data, t0, twidth, ddx, ddy, ddz, ddc, folder_path, file_suffix)
+            return plot_scatter3_ti_tf(plot_name, plot_data, t0, twidth, ddx, ddy, ddz, ddc, path, file_suffix)
 
     for idx, name in enumerate(PLOT_NAMES):
         single_callback(idx, name, data)
