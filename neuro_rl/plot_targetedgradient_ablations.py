@@ -20,18 +20,18 @@ data6 = [400,399,400,399,398,397,394,396,397,395,393,395,390,399,390,392,386,316
 
 
 
-# Define x-axis values
-x_values = [0,16,32,48,64,80,96,112,128]  # X-axis values from 0 to 128 (integer)
+# # Define x-axis values
+# x_values = [0,16,32,48,64,80,96,112,128]  # X-axis values from 0 to 128 (integer)
 
-# Manually specify data points for four datasets, each containing 6 data points
-data1 = [400,0,0,0,0,0,0,0,0]  # Recovery rate for dataset 1
-data2 = [400,400,400,400,383,374,341,258,211]  # Recovery rate for dataset 2
-data3 = [400,303,301,195,109,105,42,0,14]  # Recovery rate for dataset 3
+# # Manually specify data points for four datasets, each containing 6 data points
+# data1 = [400,0,0,0,0,0,0,0,0]  # Recovery rate for dataset 1
+# data2 = [400,400,400,400,383,374,341,258,211]  # Recovery rate for dataset 2
+# data3 = [400,303,301,195,109,105,42,0,14]  # Recovery rate for dataset 3
 
-# Manually specify data points for three additional datasets, each containing 5 data points
-data4 = [400,256,53,6,0,0,0,0,0]  # Recovery rate for dataset 4
-data5 = [400,399,392,381,358,331,308,253,243]  # Recovery rate for dataset 5
-data6 = [400,386,316,247,158,94,66,14,4]  # Recovery rate for dataset 6
+# # Manually specify data points for three additional datasets, each containing 5 data points
+# data4 = [400,256,53,6,0,0,0,0,0]  # Recovery rate for dataset 4
+# data5 = [400,399,392,381,358,331,308,253,243]  # Recovery rate for dataset 5
+# data6 = [400,386,316,247,158,94,66,14,4]  # Recovery rate for dataset 6
 
 
 
@@ -59,6 +59,7 @@ plt.plot(x_values, data5_normalized, label='Random Ablations: Hidden Neurons (Pr
 plt.plot(x_values, data6_normalized, label='Random Ablations: Cell Neurons (Pre-RNN)', c='r', linestyle='--', alpha=1, marker='x')
 
 # Add labels and legend
+plt.xticks([0,16,32,48,64,80,96,112,128])
 plt.xlabel('Number of Neurons Ablated')
 plt.ylabel('Recovery Rate')
 plt.legend()
