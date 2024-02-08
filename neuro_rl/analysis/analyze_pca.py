@@ -71,8 +71,7 @@ def import_scl(path: str):
 def import_pca(path: str):
     return pk.load(open(path,'rb'))
 
-def analyze_pca(path: str, file: str, data_names: List[str], file_suffix: str = ''):
-
+def analyze_pca(path: str, file: str, data_names: List[str], max_dims: int, file_suffix: str = ''):
 
     # load DataFrame
     data = process_csv(path + file + file_suffix + '.csv')
@@ -81,26 +80,34 @@ def analyze_pca(path: str, file: str, data_names: List[str], file_suffix: str = 
     # meta_data = data.loc[:,~data.columns.str.contains('_RAW')].compute()
     # meta_data.to_csv(path + 'META_DATA' + file_suffix + '.csv')
 
+    # Create a dictionary to store scl and pca objects
+    pca_dict = {}
+
     for idx, data_type in enumerate(data_names):
 
         # select data for PCA analysis (only raw data)
         filt_data = data.loc[:,data.columns.str.contains(data_type + '_RAW')]
 
         # get number of dimensions of DataFrame
-        N_DIMENSIONS = len(filt_data.columns)
+        n_dims = min(len(filt_data.columns), max_dims)
 
         # create column name
-        COLUMNS = np.char.mod(data_type + '_PC_%03d', np.arange(N_DIMENSIONS))
+        COLUMNS = np.char.mod(data_type + '_PC_%03d', np.arange(n_dims))
 
-        if N_DIMENSIONS > 0:
+        if n_dims > 0:
 
-            # computa pca
-            scl, pca, pc_df = compute_pca(filt_data, N_DIMENSIONS, COLUMNS)
+            # compute pca
+            scl, pca, pc_df = compute_pca(filt_data, n_dims, COLUMNS)
 
             # export PCA object
             export_pca(pca, path + data_type +'_PCA' + '.pkl')
             export_scl(scl, path + data_type +'_SCL' + '.pkl')
 
+            # Store scl and pca objects in the dictionary
+            pca_dict[data_type] = {'scl': scl, 'pca': pca}
+
             # export PC DataFrame
             pc_df.to_csv(path + data_type + '_' + 'PC_DATA' + file_suffix + '.csv')
+
+    return pca_dict
 

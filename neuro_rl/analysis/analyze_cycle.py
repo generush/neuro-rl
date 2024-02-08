@@ -60,8 +60,14 @@ def analyze_cycle(path: str, file: str):
     # create a new DataFrame that only includes data that matches the mode of the maximum value
     filtered_df = df[df['CYCLE_PERIOD'] == df['Mode_of_Max_Value']].reset_index(drop=True)
 
+    # Step 1: Capture the original column order
+    original_columns = filtered_df.columns.tolist()
+
     # AVERAGE cycles based on the u, v, r commands
     avg_df = filtered_df.groupby(['CYCLE_TIME', 'OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star']).mean().reset_index()
+
+    # Put columns back in original order
+    avg_df = avg_df[original_columns]
 
     # sort by condition and then by time
     avg_sorted_df = avg_df.sort_values(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star', 'CYCLE_TIME'], ascending=[True, True, True, True]).reset_index(drop=True)
@@ -75,10 +81,14 @@ def analyze_cycle(path: str, file: str):
     # recompute actual time based on cycle_time
     avg_sorted_df.insert(loc=0, column='TIME', value=avg_sorted_df['CYCLE_TIME'] * DT)
 
-    # The 'CONDITION' column will contain the unique indices based on commands u, v, r
-    avg_sorted_df['CONDITION'] = avg_sorted_df.groupby(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star'], sort=True).ngroup()
+    # Calculate the 'CONDITION' values
+    condition_values = avg_sorted_df.groupby(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star'], sort=True).ngroup()
 
+    # Insert the 'CONDITION' column at the beginning of the DataFrame
+    avg_sorted_df.insert(0, 'CONDITION', condition_values)
+    
     # export trial-averaged data (1 cycle per CONDITION) !!!
+    avg_sorted_df.to_parquet(path + file + '_AVG' + '.parquet')
     avg_sorted_df.to_csv(path + file + '_AVG' + '.csv')
 
     # COVARIANCE of cycles based on the u, v, r commands
@@ -100,6 +110,7 @@ def analyze_cycle(path: str, file: str):
     var_sorted_df['CONDITION'] = var_sorted_df.groupby(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star'], sort=True).ngroup()
 
     # export trial-averaged data (1 cycle per CONDITION) !!!
+    var_sorted_df.to_parquet(path + file + '_VAR' + '.parquet')
     var_sorted_df.to_csv(path + file + '_VAR' + '.csv')
 
     return avg_sorted_df

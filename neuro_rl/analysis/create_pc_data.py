@@ -33,35 +33,41 @@ import pandas as pd
 import pickle as pk
 import dask.dataframe as dd
 
-def append_pc_data(FOLDER_PATH, FILE_NAME, DATASETS):
+def create_pc_data(FOLDER_PATH, FILE_NAME, DATASETS):
 
     # load DataFrame
     df = pd.read_parquet(FOLDER_PATH + FILE_NAME + '.parquet')
 
+    new_dfs = []
+
+    filt_pc_df = pd.DataFrame()  # List to store new DataFrames
+
+    meta_df = df.loc[:, ~df.columns.str.contains('_RAW')]
 
     for idx, data_type in enumerate(DATASETS):
 
         # select data for PCA analysis (only raw data)
-        filt_df = df.loc[:,df.columns.str.contains(data_type + '_RAW')]
+        filt_df = df.loc[:, df.columns.str.contains(data_type + '_RAW')]
 
-        # get number of dimensions of DataFrame
-        N_DIMENSIONS = len(filt_df.columns)
+        pca = import_pca(FOLDER_PATH + data_type + '_PCA' + '.pkl')
+        scl = import_scl(FOLDER_PATH + data_type + '_SCL' + '.pkl')
 
-        # create column name
-        COLUMNS = np.char.mod(data_type + '_PC_%03d', np.arange(N_DIMENSIONS))
+        N_DIMENSIONS = pca.n_components
 
         if N_DIMENSIONS > 0:
 
-            pca = import_pca(FOLDER_PATH + data_type +'_PCA' + '.pkl')
-            scl = import_scl(FOLDER_PATH + data_type +'_SCL' + '.pkl')
+            # create column name
+            COLUMNS = np.char.mod(data_type + '_PC_%03d', np.arange(N_DIMENSIONS))
 
             # transform to PCA space
             filt_pc_data = pca.transform(scl.transform(filt_df.values))
             filt_pc_df = pd.DataFrame(data=filt_pc_data, columns=COLUMNS)
-            
-            # append pc data (concatenating along columns)
-            df = pd.concat([df, filt_pc_df], axis=1)
 
+            new_dfs.append(filt_pc_df)
 
-    # NEED TO MOVE TO ANOTHER FUNCTION SO IT OPERATES ON ENTIRE RAW_DATA AND NOT AVG DATA!
-    df.to_parquet(FOLDER_PATH + 'RAW_AND_PC_DATA' + '.parquet')
+    new_df = pd.concat([meta_df] + new_dfs, axis=1)
+
+    # Save the new DataFrame to a new parquet file
+    new_df.to_parquet(FOLDER_PATH + 'PC_DATA' + '.parquet')
+
+    return new_df

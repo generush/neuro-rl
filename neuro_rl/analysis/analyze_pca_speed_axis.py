@@ -169,7 +169,7 @@ def plot_data(x_data, y_data, z_data, c_data, cc_global_min, cc_global_max, data
         filename = f"{data_type}__{xlabel}{ylabel}{zlabel}__{clabel}".replace("/", "-")
         fig.savefig(path + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
 
-def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = ''):
+def analyze_pca_speed_axis(path: str, data_names: List[str], max_dims: int, file_suffix: str = ''):
 
     # load DataFrame
     df = process_data(path + 'RAW_DATA' + file_suffix + '.parquet')
@@ -195,11 +195,10 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         df_speed_act = spd_act.loc[idx].reset_index(drop=True)
         df_tangling = tangl_data.loc[idx].reset_index(drop=True)
 
-        N_DIMENSIONS = len(df_neuron.columns)
-        N_COMPONENTS = N_DIMENSIONS
+        N_COMPONENTS = min(len(filt_data.columns), max_dims)
         COLUMNS = np.char.mod(data_type + 'SPEED_PC_%03d', np.arange(N_COMPONENTS))
 
-        if N_DIMENSIONS > 0:
+        if N_COMPONENTS > 0:
             scl, pca, pc_df = compute_pca(df_neuron, N_COMPONENTS, COLUMNS)
             export_scl(scl, path + data_type + '_SPEED_SCL.pkl')
             export_pca(pca, path + data_type + '_SPEED_PCA.pkl')
@@ -286,13 +285,13 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], file_suffix: str = 
         plot_data(xx, yy, zz1, ss, s_global_min, s_global_max, data_type, 'PC 3', 'u [m/s]', 'Spectral', path, save_figs=True)
 
         # PC1, PC2, PC3, Tangling
-        plot_data(xx, yy, zz1, tt, t_global_min, t_global_max, data_type, 'PC 3', 'Tangling', 'viridis', path, save_figs=True)
+        plot_data(xx, yy, zz1, tt, np.min(tt), np.max(tt), data_type, 'PC 3', 'Tangling', 'viridis', path, save_figs=True)
 
         # PC1, PC2, SpeedAxis, Speed
         plot_data(xx, yy, zz2, ss, s_global_min, s_global_max, data_type, 'Speed Axis', 'u [m/s]', 'Spectral', path, save_figs=True)
 
-        # PC1, PC2, SpeedAxis, Speed
-        plot_data(xx, yy, zz2, tt, t_global_min, t_global_max, data_type, 'Speed Axis', 'Tangling', 'viridis', path, save_figs=True)
+        # PC1, PC2, SpeedAxis, Tangling
+        plot_data(xx, yy, zz2, tt, np.min(tt), np.max(tt), data_type, 'Speed Axis', 'Tangling', 'viridis', path, save_figs=True)
 
     plt.show()
 

@@ -18,7 +18,7 @@ from analysis.analyze_traj import analyze_traj
 from analysis.analyze_pca import analyze_pca
 from analysis.analyze_pca_speed_axis import analyze_pca_speed_axis
 from analysis.analyze_tangling import analyze_tangling
-from analysis.append_pc_data import append_pc_data
+from analysis.create_pc_data import create_pc_data
 from plotting.dashboard import run_dashboard
 
 import sklearn.decomposition
@@ -35,13 +35,6 @@ import time
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_22-37-25_u[1]_v[0]_r[-1,1,2]_n[100]/'
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_22-36-09_u[0]_v[-1,1,2]_r[0]_n[100]/'
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_22-34-50_u[-1,1,2]_v[0]_r[0]_n[100]/'
-
-
-
-
-
-
-
 
 # exp 1
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/exp1_2023-05-16_23-21-39_u[1]_v[0]_r[0]_n[100]_w_noise/'
@@ -251,6 +244,19 @@ DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaac
 # lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
 DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-09-27-15-49_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
+# THESIS
+DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2024-02-04-16-37_u[0.4,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
+
+# THESIS
+INPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/forward_walking/'
+INPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_1speed/'
+INPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_7speeds/'
+
+# THESIS
+OUTPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/forward_walking/'
+OUTPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_1speed/'
+OUTPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_7speeds/'
+
 DATASETS = [
     'OBS',
     'ACT',
@@ -269,6 +275,8 @@ DATASETS = [
 
 AVG = True
 
+MAX_DIMS = 10
+
 start = time.process_time()
 
 if AVG:
@@ -276,33 +284,32 @@ if AVG:
     # df_avg = analyze_traj(DATA_PATH)
     # print('Finished analyze_traj', time.process_time() - start)
 
-    # # Compute cycle-average and variance for raw data
-    # # df_raw_avg_var = analyze_cycle(DATA_PATH, 'RAW_DATA')
-    # print('Finished analyze_cycle', time.process_time() - start)
+    # Compute cycle-average and variance for raw data
+    df_raw_avg_var = analyze_cycle(INPUT_DATA_PATH, 'RAW_DATA')
+    print('Finished analyze_cycle', time.process_time() - start)
 
     # Compute PCA of the average cycles
-    analyze_pca(DATA_PATH, 'RAW_DATA', DATASETS)
+    pc_dict = analyze_pca(INPUT_DATA_PATH, 'RAW_DATA_AVG', DATASETS, MAX_DIMS)
     print('Finished analyze_pca', time.process_time() - start)
 
-    # # Append pc data to raw data
-    # append_pc_data(DATA_PATH, 'RAW_DATA', DATASETS)
+    # Create pc data
+    df_pc = create_pc_data(INPUT_DATA_PATH, 'RAW_DATA_AVG', DATASETS)
 
-    # # Compute cycle-average and varance for raw data and pc data
-    # df_pc_avg_var = analyze_cycle(DATA_PATH, 'RAW_AND_PC_DATA')
+    # df_pc_avg_var = analyze_cycle(INPUT_DATA_PATH, 'PC_DATA')
     # print('Finished analyze_cycle', time.process_time() - start)
 
-    # # data_w_tangling = analyze_tangling(DATA_PATH, DATASETS, '_AVG')
-    # # print('Finished analyze_tangling', time.process_time() - start)
+    data_w_tangling = analyze_tangling(INPUT_DATA_PATH, DATASETS, '_AVG')
+    print('Finished analyze_tangling', time.process_time() - start)
 
-    # # analyze_pca_speed_axis(DATA_PATH, DATASETS, '_AVG_WITH_TANGLING')
-    # # print('Finished analyze_pca', time.process_time() - start)
+    analyze_pca_speed_axis(INPUT_DATA_PATH, DATASETS, MAX_DIMS, '_AVG_WITH_TANGLING')
+    print('Finished analyze_pca', time.process_time() - start)
 
-    run_dashboard(DATA_PATH)
+    run_dashboard(INPUT_DATA_PATH)
 
     print('done')
 
 else:
-    analyze_pca(DATA_PATH, DATASETS)
+    analyze_pca(INPUT_DATA_PATH, DATASETS)
     print('Finished analyze_pca', time.process_time() - start)
 
-    run_dashboard(DATA_PATH)
+    run_dashboard(INPUT_DATA_PATH)
