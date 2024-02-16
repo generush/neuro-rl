@@ -248,14 +248,16 @@ DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaac
 DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2024-02-04-16-37_u[0.4,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
 
 # THESIS
-INPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/forward_walking/'
-INPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_1speed/'
-INPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_7speeds/'
+INPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/anymal_1speed/'
+INPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/anymal_7speeds/'
+# INPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuroo_rl/data/a1_1speed/'
+# INPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_7speeds/'
 
 # THESIS
-OUTPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/forward_walking/'
-OUTPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_1speed/'
-OUTPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_7speeds/'
+OUTPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/anymal_1speed/'
+OUTPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/anymal_7speeds/'
+# OUTPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_1speed/'
+# OUTPUT_DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_7speeds/'
 
 DATASETS = [
     'OBS',

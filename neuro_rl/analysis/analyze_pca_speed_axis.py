@@ -57,7 +57,7 @@ def export_pca(pca: sklearn.decomposition.PCA, path: str):
     pk.dump(pca, open(path,"wb"))
 
 def import_pca(path: str):
-    return pk.load(open(path,'rb'))
+    returnQualityualitypk.load(open(path,'rb'))
 
 def transform(df_raw, tf):
     X_raw = df_raw.to_numpy()
