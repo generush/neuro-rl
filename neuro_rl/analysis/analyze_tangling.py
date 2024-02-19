@@ -24,7 +24,7 @@ import numpy as np
 
 def compute_tangling(X: np.array, t: np.array):
     
-    scaler = sklearn.preprocessing.StandardScaler()
+    # scaler = sklearn.preprocessing.StandardScaler()
     # X = scaler.fit_transform(X)
 
     dt = t[1] - t[0]
@@ -41,10 +41,8 @@ def compute_tangling(X: np.array, t: np.array):
     for i in range(len(first_indices)):
         X_dot[first_indices[i], :] = ( X[first_indices[i], :] - X[last_indices[i], :] ) / dt  # X_dot = X[first time step w/in CONDITION] - X[last time step w/in CONDITION] 
  
-    # compute constant, prevents denominator from shrinking to zero
-    epsilon = 0.1
-    # epsilon = 0.1 * np.var(X)
-    # epsilon = 0.1 * np.linalg.norm(X) * np.linalg.norm(X) / len(X)
+    # compute constant, prevents denominator from shrinking to 
+    epsilon = 0.1 * np.var(X)
 
     # Calculate the pairwise squared differences for X and X_dot
     X_diff_t = np.sum((X[:, None] - X[None, :]) ** 2, axis=-1)
@@ -66,23 +64,23 @@ def export_tangling(pca: sklearn.decomposition.PCA, path: str):
 def import_tangling(path: str):
     return pk.load(open(path,'rb'))
 
-def analyze_tangling(path: str, data_names: List[str], file_suffix: str = ''):
+def analyze_tangling(df: pd.DataFrame, data_names: List[str], file_suffix: str = ''):
 
     # load DataFrame
-    data = pd.read_csv(path + 'RAW_DATA' + file_suffix + '.csv', index_col=0)
+    # data = pd.read_csv(path + 'PC_DATA' + file_suffix + '.csv', index_col=0)
 
     # copy data DataFrame so can add tangling data to it
-    data_w_tangling = data
+    data_w_tangling = df
 
     for idx, data_type in enumerate(data_names):
 
         # select data for PCA analysis
-        filt_data = data.loc[:,data.columns.str.contains(data_type + '_RAW')].values
-        time = data['TIME'].values
+        filt_data = df.loc[:,df.columns.str.contains(data_type + '_PC')].values
+        time = df['TIME'].values
 
         # if filt_data.shape[1] > 0:
             
-        # computa pca
+        # computa tangling
         tangling = compute_tangling(filt_data, time)
 
         tangling_df = pd.DataFrame(tangling, columns = [data_type + '_TANGLING'])
@@ -91,7 +89,7 @@ def analyze_tangling(path: str, data_names: List[str], file_suffix: str = ''):
         data_w_tangling = pd.concat([data_w_tangling, tangling_df], axis=1)
 
     # export DataFrame
-    data_w_tangling.to_parquet(path + 'RAW_DATA' + file_suffix + '_WITH_TANGLING' + '.parquet')
-    data_w_tangling.to_csv(path + 'RAW_DATA' + file_suffix + '_WITH_TANGLING' + '.csv')
+    # data_w_tangling.to_parquet(path + 'RAW_DATA' + file_suffix + '_WITH_TANGLING' + '.parquet')
+    # data_w_tangling.to_csv(path + 'RAW_DATA' + file_suffix + '_WITH_TANGLING' + '.csv')
 
     return data_w_tangling

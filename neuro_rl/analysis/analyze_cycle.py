@@ -17,10 +17,7 @@ import sklearn.decomposition
 import sklearn.manifold
 import sklearn.metrics
 
-def analyze_cycle(path: str, file: str):
-
-    # load DataFrame
-    df = pd.read_parquet(path + file + '.parquet')
+def analyze_cycle(df: pd.DataFrame):
 
     # get dt time step
     DT = df['TIME'][1] - df['TIME'][0]
@@ -87,9 +84,9 @@ def analyze_cycle(path: str, file: str):
     # Insert the 'CONDITION' column at the beginning of the DataFrame
     avg_sorted_df.insert(0, 'CONDITION', condition_values)
     
-    # export trial-averaged data (1 cycle per CONDITION) !!!
-    avg_sorted_df.to_parquet(path + file + '_AVG' + '.parquet')
-    avg_sorted_df.to_csv(path + file + '_AVG' + '.csv')
+    # # export trial-averaged data (1 cycle per CONDITION) !!!
+    # avg_sorted_df.to_parquet(file + '_AVG' + '.parquet')
+    # avg_sorted_df.to_csv(file + '_AVG' + '.csv')
 
     # COVARIANCE of cycles based on the u, v, r commands
     var_df = filtered_df.groupby(['CYCLE_TIME', 'OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star']).var().reset_index()
@@ -109,9 +106,9 @@ def analyze_cycle(path: str, file: str):
     # The 'CONDITION' column will contain the unique indices based on commands u, v, r
     var_sorted_df['CONDITION'] = var_sorted_df.groupby(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star'], sort=True).ngroup()
 
-    # export trial-averaged data (1 cycle per CONDITION) !!!
-    var_sorted_df.to_parquet(path + file + '_VAR' + '.parquet')
-    var_sorted_df.to_csv(path + file + '_VAR' + '.csv')
+    # # export trial-averaged data (1 cycle per CONDITION) !!!
+    # var_sorted_df.to_parquet(file + '_VAR' + '.parquet')
+    # var_sorted_df.to_csv(file + '_VAR' + '.csv')
 
-    return avg_sorted_df
+    return avg_sorted_df, var_sorted_df
     

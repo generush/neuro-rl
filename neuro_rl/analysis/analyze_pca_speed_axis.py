@@ -41,6 +41,8 @@ import pickle as pk
 import os
 from pdfCropMargins import crop
 
+from constants.normalization_types import NormalizationType
+
 def crop_pdfs_in_folder(folder_path):
     # Create the "cropped" folder if it doesn't exist
     cropped_folder = os.path.join(folder_path, "cropped")
@@ -169,11 +171,11 @@ def plot_data(x_data, y_data, z_data, c_data, cc_global_min, cc_global_max, data
         filename = f"{data_type}__{xlabel}{ylabel}{zlabel}__{clabel}".replace("/", "-")
         fig.savefig(path + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
 
-def analyze_pca_speed_axis(path: str, data_names: List[str], max_dims: int, file_suffix: str = ''):
+def analyze_pca_speed_axis(df: pd.DataFrame, data_names: List[str], max_dims: int, norm_type: NormalizationType, file_suffix: str = ''):
 
     # load DataFrame
-    df = process_data(path + 'RAW_DATA' + file_suffix + '.parquet')
-    dt = df['TIME'][1].compute().to_numpy() - df['TIME'][0].compute().to_numpy()
+    # df = process_data(path + 'RAW_DATA' + file_suffix + '.parquet')
+    dt = df['TIME'][1] - df['TIME'][0]
 
     x_data = []
     y_data = []
@@ -184,11 +186,11 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], max_dims: int, file
 
     for idx, data_type in enumerate(data_names):
         # get data for PCA analysis (only raw data)
-        filt_data = df.loc[:, df.columns.str.contains(data_type + '_RAW')].compute()
-        tangl_data = df.loc[:, df.columns.str.contains(data_type + '_TANGLING')].compute()
-        spd_cmd = df.loc[:, 'OBS_RAW_009_u_star'].compute()
-        spd_act = df.loc[:, 'OBS_RAW_000_u'].compute()
-        idx = df.index.compute()
+        filt_data = df.loc[:, df.columns.str.contains(data_type + '_RAW')]
+        tangl_data = df.loc[:, df.columns.str.contains(data_type + '_TANGLING')]
+        spd_cmd = df.loc[:, 'OBS_RAW_009_u_star']
+        spd_act = df.loc[:, 'OBS_RAW_000_u']
+        idx = df.index
 
         df_neuron = filt_data.loc[idx].reset_index(drop=True)
         df_speed_cmd = spd_cmd.loc[idx].reset_index(drop=True)
@@ -199,10 +201,10 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], max_dims: int, file
         COLUMNS = np.char.mod(data_type + 'SPEED_PC_%03d', np.arange(N_COMPONENTS))
 
         if N_COMPONENTS > 0:
-            scl, pca, pc_df = compute_pca(df_neuron, N_COMPONENTS, COLUMNS)
-            export_scl(scl, path + data_type + '_SPEED_SCL.pkl')
-            export_pca(pca, path + data_type + '_SPEED_PCA.pkl')
-            pc_df.to_csv(path + data_type + '_SPEED_PC_DATA' + file_suffix + '.csv')
+            scl, pca, pc_df = compute_pca(df_neuron, N_COMPONENTS, norm_type, COLUMNS)
+            # export_scl(scl, path + data_type + '_SPEED_SCL.pkl')
+            # export_pca(pca, path + data_type + '_SPEED_PCA.pkl')
+            # pc_df.to_csv(path + data_type + '_SPEED_PC_DATA' + file_suffix + '.csv')
         
         x_s = pc_df.iloc[:, 2:]
         v_bar = df_speed_cmd.unique()
@@ -252,17 +254,17 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], max_dims: int, file
         t_data.append(t)
 
         # export some data for the paper/suppl matl
-        pd.DataFrame(pc_12speed_tf).to_csv(path + 'info_' + data_type + '_pc_12speed_tf.csv')
-        pd.DataFrame(pc_123_tf).to_csv(path + 'info_' + data_type + '_pc_123_tf.csv')
-        pd.DataFrame(pca.explained_variance_ratio_.cumsum()).to_csv(path + 'info_' + data_type + '_cumvar.csv')
-        pd.DataFrame(x).to_csv(path + 'info_' + data_type + '_x_by_speed.csv')
-        pd.DataFrame(y).to_csv(path + 'info_' + data_type + '_y_by_speed.csv')
-        pd.DataFrame(z1).to_csv(path + 'info_' + data_type + '_z1_by_speed.csv')
-        pd.DataFrame(z2).to_csv(path + 'info_' + data_type + '_z2_by_speed.csv')
-        pd.DataFrame(t).to_csv(path + 'info_' + data_type + '_tangling_by_speed.csv')
-        pd.DataFrame(d_opt).to_csv(path + 'info_' + data_type + '_dopt.csv')
-        export_scl(scl, path + 'info_' + data_type +'_SCL' + '.pkl')
-        export_pca(pca, path + 'info_' + data_type +'_PCA' + '.pkl')
+        # pd.DataFrame(pc_12speed_tf).to_csv(path + 'info_' + data_type + '_pc_12speed_tf.csv')
+        # pd.DataFrame(pc_123_tf).to_csv(path + 'info_' + data_type + '_pc_123_tf.csv')
+        # pd.DataFrame(pca.explained_variance_ratio_.cumsum()).to_csv(path + 'info_' + data_type + '_cumvar.csv')
+        # pd.DataFrame(x).to_csv(path + 'info_' + data_type + '_x_by_speed.csv')
+        # pd.DataFrame(y).to_csv(path + 'info_' + data_type + '_y_by_speed.csv')
+        # pd.DataFrame(z1).to_csv(path + 'info_' + data_type + '_z1_by_speed.csv')
+        # pd.DataFrame(z2).to_csv(path + 'info_' + data_type + '_z2_by_speed.csv')
+        # pd.DataFrame(t).to_csv(path + 'info_' + data_type + '_tangling_by_speed.csv')
+        # pd.DataFrame(d_opt).to_csv(path + 'info_' + data_type + '_dopt.csv')
+        # export_scl(scl, path + 'info_' + data_type +'_SCL' + '.pkl')
+        # export_pca(pca, path + 'info_' + data_type +'_PCA' + '.pkl')
 
     s_global_min = np.min(s_data)
     s_global_max = np.max(s_data)
@@ -281,6 +283,7 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], max_dims: int, file
         ss = s_data[idx]
         tt = t_data[idx]
         
+        path = ""
         # PC1, PC2, PC3, Speed
         plot_data(xx, yy, zz1, ss, s_global_min, s_global_max, data_type, 'PC 3', 'u [m/s]', 'Spectral', path, save_figs=True)
 
@@ -296,6 +299,6 @@ def analyze_pca_speed_axis(path: str, data_names: List[str], max_dims: int, file
     plt.show()
 
     # crop white space out of pdfs
-    crop_pdfs_in_folder(path)
+    # crop_pdfs_in_folder(path)
     
     print('done plotting')

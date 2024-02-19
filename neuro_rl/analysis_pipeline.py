@@ -1,4 +1,8 @@
-# https://plotly.com/python/3d-scatter-plots/
+
+
+# %%
+
+# # https://plotly.com/python/3d-scatter-plots/
 import logging
 from collections import OrderedDict
 
@@ -26,6 +30,9 @@ import sklearn.manifold
 import sklearn.metrics
 
 import time
+
+from constants.normalization_types import NormalizationType
+
 
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_21-25-03_u[-1,-0.4,7]_v[0]_r[0]_n[100]/'
 # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-15_21-20-32_u[0.4,1,7]_v[0]_r[0]_n[100]/'
@@ -277,9 +284,46 @@ DATASETS = [
 
 AVG = True
 
-MAX_DIMS = 10
+# Maximum principal components
+MAX_DIMS = 12
+
+# Set the current normalization type
+norm_type = NormalizationType.RANGE_SOFT.value  # Only one of these should be set
+
+
 
 start = time.process_time()
+
+# %%
+
+# load DataFrame
+df_raw = pd.read_parquet(INPUT_DATA_PATH + 'RAW_DATA' + '.parquet')
+
+# %%
+
+# Compute cycle-average and variance for raw data
+df_raw_avg, df_raw_var = analyze_cycle(df_raw)
+print('Finished analyze_cycle', time.process_time() - start)
+
+# %%
+
+# Compute PCA of the average cycles
+df_avg_pc, pc_dict = analyze_pca(df_raw_avg, DATASETS, MAX_DIMS, norm_type)
+print('Finished analyze_pca', time.process_time() - start)
+
+# %%
+
+data_w_tangling = analyze_tangling(df_avg_pc, DATASETS, '_AVG')
+print('Finished analyze_tangling', time.process_time() - start)
+
+
+# %% 
+
+analyze_pca_speed_axis(data_w_tangling, DATASETS, MAX_DIMS, norm_type, '_AVG_WITH_TANGLING')
+print('Finished analyze_pca', time.process_time() - start)
+
+# %%
+
 
 if AVG:
 
@@ -302,9 +346,6 @@ if AVG:
 
     data_w_tangling = analyze_tangling(INPUT_DATA_PATH, DATASETS, '_AVG')
     print('Finished analyze_tangling', time.process_time() - start)
-
-    analyze_pca_speed_axis(INPUT_DATA_PATH, DATASETS, MAX_DIMS, '_AVG_WITH_TANGLING')
-    print('Finished analyze_pca', time.process_time() - start)
 
     run_dashboard(INPUT_DATA_PATH)
 

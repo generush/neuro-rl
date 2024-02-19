@@ -68,6 +68,7 @@ def create_pc_data(FOLDER_PATH, FILE_NAME, DATASETS):
     new_df = pd.concat([meta_df] + new_dfs, axis=1)
 
     # Save the new DataFrame to a new parquet file
-    new_df.to_parquet(FOLDER_PATH + 'PC_DATA' + '.parquet')
+    new_df.to_parquet(FOLDER_PATH + 'PC_DATA_AVG' + '.parquet')
+    new_df.to_csv(FOLDER_PATH + 'PC_DATA_AVG' + '.csv')
 
     return new_df

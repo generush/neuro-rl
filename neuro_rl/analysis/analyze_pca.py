@@ -9,6 +9,7 @@ from typing import List
 
 import numpy as np
 import pandas as pd
+import dask.dataframe as dd
 
 from utils.data_processing import process_data, process_csv
 from plotting.generation import generate_dropdown, generate_graph
@@ -19,9 +20,10 @@ import sklearn.preprocessing
 import sklearn.decomposition
 import sklearn.manifold
 import sklearn.metrics
+from constants.normalization_types import NormalizationType
+from utils.scalers import RangeScaler, RangeSoftScaler
 
-def compute_pca(df_raw, n_components, columns):
-
+def compute_pca(df_raw, n_components, norm_type: NormalizationType, columns):
 
     # # get column names that contain the string "RAW"
     # cols_to_normalize = [col for col in df_raw.columns if 'RAW' in col]
@@ -36,10 +38,30 @@ def compute_pca(df_raw, n_components, columns):
     # # concatenate the normalized dataframe with the original dataframe along the columns axis
     # df_raw = pd.concat([df_raw.drop(cols_to_normalize, axis=1).compute(), normalized_df.compute()], axis=1)
 
-    # added scaling since dimensions might have different magnitudes
-    
-    scl = sklearn.preprocessing.StandardScaler()
-    df_scaled = scl.fit_transform(df_raw)
+    # Example usage
+    if norm_type == NormalizationType.Z_SCORE.value:
+        # Perform z-score normalization
+
+        scl = sklearn.preprocessing.StandardScaler()
+
+        df_scaled = scl.fit_transform(df_raw)
+        
+    elif norm_type == NormalizationType.RANGE.value:
+        # Perform range normalization
+        
+        scl = RangeScaler()
+        df_scaled = scl.fit_transform(df_raw)
+        
+    elif norm_type == NormalizationType.RANGE_SOFT.value:
+        # Perform range soft normalization
+        
+        scl = RangeSoftScaler(softening_factor=5)  # You can adjust the softening factor as needed
+        df_scaled = scl.fit_transform(df_raw)
+
+    else:
+
+        raise ValueError(f"Unsupported normalization type: {norm_type}")
+        
 
     # create PCA object
     pca = sklearn.decomposition.PCA(n_components=n_components)
@@ -71,10 +93,10 @@ def import_scl(path: str):
 def import_pca(path: str):
     return pk.load(open(path,'rb'))
 
-def analyze_pca(path: str, file: str, data_names: List[str], max_dims: int, file_suffix: str = ''):
+def analyze_pca(df: pd.DataFrame, data_names: List[str], max_dims: int, norm_type: NormalizationType, file_suffix: str = ''):
 
     # load DataFrame
-    data = process_csv(path + file + file_suffix + '.csv')
+    # data = process_csv(path + file + file_suffix + '.csv')
     # data['TIME']
 
     # meta_data = data.loc[:,~data.columns.str.contains('_RAW')].compute()
@@ -86,7 +108,7 @@ def analyze_pca(path: str, file: str, data_names: List[str], max_dims: int, file
     for idx, data_type in enumerate(data_names):
 
         # select data for PCA analysis (only raw data)
-        filt_data = data.loc[:,data.columns.str.contains(data_type + '_RAW')]
+        filt_data = df.loc[:,df.columns.str.contains(data_type + '_RAW')]
 
         # get number of dimensions of DataFrame
         n_dims = min(len(filt_data.columns), max_dims)
@@ -97,17 +119,30 @@ def analyze_pca(path: str, file: str, data_names: List[str], max_dims: int, file
         if n_dims > 0:
 
             # compute pca
-            scl, pca, pc_df = compute_pca(filt_data, n_dims, COLUMNS)
+            scl, pca, pc_df = compute_pca(filt_data, n_dims, norm_type, COLUMNS)
 
             # export PCA object
-            export_pca(pca, path + data_type +'_PCA' + '.pkl')
-            export_scl(scl, path + data_type +'_SCL' + '.pkl')
+            export_pca(pca, data_type +'_PCA' + '.pkl')
+            export_scl(scl, data_type +'_SCL' + '.pkl')
 
             # Store scl and pca objects in the dictionary
             pca_dict[data_type] = {'scl': scl, 'pca': pca}
 
             # export PC DataFrame
-            pc_df.to_csv(path + data_type + '_' + 'PC_DATA' + file_suffix + '.csv')
+            pc_df.to_csv(data_type + '_' + 'PC_DATA' + file_suffix + '.csv')
 
-    return pca_dict
+            # Define a function to concatenate pc_df to each partition of filt_data
+            def concat_partitions(partition, pc_df):
+                # Convert the partition (which is a Pandas DataFrame) to the same index as pc_df if needed
+                return partition.join(pc_df, how='left')
+
+            # # Use map_partitions to apply the function to each partition of filt_data
+            # df = df.map_partitions(concat_partitions, pc_df=pc_df)
+
+            # Append pc_df to filt_data
+            df = pd.concat([df, pc_df], axis=1)
+
+            print('hello')
+
+    return df, pca_dict
 
