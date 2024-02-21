@@ -12,7 +12,7 @@ import dask.dataframe as dd
 
 import sklearn.decomposition
 
-from analysis.analyze_pca import compute_pca
+from analysis.append_pc import compute_pca
 
 # FOLDER_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data_PAPER_test_subspace'
 FOLDER_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/'

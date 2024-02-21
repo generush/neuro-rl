@@ -13,10 +13,10 @@ from plotting.generation import generate_dropdown, generate_graph
 from plotting.plot import plot_scatter3_ti_tf
 from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
 
-from analysis.analyze_cycle import analyze_cycle
-from analysis.analyze_pca import analyze_pca
+from analysis.compute_avg_gait_cycle import analyze_cycle
+from analysis.append_pc import analyze_pca
 from analysis.analyze_pca_speed_axis import analyze_pca_speed_axis
-from analysis.analyze_tangling import analyze_tangling
+from analysis.append_tangling import analyze_tangling
 from plotting.dashboard import run_dashboard
 
 from analysis.cluster import find_clusters

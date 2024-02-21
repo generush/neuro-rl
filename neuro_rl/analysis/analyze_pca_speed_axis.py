@@ -145,8 +145,8 @@ def plot_data(x_data, y_data, z_data, c_data, cc_global_min, cc_global_max, data
     cc = np.concatenate(c_data, axis=0)
 
     # plot figures with speed colors and tangling colors
-    scatter1 = ax.scatter(xx, yy, zz, c=cc, s=2*np.ones_like(xx), cmap=cmap, vmin=cc_global_min, vmax=cc_global_max, alpha=1, depthshade=True, rasterized=True)
-    scatter2 = ax.scatter(xx.flatten(), yy.flatten(), 1.5 * zz.min()*np.ones_like(zz), c='grey', s=1*np.ones_like(xx), alpha=1, depthshade=True, rasterized=True)
+    ax.scatter(xx, yy, zz, c=cc, s=2*np.ones_like(xx), cmap=cmap, vmin=cc_global_min, vmax=cc_global_max, alpha=1, depthshade=True, rasterized=True)
+    ax.scatter(xx.flatten(), yy.flatten(), 1.5 * zz.min()*np.ones_like(zz), c='grey', s=1*np.ones_like(xx), alpha=1, depthshade=True, rasterized=True)
 
     # Add labels and a legend
     xlabel = 'PC 1'

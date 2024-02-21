@@ -9,7 +9,7 @@ import sklearn.metrics
 import umap
 
 from utils.data_processing import process_data, format_df
-from utils.geometry import compute_tangling
+from utils.metrics import tangling
 
 @dataclass
 class Data:
@@ -47,7 +47,7 @@ class PCAEmbedding(Embedding):
         self.x_embd = format_df(self.embedding.fit_transform(x.raw))
 
     def append_tangling(self, dt: float) -> None:
-        self.x_embd['tangling'] = compute_tangling(self.x_embd.to_numpy(), dt)
+        self.x_embd['tangling'] = tangling(self.x_embd.to_numpy(), dt)
 
     @property
     def var(self) -> np.array:

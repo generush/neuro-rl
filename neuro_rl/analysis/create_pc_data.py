@@ -1,37 +1,8 @@
 # https://plotly.com/python/3d-scatter-plots/
-import logging
-from collections import OrderedDict
-
-import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, dcc, html
-
-from typing import List
-
 import numpy as np
 import pandas as pd
 
-from analysis.analyze_pca import import_pca, import_scl
-
-from utils.data_processing import process_data, process_csv
-from plotting.generation import generate_dropdown, generate_graph
-from plotting.plot import plot_scatter3_ti_tf
-from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
-
-import sklearn.preprocessing
-import sklearn.decomposition
-import sklearn.manifold
-import sklearn.metrics
-# https://plotly.com/python/3d-scatter-plots/
-import logging
-from collections import OrderedDict
-
-import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, dcc, html
-
-import numpy as np
-import pandas as pd
-import pickle as pk
-import dask.dataframe as dd
+from utils.io import import_pk
 
 def create_pc_data(FOLDER_PATH, FILE_NAME, DATASETS):
 
@@ -49,8 +20,8 @@ def create_pc_data(FOLDER_PATH, FILE_NAME, DATASETS):
         # select data for PCA analysis (only raw data)
         filt_df = df.loc[:, df.columns.str.contains(data_type + '_RAW')]
 
-        pca = import_pca(FOLDER_PATH + data_type + '_PCA' + '.pkl')
-        scl = import_scl(FOLDER_PATH + data_type + '_SCL' + '.pkl')
+        pca = import_pk(FOLDER_PATH + data_type + '_PCA' + '.pkl')
+        scl = import_pk(FOLDER_PATH + data_type + '_SCL' + '.pkl')
 
         N_DIMENSIONS = pca.n_components
 

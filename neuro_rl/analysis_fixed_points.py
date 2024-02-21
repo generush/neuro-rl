@@ -1,38 +1,13 @@
 # https://plotly.com/python/3d-scatter-plots/
-import logging
-from collections import OrderedDict
-
-import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, dcc, html
-
 import numpy as np
 import pandas as pd
-
-from utils.data_processing import process_data
-from plotting.generation import generate_dropdown, generate_graph
-from plotting.plot import plot_scatter3_ti_tf
-from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
-
-from analysis.analyze_cycle import analyze_cycle
-from analysis.analyze_pca import analyze_pca
-from analysis.analyze_pca_speed_axis import analyze_pca_speed_axis
-from analysis.analyze_tangling import analyze_tangling
-from plotting.dashboard import run_dashboard
 
 from analysis.cluster import find_clusters
 from analysis.jacobian import compute_jacobian, compute_jacobian_alternate, compute_jacobian_alternate2
 
-import sklearn.decomposition
-import sklearn.manifold
-import sklearn.metrics
-
-import time
-
 import torch
 
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.autograd import grad
 
 import random
 
@@ -119,7 +94,7 @@ import matplotlib.pyplot as plt
 
 # **LSTM16-DIST500 4/4 steps, W/ TERRAIN ()
 lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
-DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-27_16-41-40_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
+DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-27-16-52_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
 
 # **LSTM16-NODIST 1/4 steps (CoRL), W/ TERRAIN ()
 # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_07-03-29-04/nn/last_AnymalTerrain_ep_3800_rew_20.163399.pth')

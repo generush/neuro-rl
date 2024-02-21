@@ -1,26 +1,12 @@
 # https://plotly.com/python/3d-scatter-plots/
-import logging
-from collections import OrderedDict
-
-import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, dcc, html
-
-import numpy as np
 import pandas as pd
-import pickle as pk
-import dask.dataframe as dd
-
-import sklearn.decomposition
-
-from analysis.analyze_pca import compute_pca
+import matplotlib.pyplot as plt
 
 DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data_CoRL/'
 df = pd.read_csv(DATA_PATH + 'robustness_statistics.csv', index_col=0)
 df = df.loc[:,'-4':'4']
 
 
-import matplotlib.pyplot as plt
-import numpy as np
 
 fig, axs = plt.subplots(3, 2, figsize=(10, 6)) # Adjust the figure size as per your requirements
 

@@ -15,7 +15,6 @@ def format_df(data: np.array):
     df.columns = df.columns.astype(str)
     return df
 
-
 def process_data_to_pd(folder_path: str, file_suffix: str):
 
     data_dir = Path(folder_path)
