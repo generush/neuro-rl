@@ -6,8 +6,6 @@ def compute_avg_gait_cycle(df: pd.DataFrame):
     # get dt time step
     DT = df['TIME'][1] - df['TIME'][0]
 
-    
-
     # this entry is the first time step of swing phase (this FOOT_FORCE_002 = zero)
     mask_swingf = df['FT_FORCE_RAW_002'] == 0
 

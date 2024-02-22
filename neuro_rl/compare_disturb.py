@@ -15,7 +15,7 @@ from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbed
 
 from analysis.compute_avg_gait_cycle import analyze_cycle
 from analysis.append_pc import analyze_pca
-from analysis.analyze_pca_speed_axis import analyze_pca_speed_axis
+from analysis.append_pc_speed_axis import analyze_pca_speed_axis
 from analysis.append_tangling import analyze_tangling
 from plotting.dashboard import run_dashboard
 

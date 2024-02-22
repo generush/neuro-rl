@@ -13,7 +13,7 @@ def append_pc(df: pd.DataFrame, data_names: List[str], max_dims: int, norm_type:
 
         filt_data = df.loc[:,df.columns.str.contains(data_type + '_RAW')].values
         n_dims = min(filt_data.shape[1], max_dims)
-        pc_columns = [f'{data_type}_PC_{i+1}' for i in range(n_dims)]
+        pc_columns = [f'{data_type}_PC_{i+1:03d}' for i in range(n_dims)]
 
         normalized_data, scl = normalize(filt_data, norm_type)
         data_pc, pca = transform_pc(normalized_data, n_dims)
