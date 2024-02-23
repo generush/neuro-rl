@@ -4,6 +4,14 @@ import numpy as np
 import dask.dataframe as dd
 from pathlib import Path
 
+def filter_by_column_keywords(df, include_keywords, exclude_keyword):
+
+    # Creating a mask for columns to include: columns that contain include_keywords or don't contain exclude_keyword
+    filter_mask = df.columns.str.contains('|'.join(include_keywords)) | ~df.columns.str.contains(exclude_keyword)
+
+    # Selecting columns based on the mask to get a filtered DataFrame
+    return df.loc[:, filter_mask]
+
 def process_data(file: str):
     return dd.read_parquet(file)
 

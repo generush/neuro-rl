@@ -58,7 +58,7 @@ ax.axhline(0, color='black')
 plt.xticks()
 
 fig.tight_layout()
-# plt.show()
+plt.show()
 
 # Save the plot as an SVG file
 plt.savefig('d_opt_barchart.svg', format='svg')

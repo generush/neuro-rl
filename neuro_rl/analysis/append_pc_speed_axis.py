@@ -64,15 +64,19 @@ def append_pc_speed_axis(df: pd.DataFrame, data_names: List[str], max_dims: int,
         df_tangling = tangl_data.loc[idx].values
         
         n_components = min(len(filt_data.columns), max_dims)
-        column_names = np.char.mod(data_type + 'SPEED_PC_%03d', np.arange(n_components))
+        column_names_pc = np.char.mod(data_type + 'SPEED_PC_%03d', np.arange(n_components))
 
         if n_components > 0:
-            scl, pca, pc_df = compute_pca(df_neuron, n_components, norm_type, column_names)
+            scl, pca, data_pc = compute_pca(df_neuron, n_components, norm_type)
+
+            # create DataFrame
+            df_pc = pd.DataFrame(data_pc, columns=column_names_pc)
+
             export_pk(scl, data_type + '_SPEED_SCL.pkl')
             export_pk(pca, data_type + '_SPEED_PCA.pkl')
-            # pc_df.to_csv(path + data_type + '_SPEED_PC_DATA' + file_suffix + '.csv')
+            # df_pc.to_csv(path + data_type + '_SPEED_PC_DATA' + file_suffix + '.csv')
         
-        x_s = pc_df.iloc[:, 2:]
+        x_s = df_pc.iloc[:, 2:]
         v_bar = np.unique(df_speed_cmd)
         n_speeds = len(v_bar)
 

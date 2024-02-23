@@ -1,20 +1,9 @@
 # https://plotly.com/python/3d-scatter-plots/
-import logging
-from collections import OrderedDict
-
-import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, dcc, html
 
 from typing import List
 
 import numpy as np
 import pandas as pd
-import dask.dataframe as dd
-
-from utils.data_processing import process_data, process_csv
-from plotting.generation import generate_dropdown, generate_graph
-from plotting.plot import plot_scatter3_ti_tf
-from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
 
 import sklearn.preprocessing
 import sklearn.decomposition
@@ -23,40 +12,26 @@ import sklearn.metrics
 from constants.normalization_types import NormalizationType
 from utils.scalers import RangeScaler, RangeSoftScaler
 
-def compute_pca(df_raw, n_components, norm_type: NormalizationType, columns):
+def compute_pca(data, n_components, norm_type: NormalizationType):
 
-    # # get column names that contain the string "RAW"
-    # cols_to_normalize = [col for col in df_raw.columns if 'RAW' in col]
-
-    # # normalize only the columns that contain the string "norm", avoiding normalization if max = min
-    # col_min = df_raw[cols_to_normalize].min()
-    # col_max = df_raw[cols_to_normalize].max()
-    # col_range = (col_max - col_min).compute() + 5
-    # col_range[col_range == 0] = 1 # avoid division by zero
-    # normalized_df = df_raw[cols_to_normalize] / col_range
-
-    # # concatenate the normalized dataframe with the original dataframe along the columns axis
-    # df_raw = pd.concat([df_raw.drop(cols_to_normalize, axis=1).compute(), normalized_df.compute()], axis=1)
-
-    # Example usage
     if norm_type == NormalizationType.Z_SCORE.value:
         # Perform z-score normalization
 
         scl = sklearn.preprocessing.StandardScaler()
 
-        df_scaled = scl.fit_transform(df_raw)
+        data_normalized = scl.fit_transform(data)
         
     elif norm_type == NormalizationType.RANGE.value:
         # Perform range normalization
         
         scl = RangeScaler()
-        df_scaled = scl.fit_transform(df_raw)
+        data_normalized = scl.fit_transform(data)
         
     elif norm_type == NormalizationType.RANGE_SOFT.value:
         # Perform range soft normalization
         
         scl = RangeSoftScaler(softening_factor=5)  # You can adjust the softening factor as needed
-        df_scaled = scl.fit_transform(df_raw)
+        data_normalized = scl.fit_transform(data)
 
     else:
 
@@ -67,15 +42,9 @@ def compute_pca(df_raw, n_components, norm_type: NormalizationType, columns):
     pca = sklearn.decomposition.PCA(n_components=n_components)
 
     # fit pca transform
-    data_pc = pca.fit_transform(df_scaled)
+    data_pc = pca.fit_transform(data_normalized)
 
-    # create DataFrame
-    df_pc = pd.DataFrame(data_pc)
-
-    # name DataFrame columns
-    df_pc.columns = columns
-
-    return scl, pca, df_pc
+    return scl, pca, data_pc
 
 # https://datascience.stackexchange.com/questions/55066/how-to-export-pca-to-use-in-another-program
 import pickle as pk

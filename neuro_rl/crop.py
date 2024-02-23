@@ -1,43 +1,10 @@
 
 # https://plotly.com/python/3d-scatter-plots/
-import logging
-from collections import OrderedDict
-
-import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, dcc, html
-
-from typing import List
-
-import numpy as np
-import pandas as pd
-
-from utils.data_processing import process_data
-from analysis.analyze_pca import compute_pca, export_pca, export_scl
-from plotting.generation import generate_dropdown, generate_graph
-from plotting.plot import plot_scatter3_ti_tf
-from embeddings.embeddings import Data, Embeddings, MultiDimensionalScalingEmbedding, PCAEmbedding, MDSEmbedding, ISOMAPEmbedding,LLEEmbedding, LEMEmbedding, TSNEEmbedding, UMAPEmbedding
-
-import sklearn.preprocessing
-import sklearn.decomposition
-import sklearn.manifold
-import sklearn.metrics
 
 import matplotlib
 matplotlib.use('TkAgg')  # Replace 'TkAgg' with another backend if needed
 
-import matplotlib.pyplot as plt
-
-from scipy.interpolate import CubicSpline
-from mpl_toolkits.mplot3d.art3d import Line3DCollection
-import matplotlib.colors as mcolors
-import matplotlib.cm as cm
-from matplotlib.ticker import ScalarFormatter
-
-from scipy.optimize import minimize
-
 # https://datascience.stackexchange.com/questions/55066/how-to-export-pca-to-use-in-another-program
-import pickle as pk
-
 
 import os
 from pdfCropMargins import crop

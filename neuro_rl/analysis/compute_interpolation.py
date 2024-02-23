@@ -1,36 +1,16 @@
 # https://plotly.com/python/3d-scatter-plots/
 
-from typing import List
 
 import numpy as np
 import pandas as pd
 
-from analysis.analyze_pca import compute_pca
-from utils.io import export_pk
-
-import sklearn.preprocessing
-import sklearn.decomposition
-import sklearn.manifold
-import sklearn.metrics
-
 import matplotlib
 matplotlib.use('TkAgg')  # Replace 'TkAgg' with another backend if needed
 
-import matplotlib.pyplot as plt
 
 from scipy.interpolate import CubicSpline
-import matplotlib.colors as mcolors
-import matplotlib.cm as cm
-from scipy.optimize import minimize
 
 # https://datascience.stackexchange.com/questions/55066/how-to-export-pca-to-use-in-another-program
-import pickle as pk
-
-
-import os
-from pdfCropMargins import crop
-
-from constants.normalization_types import NormalizationType
 
 def interpolate_dataframe(variable, time_periodic, fine_time):
     """Interpolate a given variable over a specified fine time grid."""

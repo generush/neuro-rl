@@ -1,72 +1,63 @@
-# https://plotly.com/python/3d-scatter-plots/
-import logging
-from collections import OrderedDict
+# %%
 
-import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, dcc, html
 
-import numpy as np
+from utils.data_processing import filter_by_column_keywords
+from analysis.compute_avg_gait_cycle import compute_avg_gait_cycle
+from analysis.analyze_pca import compute_pca
+
 import pandas as pd
-import pickle as pk
-import dask.dataframe as dd
+import numpy as np
+import matplotlib.pyplot as plt
 
-import sklearn.decomposition
+import yaml
 
-from analysis.append_pc import compute_pca
+# %matplotlib widget
 
-# FOLDER_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data_PAPER_test_subspace'
-FOLDER_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/'
-FOLDER_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-24_10-43-18_u[-1.0,1.0,2]_v[-1.0,1.0,2]_r[-1.0,1.0,2]_n[100]/'
+# Load YAML config file
+with open('cfg/analyze/analysis.yaml', 'r') as config_file:
+    config = yaml.safe_load(config_file)
 
+# Accessing config variables
+input_data_path = config['data_paths']['input']
+output_data_path = config['data_paths']['output']
+dataset_names = config['dataset_names']
+norm_type = config['normalization_type']
+max_components = config['max_num_principal_components']
+tangling_type = config['tangling_type']
 
-# load DataFrame
-df = dd.read_csv(FOLDER_PATH + 'RAW_DATA_AVG' + '.csv')
+# %% Load DataFrame
+raw_df = pd.read_parquet(input_data_path + 'RAW_DATA' + '.parquet')
+                         
+# %% Load DataFrame
+filt_df = filter_by_column_keywords(raw_df, dataset_names, 'RAW')
 
-def V(R, W):
-    return 1 - np.linalg.norm( R - np.matmul ( R, np.matmul( W, W.transpose() ) ) ) / np.linalg.norm(R)
+# %% Compute cycle-average and variance datasets from raw dataset
+avg_cycle_df, var_cycle_df = compute_avg_gait_cycle(filt_df)
 
-def transform(X_raw, tf):
-    scaler = sklearn.preprocessing.StandardScaler()
-    X_scaled = scaler.fit_transform(X_raw)
-    X_transformed = np.matmul(X_scaled, tf)
-    return pd.DataFrame(X_transformed)
-    
-DATASETS = [
-    # 'OBS',
-    # 'ACT',
-    # 'ALSTM_HX',
-    'A_LSTM_CX',
-    # 'CLSTM_HX',
-    # 'CLSTM_CX',
-    # 'AGRU_HX',
-    # 'CGRU_HX',
-]
-
-NUM_CONDITIONS = int(df['CONDITION'].max().compute() + 1)
 R = []
 W = []
 
-# loop through each datatype
-for i, data_type in enumerate(DATASETS):
+n_conditions = avg_cycle_df['CONDITION'].max() + 1
 
-    # get data for ith datatype
-    df_filt = df.loc[:,df.columns.str.contains(data_type + '_RAW')].compute()
+for data_type in dataset_names:
+
+    data_filt = avg_cycle_df.loc[:,avg_cycle_df.columns.str.contains(data_type + '_RAW')].values
+    n_dims = min(data_filt.shape[1], max_components)
+    pc_columns = [f'{data_type}_PC_{i+1:03d}' for i in range(n_dims)]
 
     # loop through each condition
-    for j in range(NUM_CONDITIONS):
-
+    for j in range(n_conditions):
+    
         # get indices for jth condition
-        idx = df.loc[df['CONDITION'] == j].index.compute()
+        idx = avg_cycle_df.loc[avg_cycle_df['CONDITION'] == j].index
 
         # get R (single cycle data) matrix: data from ith datatype, jth condition
-        RR = df_filt.loc[idx].to_numpy()
+        RR = data_filt[idx,:]
 
         # initialize PCA object
-        pca = sklearn.decomposition.PCA(n_components=10)
+        scl, pca, data_pc = compute_pca(RR, max_components, norm_type)
 
-        pca, data_pc = compute_pca(RR, 10, df_filt.columns[:10])
-
-        RR = transform(RR, np.eye(np.shape(RR)[1])).to_numpy()
+        RR = scl.fit_transform(RR)
 
         # get W (principal components) matrix: data from ith datatype, jth condition
         WW = pca.components_.transpose()
@@ -77,134 +68,83 @@ for i, data_type in enumerate(DATASETS):
         print('Finished ', data_type, ' CONDITION: ', j)
 
 # initialize subspace overlap matrix:
-subspace_overlap = np.zeros((NUM_CONDITIONS, NUM_CONDITIONS), dtype=float)
+subspace_overlap = np.zeros((n_conditions, n_conditions), dtype=float)
 
-# loop through each permutation of 2 conditions and compute subspace overlap!
-for r in range(NUM_CONDITIONS): # loop through reference cycles
-    for c in range(NUM_CONDITIONS): # loop through comparison cycles
+def V(R, W):
+    return 1 - np.linalg.norm( R - np.matmul ( R, np.matmul( W, W.transpose() ) ) ) / np.linalg.norm(R)
+
+# loop through each permutation of 2 condition_labels and compute subspace overlap!
+for r in range(n_conditions): # loop through reference cycles
+    for c in range(n_conditions): # loop through comparison cycles
         subspace_overlap[r,c] = V(R[c], W[r]) / V(R[c], W[c])
         print('Subspace Overlap for CONDITIONS: ', r, c, ': ', subspace_overlap[r,c])
 
 pd.DataFrame(subspace_overlap).to_csv('subspace_overlap.csv')
 
-# just grab the subpspace overlaps that compare to the first CONDITION (CONDITION 0 vs CONDITION 0, 1, ..., N)
-arr_1d = subspace_overlap[0,:]
+# Simplified labels
+if n_conditions == 8:
+    labels = ['–', '+']
+elif n_conditions == 27:
+    labels = ['–', '0', '+']
+condition_labels = [f'{u}{v}{r}' for u in labels for v in labels for r in labels]
 
-# reshape it so its in a grid form
-arr_3d = arr_1d.reshape((2,6,6))
-
-import numpy as np
-from pylab import *
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-
-fig = plt.figure(figsize=(8,6))
-
-ax = fig.add_subplot(111,projection='3d')
-
-data = np.random.random(size=(6, 6, 6))
-
-zs, xs, ys = data.nonzero()
-xs = -1 + 2 *xs / 5
-ys = -1 + 2 *ys / 5
-zs = -1 + 2 *zs / 5
-
-# xs = np.linspace(-1, 1, 6)
-# ys = np.linspace(-1, 1, 6)
-# zs = np.linspace(-1, 1, 6)
-
-colmap = cm.ScalarMappable(cmap='viridis')
-colmap.set_array(arr_3d)
-colmap.set_clim(vmin=arr_3d.min(), vmax=arr_3d.max()) # set the colorbar limits
-
-yg = ax.scatter(xs, ys, zs, c=arr_3d, cmap='viridis', alpha=1.0)
-cbar = fig.colorbar(colmap)
-
-ax.set_xlabel('u')
-ax.set_ylabel('v')
-ax.set_zlabel('r')
-
-plt.show()
-
-# Compute the cosine similarity between the first PC for different CONDITIONS (000, 001):
-sklearn.metrics.pairwise.cosine_similarity(W[0][:,0].reshape(1,-1) , W[1][:,0].reshape(1,-1) )
-
-
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-
-# Create a figure and set the figure size
-fig = plt.figure(figsize=(5, 5))
+if n_conditions == 8:
+    fig, ax = plt.subplots(figsize=(4, 4))
+elif n_conditions == 27:
+    fig, ax = plt.subplots(figsize=(8, 8))
 
 # Add white space above the plot
-fig.subplots_adjust(top=0.9)
+fig.subplots_adjust(left=0.2, top=0.9, right=0.8)
 
-# Add white space to the left of the plot
-fig.subplots_adjust(left=0.2)
-
-# Manually label x and y ticks for each cell
-plt.xticks(np.arange(8) + 0.5, [
-    'u-  v-  r-',
-    'u-  v-  r+',
-    'u-  v+  r-',
-    'u-  v+  r+',
-    'u+  v-  r-',
-    'u+  v-  r+',
-    'u+  v+  r-',
-    'u+  v+  r+'], rotation=45
-)
-
-# Manually label x and y ticks for each cell
-plt.yticks(np.arange(8), [
-    'u-  v-  r-',
-    'u-  v-  r+',
-    'u-  v+  r-',
-    'u-  v+  r+',
-    'u+  v-  r-',
-    'u+  v-  r+',
-    'u+  v+  r-',
-    'u+  v+  r+']
-)
-
-# Move x-axis tick labels to the top
-plt.gca().xaxis.tick_top()
-plt.gca().xaxis.set_label_position('top')
-
-# Move y-axis tick labels to the top
-plt.gca().yaxis.tick_left()
-plt.gca().yaxis.set_label_position('left')
-
-# Remove tick marks
-plt.tick_params(axis='both', which='both', top=False, right=False, bottom=False, left=False)
-
-# Add text annotations for cell values
-for i in range(8):
-    for j in range(8):
-        value = subspace_overlap[i, j]
-        text = '{:.2f}'.format(value)
-        color = 'black' if value == 1.0 else 'white'
-        plt.text(j, i, text, ha='center', va='center', color=color, fontsize=7)
-
+# Create a figure and set the figure size
 # Plot the array as a grayscale grid
-plt.imshow(subspace_overlap, cmap='gray', vmin=0, vmax=1)
-# plt.colorbar()
+cax = ax.imshow(subspace_overlap, cmap='gray', vmin=0, vmax=1)
 
-# Shrink the height of the colorbar
-cbar = plt.colorbar(shrink=0.75) # Adjust the y-axis limits to shrink the height
-cbar.ax.yaxis.set_ticks_position('left')
-cbar.ax.set_ylabel('subspace overlap', rotation=90)
-cbar.ax.set_position([0.88, 0.15, 0.04, 0.7]) 
+# Add colorbar
+cbar = fig.colorbar(cax, ax=ax, fraction=0.046, pad=0.04)
+cbar.set_label('Subspace Overlap')
 
-# Display the plot
-# plt.show()
+# Set tick positions
+ax.set_xticks(np.arange(len(condition_labels)))
+ax.set_yticks(np.arange(len(condition_labels)))
 
+# Set tick labels
+ax.set_xticklabels(condition_labels, rotation=45, ha='left')
+ax.set_yticklabels(condition_labels)
 
-# Save the plot as an SVG file
-plt.savefig('grayscale_grid.svg', format='svg')
-plt.savefig('grayscale_grid.pdf', format='pdf', dpi=600)
-plt.savefig('grayscale_grid.png', format='png', dpi=600)
+# Draw gridlines to separate groups
+if n_conditions == 8:
+    for i in range(1, 4):
+        ax.axhline(2*i-0.5, color='lightgrey', lw=0.5)
+        ax.axvline(2*i-0.5, color='lightgrey', lw=0.5)
+    for i in range(1, 2):
+        ax.axhline(4*i-0.5, color='lightgrey', lw=2)
+        ax.axvline(4*i-0.5, color='lightgrey', lw=2)
+elif n_conditions == 27:
+    for i in range(1, 9):
+        ax.axhline(3*i-0.5, color='lightgrey', lw=0.5)
+        ax.axvline(3*i-0.5, color='lightgrey', lw=0.5)
+    for i in range(1, 3):
+        ax.axhline(9*i-0.5, color='lightgrey', lw=2)
+    ax.axvline(9*i-0.5, color='lightgrey', lw=2)
 
+if n_conditions == 8:
+    # Add text annotations for cell values
+    for i in range(8):
+        for j in range(8):
+            value = subspace_overlap[i, j]
+            text = '{:.2f}'.format(value)
+            color = 'black' if value == 1.0 else 'white'
+            plt.text(j, i, text, ha='center', va='center', color=color, fontsize=7)
+
+# Adjust tick parameters
+ax.tick_params(top=True, bottom=False, labeltop=True, labelbottom=False)
+
+# Set labels
+ax.set_xlabel('Reference Condition (u, v, r)')
+ax.set_ylabel('Comparison Condition (u, v, r)')
+ax.xaxis.set_label_position('top') 
+
+plt.show()
 
 print('hi')
