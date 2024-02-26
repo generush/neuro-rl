@@ -72,8 +72,8 @@ def plot_pc12_speed_axis(df, data_names):
         # export_scl(scl, path + 'info_' + data_type +'_SCL' + '.pkl')
         # export_pca(pca, path + 'info_' + data_type +'_PCA' + '.pkl')
  
-    s_global_min = df.loc[:, df.columns.str.contains('OBS_RAW_000_u')].values.min()
-    s_global_max = df.loc[:, df.columns.str.contains('OBS_RAW_000_u')].values.max()
+    s_global_min = df.loc[:, df.columns.str.contains('OBS_RAW_009_u_star')].values.min()
+    s_global_max = df.loc[:, df.columns.str.contains('OBS_RAW_009_u_star')].values.max()
     t_global_min = df.loc[:, df.columns.str.contains('TANGLING')].values.min()
     t_global_max = df.loc[:, df.columns.str.contains('TANGLING')].values.max()
  
@@ -81,7 +81,7 @@ def plot_pc12_speed_axis(df, data_names):
  
     # Plot the data for each data_type
     for idx, data_type in enumerate(data_names):
-        speed = df.loc[:, df.columns.str.contains('OBS_RAW_000_u')].values
+        speed = df.loc[:, df.columns.str.contains('OBS_RAW_009_u_star')].values
         pc1 = df.loc[:, df.columns.str.contains(data_type + '_PC_001')].values
         pc2 = df.loc[:, df.columns.str.contains(data_type + '_PC_002')].values
         pc3 = df.loc[:, df.columns.str.contains(data_type + '_PC_003')].values

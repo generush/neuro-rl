@@ -37,7 +37,7 @@ def objective(d, x, v):
 def constraint(d):
     return np.linalg.norm(d) - 1
 
-def append_pc_speed_axis(df: pd.DataFrame, data_names: List[str], max_dims: int, norm_type: NormalizationType):
+def append_speed_axis(df: pd.DataFrame, data_names: List[str], max_dims: int, norm_type: NormalizationType):
 
     dt = df['TIME'][1] - df['TIME'][0]
 
