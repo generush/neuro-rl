@@ -1,0 +1,24 @@
+data_paths:
+    input: '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_7speed/'
+    output: '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_7speed/'
+
+dataset_names:
+    - FT_FORCE
+    - OBS
+    - ACT
+    - A_MLP_XX
+    - A_LSTM_HC
+    # - A_LSTM_CX
+    # - A_LSTM_HX
+    # - A_LSTM_C1X
+    # - A_LSTM_C2X
+    # - C_MLP_XX
+    # - C_LSTM_CX
+    # - C_LSTM_HX
+    # - A_GRU_HX
+    # - C_GRU_HX
+
+max_num_principal_components: 12
+tangling_type: PC # RAW
+
+normalization_type: Z_SCORE
