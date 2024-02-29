@@ -20,6 +20,7 @@ def tangling(X: np.array, t: np.array):
     epsilon = 0.1 * np.var(X)
 
     # Calculate the pairwise squared differences for X and X_dot
+    # https://towardsdatascience.com/how-to-vectorize-pairwise-dis-similarity-metrics-5d522715fb4e
     X_diff_t = np.sum((X[:, None] - X[None, :]) ** 2, axis=-1)
     X_dot_diff_t = np.sum((X_dot[:, None] - X_dot[None, :]) ** 2, axis=-1)
     
@@ -30,4 +31,3 @@ def tangling(X: np.array, t: np.array):
     Q = ratios.max(axis=0)
 
     return Q
-

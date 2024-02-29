@@ -27,7 +27,7 @@ for ((i=START_INDEX; i<START_INDEX+N; i++)); do
 
   # Execute the python command with updated parameters
   python train.py task=bash_AnymalTerrain_NeuroRL_train \
-    train=AnymalTerrainPPO_LSTM_NeuroRL \
+    train=AnymalTerrainPPO_NeuroRL \
     capture_video=False \
     capture_video_len=1000 \
     force_render=False \
@@ -35,7 +35,7 @@ for ((i=START_INDEX; i<START_INDEX+N; i++)); do
     wandb_activate=True \
     wandb_project=frontiers \
     wandb_entity=erush91 \
-    task.env.terrain.terrainType=trimesh \
+    task.env.terrain.terrainType=plane \
     task.env.learn.perturbRandom.perturbRandomOn=true \
     +output_path=${export_path}/${script_name}-${id} \
     +train_dir=${export_path} \

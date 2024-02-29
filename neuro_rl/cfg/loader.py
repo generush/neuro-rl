@@ -9,7 +9,9 @@ def load_configuration():
     parser = argparse.ArgumentParser(description='Load YAML configuration.')
 
     # Adding argument
-    parser.add_argument('config_path', type=str, help='Path to the YAML configuration file')
+    parser.add_argument('--config_path', type=str, help='Path to the YAML configuration file')
+    parser.add_argument('--input_path', type=str, help='Optional override for the input path')
+    parser.add_argument('--output_path', type=str, help='Optional override for the output path')
 
     # Parsing arguments
     args = parser.parse_args()

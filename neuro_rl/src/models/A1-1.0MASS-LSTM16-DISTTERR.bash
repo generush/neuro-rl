@@ -37,8 +37,8 @@ for ((i=START_INDEX; i<START_INDEX+N; i++)); do
     wandb_entity=erush91 \
     task.env.terrain.terrainType=trimesh \
     task.env.learn.perturbRandom.perturbRandomOn=true \
-    +output_path=${export_path} \
+    +output_path=${export_path}/${script_name}-${id} \
     +train_dir=${export_path} \
-    +full_experiment_name=${script_name}_${id} \
+    +full_experiment_name=${script_name}-${id} \
     seed=${seed}
 done
