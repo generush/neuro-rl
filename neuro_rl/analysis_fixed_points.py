@@ -93,8 +93,8 @@ import matplotlib.pyplot as plt
 
 
 # **LSTM16-DIST500 4/4 steps, W/ TERRAIN ()
-lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
-DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-27-16-52_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
+# lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
+# DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-27-16-52_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
 
 # **LSTM16-NODIST 1/4 steps (CoRL), W/ TERRAIN ()
 # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_07-03-29-04/nn/last_AnymalTerrain_ep_3800_rew_20.163399.pth')
@@ -103,6 +103,29 @@ DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaac
 # *LSTM16-DIST500 4/4 steps, NO TERRAIN (LESS ROBUST W/O TERRAIN!!!)
 # lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_14-17-13/nn/last_AnymalTerrain_ep_900_rew_20.139568.pth')
 # DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-27_16-56-05_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
+
+# TRY RECREATING CoRL
+
+# **LSTM16-NODIST 1/4 steps (CoRL), W/ TERRAIN () --NOTES: CANNOT RECREATE THE 3 FIXED POINTS :( NOT SURE WHY, BUT MY RESULTS ARE INCONSISTENT, GETTING 1-3 FIXED POINTS, ALL CLOSE TO ONE ANOTHER
+# I THINK THERE IS AN ISSUE WITH THE CLUSTERING, I DON'T KNOW IF THEY ARE UNIQUE OR DUPLICATES. CHANGED # MIN POINTS FOR CLUSTER FROM 5 to 1.
+
+lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_07-03-29-04/nn/last_AnymalTerrain_ep_3800_rew_20.163399.pth')
+DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/anymal_14speed_fixedpt_orig/'
+
+# TESTING OUT FRONTIERS ANYMAL MODEL --NOTES: 1 STABLE FIXED POINT
+
+# lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
+# DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/anymal_14speed_fixedpt_new/'
+
+# TESTING OUT A1 MODEL --NOTES: 1 STABLE FIXED POINT (BUT STREAMPLOT SHOWS AS SADDLE, POSITIONED IN BETWEEN TWO ATTRACTORS).
+
+# lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/2024-01-31-23-57_A1Terrain/nn/last_A1Terrain_ep_10100_rew_17.263123.pth')
+# DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_14speed_fixedpt_new/'
+
+# TESTING OUT FRONTIERS ANYMAL MODEL (NODIST-NOTERR) --NOTES: ONE STABLE FIXED POINT
+
+# lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/2023-09-13-18-33_AnymalTerrain/nn/last_AnymalTerrain_ep_700_rew_20.361492.pth')
+# DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/anymal_nodist_noterr_14speed_fixedpt_new/'
 
 
 state_dict = {key.replace('a2c_network.a_rnn.rnn.', ''): value for key, value in lstm_model['model'].items() if key.startswith('a2c_network.a_rnn.rnn')}
@@ -118,15 +141,15 @@ a_rnn = nn.LSTM(INPUT_SIZE, HIDDEN_SIZE, N_LAYERS).to(device)
 a_rnn.load_state_dict(state_dict)
 
 # load scaler and pca transforms
-scl = pk.load(open(DATA_PATH + 'A_LSTM_HC_SPEED_SCL.pkl','rb'))
-pca = pk.load(open(DATA_PATH + 'A_LSTM_HC_SPEED_PCA.pkl','rb'))
+scl = pk.load(open(DATA_PATH + 'A_LSTM_HC_SCL.pkl','rb'))
+pca = pk.load(open(DATA_PATH + 'A_LSTM_HC_PCA.pkl','rb'))
 
 # specify parameters for fix point finder
-N_INITIAL_GUESSES = 4096
-INITIAL_GUESS_RANGE = 20
+N_INITIAL_GUESSES = 4096 # 512
+INITIAL_GUESS_RANGE = 30
 INITIAL_GUESS_DIM = 12
 SAMPLE_RATE = 100
-MAX_ITERATIONS = 100000
+MAX_ITERATIONS = 500000
 
 # Generate random numbers within the specified bounds
 random_numbers = [[random.uniform(-1, 1) for _ in range(INITIAL_GUESS_DIM)] for _ in range(N_INITIAL_GUESSES)]
@@ -189,9 +212,10 @@ for epoch in range(MAX_ITERATIONS):
     # backpropagate the error
     gradient = torch.ones_like(q)
     q.backward(gradient)
-    
+
     # Update the weights
     optimizer.step()
+
 
 # Convert lists to tensors
 hc_hist_fixedpt = torch.stack(hc_hist_fixedpt).squeeze()
@@ -265,7 +289,7 @@ max_imag = torch.imag(eval).max()
 
 cycle_pc1 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_x_by_speed.csv', index_col=0)
 cycle_pc2 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_y_by_speed.csv', index_col=0)
-cycle_pc3 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_z1_by_speed.csv', index_col=0)
+cycle_pc3 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_z_by_speed.csv', index_col=0)
 
 # df_perturb = pd.read_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_17-17-18_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/RAW_DATA_AVG.csv')
 # df_perturb = pd.read_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_17-57-45_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/RAW_DATA_AVG.csv')
@@ -409,8 +433,7 @@ fig = plot_3d(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, cycle_pc3)
 
 filename = f"3d"
 fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
-
-
+fig.savefig(DATA_PATH + filename + '.svg', format='svg', dpi=600, facecolor=fig.get_facecolor())
 
 for fp_idx, fp in enumerate(fps_pc):
 
@@ -431,7 +454,7 @@ for fp_idx, fp in enumerate(fps_pc):
     buffer = 0.1
 
     # Setting x and y limits with buffer
-    ax.set_xlim([min_real - buffer, max_real + buffer])
+    ax.set_xlim([min_real - buffer, max(1.1, max_real + buffer)])
     ax.set_ylim([min_imag - buffer, max_imag + buffer])
 
     plt.xlabel('Real Part')
@@ -441,6 +464,7 @@ for fp_idx, fp in enumerate(fps_pc):
 
     filename = f"fixed_point_{fp_idx}"
     fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
+    fig.savefig(DATA_PATH + filename + '.svg', format='svg', dpi=600, facecolor=fig.get_facecolor())
 
     ### STREAMPLOT
     TRAJ_TIME_LENGTH = 100
@@ -490,11 +514,13 @@ for fp_idx, fp in enumerate(fps_pc):
 
     filename = f"streamplot_slice_for_fixed_point_{fp_idx}"
     fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
+    fig.savefig(DATA_PATH + filename + '.svg', format='svg', dpi=600, facecolor=fig.get_facecolor())
 
     fig = plot_2d_traj(fp_idx, fps_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc)
 
     filename = f"2d_traj_for_fixed_point_{fp_idx}"
     fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
+    fig.savefig(DATA_PATH + filename + '.svg', format='svg', dpi=600, facecolor=fig.get_facecolor())
 
     # plot_3d_traj(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc)
 

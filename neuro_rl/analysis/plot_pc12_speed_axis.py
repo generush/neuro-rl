@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import matplotlib.cm as cm
 
+import pandas as pd
+
 def plot_data(x_data, y_data, z_data, c_data, cc_global_min, cc_global_max, data_type, zlabel, clabel, cmap, path, save_figs = False):
     
     plt.ion()
@@ -58,20 +60,7 @@ def plot_data(x_data, y_data, z_data, c_data, cc_global_min, cc_global_max, data
         filename = f"{data_type}__{xlabel}{ylabel}{zlabel}__{clabel}".replace("/", "-")
         fig.savefig(path + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
 
-def plot_pc12_speed_axis(df, data_names):
-        # export some data for the paper/suppl matl
-        # pd.DataFrame(pc_12speed_tf).to_csv(path + 'info_' + data_type + '_pc_12speed_tf.csv')
-        # pd.DataFrame(pc_123_tf).to_csv(path + 'info_' + data_type + '_pc_123_tf.csv')
-        # pd.DataFrame(pca.explained_variance_ratio_.cumsum()).to_csv(path + 'info_' + data_type + '_cumvar.csv')
-        # pd.DataFrame(x).to_csv(path + 'info_' + data_type + '_x_by_speed.csv')
-        # pd.DataFrame(y).to_csv(path + 'info_' + data_type + '_y_by_speed.csv')
-        # pd.DataFrame(z1).to_csv(path + 'info_' + data_type + '_z1_by_speed.csv')
-        # pd.DataFrame(z2).to_csv(path + 'info_' + data_type + '_z2_by_speed.csv')
-        # pd.DataFrame(t).to_csv(path + 'info_' + data_type + '_tangling_by_speed.csv')
-        # pd.DataFrame(d_opt).to_csv(path + 'info_' + data_type + '_dopt.csv')
-        # export_scl(scl, path + 'info_' + data_type +'_SCL' + '.pkl')
-        # export_pca(pca, path + 'info_' + data_type +'_PCA' + '.pkl')
- 
+def plot_pc12_speed_axis(df, data_names, export_path):
     s_global_min = df.loc[:, df.columns.str.contains('OBS_RAW_009_u_star')].values.min()
     s_global_max = df.loc[:, df.columns.str.contains('OBS_RAW_009_u_star')].values.max()
     t_global_min = df.loc[:, df.columns.str.contains('TANGLING')].values.min()
@@ -88,23 +77,33 @@ def plot_pc12_speed_axis(df, data_names):
         speed_axis = df.loc[:, df.columns.str.contains(data_type + '_SPEED_AXIS')].values
         tangling = df.loc[:, df.columns.str.contains(data_type + '_TANGLING')].values
 
-        
-        path = ""
         # PC1, PC2, PC3, Speed
-        plot_data(pc1, pc2, pc3, speed, s_global_min, s_global_max, data_type, 'PC 3', 'u [m/s]', 'Spectral', path, save_figs=True)
+        plot_data(pc1, pc2, pc3, speed, s_global_min, s_global_max, data_type, 'PC 3', 'u [m/s]', 'Spectral', export_path, save_figs=True)
 
         # PC1, PC2, PC3, Tangling
-        plot_data(pc1, pc2, pc3, tangling, np.min(tangling), np.max(tangling), data_type, 'PC 3', 'Tangling', 'viridis', path, save_figs=True)
+        plot_data(pc1, pc2, pc3, tangling, np.min(tangling), np.max(tangling), data_type, 'PC 3', 'Tangling', 'viridis', export_path, save_figs=True)
 
         # PC1, PC2, SpeedAxis, Speed
-        plot_data(pc1, pc2, speed_axis, speed, s_global_min, s_global_max, data_type, 'Speed Axis', 'u [m/s]', 'Spectral', path, save_figs=True)
+        plot_data(pc1, pc2, speed_axis, speed, s_global_min, s_global_max, data_type, 'Speed Axis', 'u [m/s]', 'Spectral', export_path, save_figs=True)
 
         # PC1, PC2, SpeedAxis, Tangling
-        plot_data(pc1, pc2, speed_axis, tangling, np.min(tangling), np.max(tangling), data_type, 'Speed Axis', 'Tangling', 'viridis', path, save_figs=True)
+        plot_data(pc1, pc2, speed_axis, tangling, np.min(tangling), np.max(tangling), data_type, 'Speed Axis', 'Tangling', 'viridis', export_path, save_figs=True)
 
+
+        # export some data for the paper/suppl matl
+        # pd.DataFrame(pca.explained_variance_ratio_.cumsum()).to_csv(export_path + 'info_' + data_type + '_cumvar.csv')
+        pd.DataFrame(pc1).to_csv(export_path + 'info_' + data_type + '_x_by_speed.csv')
+        pd.DataFrame(pc2).to_csv(export_path + 'info_' + data_type + '_y_by_speed.csv')
+        pd.DataFrame(pc3).to_csv(export_path + 'info_' + data_type + '_z_by_speed.csv')
+        # pd.DataFrame(z2).to_csv(export_path + 'info_' + data_type + '_z2_by_speed.csv')
+        # pd.DataFrame(t).to_csv(export_path + 'info_' + data_type + '_tangling_by_speed.csv')
+        # pd.DataFrame(d_opt).to_csv(export_path + 'info_' + data_type + '_dopt.csv')
+        # export_scl(scl, export_path + 'info_' + data_type +'_SCL' + '.pkl')
+        # export_pca(pca, export_path + 'info_' + data_type +'_PCA' + '.pkl')
+ 
 
     # crop white space out of pdfs
-    # crop_pdfs_in_folder(path)
+    # crop_pdfs_in_folder(export_path)
     
     print('done plotting')
     

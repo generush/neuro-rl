@@ -5,7 +5,7 @@ from typing import List
 from utils.transforms import normalize, transform_pc
 from utils.io import export_pk
 
-def append_pc(df: pd.DataFrame, data_names: List[str], max_dims: int, norm_type: NormalizationType) -> pd.DataFrame:
+def append_pc(df: pd.DataFrame, data_names: List[str], max_dims: int, norm_type: NormalizationType, export_path: str) -> pd.DataFrame:
 
     pca_dict = {}
 
@@ -21,8 +21,8 @@ def append_pc(df: pd.DataFrame, data_names: List[str], max_dims: int, norm_type:
         pc_df = pd.DataFrame(data_pc, columns=pc_columns)
 
         # Optionally export PCA and scaler objects
-        export_pk(pca, f'{data_type}_PCA.pkl')
-        export_pk(scl, f'{data_type}_SCL.pkl')
+        export_pk(pca, export_path + f'{data_type}_PCA.pkl')
+        export_pk(scl, export_path + f'{data_type}_SCL.pkl')
 
         pca_dict[data_type] = {'scaler': scl, 'pca': pca}
         df = pd.concat([df, pc_df], axis=1)  # Append principal components to the original DataFrame

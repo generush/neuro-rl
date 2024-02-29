@@ -1,6 +1,6 @@
 # %%
 import sys
-from analysis.analysis_pipeline import run_analysis
+from .analysis_pipeline import run_analysis
 
 %matplotlib widget
 

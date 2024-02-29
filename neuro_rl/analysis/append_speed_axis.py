@@ -37,7 +37,7 @@ def objective(d, x, v):
 def constraint(d):
     return np.linalg.norm(d) - 1
 
-def append_speed_axis(df: pd.DataFrame, data_names: List[str], max_dims: int, norm_type: NormalizationType):
+def append_speed_axis(df: pd.DataFrame, data_names: List[str], max_dims: int, norm_type: NormalizationType, export_path: str):
 
     dt = df['TIME'][1] - df['TIME'][0]
 
@@ -63,6 +63,8 @@ def append_speed_axis(df: pd.DataFrame, data_names: List[str], max_dims: int, no
         df_speed_act = spd_act.loc[idx].values
         df_tangling = tangl_data.loc[idx].values
         
+
+        
         n_components = min(len(filt_data.columns), max_dims)
         column_names_pc = np.char.mod(data_type + 'SPEED_PC_%03d', np.arange(n_components))
 
@@ -72,8 +74,8 @@ def append_speed_axis(df: pd.DataFrame, data_names: List[str], max_dims: int, no
             # create DataFrame
             df_pc = pd.DataFrame(data_pc, columns=column_names_pc)
 
-            export_pk(scl, data_type + '_SPEED_SCL.pkl')
-            export_pk(pca, data_type + '_SPEED_PCA.pkl')
+            # export_pk(scl, data_type + '_SCL.pkl')
+            # export_pk(pca, data_type + '_PCA.pkl')
             # df_pc.to_csv(path + data_type + '_SPEED_PC_DATA' + file_suffix + '.csv')
         
         x_s = df_pc.iloc[:, 2:]
@@ -113,6 +115,12 @@ def append_speed_axis(df: pd.DataFrame, data_names: List[str], max_dims: int, no
         pc_123_df = transform(df_neuron, pc_123_tf)
 
         pc_pc2_pc3_speedaxis_df = pd.concat([pc_123_df, pc_12speed_df.iloc[:, -1]], axis=1)
+
+
+        # export some data for the paper/suppl matl
+        pd.DataFrame(pc_12speed_tf).to_csv(export_path + 'info_' + data_type + '_pc_12speed_tf.csv')
+        pd.DataFrame(pc_123_tf).to_csv(export_path + 'info_' + data_type + '_pc_123_tf.csv')
+        # pd.DataFrame(pca.explained_variance_ratio_.cumsum()).to_csv(path + 'info_' + data_type + '_cumvar.csv')
 
         speedaxis = pc_12speed_df.iloc[:, 2].values
 

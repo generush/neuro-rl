@@ -6,7 +6,7 @@ import torch
 from sklearn.cluster import KMeans
 from sklearn.cluster import DBSCAN
 
-def find_clusters(tensor, eps=0.5, min_samples=5):
+def find_clusters(tensor, eps=0.5, min_samples=1):
     # convert tensor to numpy for sklearn compatibility
     data = tensor.numpy()
 
