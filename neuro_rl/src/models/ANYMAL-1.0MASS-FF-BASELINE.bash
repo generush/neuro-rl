@@ -4,7 +4,7 @@
 START_INDEX=1
 
 # Number of models to train
-N=2
+N=3
 
 # Extract the base name of the script
 script_name=$(basename "$0")
@@ -16,10 +16,11 @@ script_name="${script_name%.*}"
 # Change directory to where the train.py script is located
 cd ../../../../IsaacGymEnvs/isaacgymenvs
 
+seed=42
+
 # Loop N times starting from START_INDEX
 for ((i=START_INDEX; i<START_INDEX+N; i++)); do
   # Increment seed by 1 each iteration
-  seed=$((42 + i - START_INDEX))
   
   # Append an ID to train_dir and output_path
   id=$(printf "%02d" $i)
