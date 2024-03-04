@@ -1,6 +1,3 @@
-input_path: '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_1speed/'
-output_path: '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_1speed/'
-
 dataset_names:
     - FT_FORCE
     - OBS

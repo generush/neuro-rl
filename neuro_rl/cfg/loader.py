@@ -15,7 +15,7 @@ def load_configuration():
 
     # Parsing arguments
     args = parser.parse_args()
-
+    
     # Construct the full path to the configuration file
     config_path = os.path.join(os.getcwd(), args.config_path)
 
@@ -25,5 +25,11 @@ def load_configuration():
 
     # Convert the loaded config dictionary to a SimpleNamespace for easier attribute access
     cfg = dict_to_simplenamespace(config)
+
+    # Override input_path and output_path if provided in command line arguments
+    if args.input_path is not None:
+        cfg.input_path = args.input_path
+    if args.output_path is not None:
+        cfg.output_path = args.output_path
 
     return cfg

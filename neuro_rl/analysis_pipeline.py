@@ -41,6 +41,11 @@ def run_analysis():
     # Plot ppeed axis figures
     plot_pc12_speed_axis(avg_cycle_interp_df, cfg.dataset_names, cfg.output_path)
 
+    avg_cycle_df.to_parquet(cfg.output_path + 'AVG_CYCLE_DATA.parquet')
+    avg_cycle_df.to_csv(cfg.output_path + 'AVG_CYCLE_DATA.csv')
+    avg_cycle_interp_df.to_parquet(cfg.output_path + 'AVG_CYCLE_INTERP_DATA.parquet')
+    avg_cycle_interp_df.to_csv(cfg.output_path + 'AVG_CYCLE_INTERP_DATA.csv')
+
     print('done')
 
 if __name__ == "__main__":
