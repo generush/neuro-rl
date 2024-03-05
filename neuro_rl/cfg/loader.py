@@ -10,7 +10,8 @@ def load_configuration():
 
     # Adding argument
     parser.add_argument('--config_path', type=str, help='Path to the YAML configuration file')
-    parser.add_argument('--input_path', type=str, help='Optional override for the input path')
+    parser.add_argument('--model_path', type=str, help='Optional override for the input path')
+    parser.add_argument('--data_path', type=str, help='Optional override for the input path')
     parser.add_argument('--output_path', type=str, help='Optional override for the output path')
 
     # Parsing arguments
@@ -27,8 +28,10 @@ def load_configuration():
     cfg = dict_to_simplenamespace(config)
 
     # Override input_path and output_path if provided in command line arguments
-    if args.input_path is not None:
-        cfg.input_path = args.input_path
+    if args.model_path is not None:
+        cfg.model_path = args.model_path
+    if args.data_path is not None:
+        cfg.data_path = args.data_path
     if args.output_path is not None:
         cfg.output_path = args.output_path
 

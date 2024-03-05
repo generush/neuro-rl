@@ -1,137 +1,127 @@
 # https://plotly.com/python/3d-scatter-plots/
+import os
+import pickle as pk
+import h5py
+import random
 import numpy as np
 import pandas as pd
-
+import torch
+import torch.nn as nn
+import matplotlib.ticker as ticker
+import matplotlib.pyplot as plt
 from analysis.cluster import find_clusters
 from analysis.jacobian import compute_jacobian, compute_jacobian_alternate, compute_jacobian_alternate2
 
-import torch
-
-import torch.nn as nn
-
-import random
-
-import h5py
-
-import numpy as np
-import pandas as pd
-
-# https://datascience.stackexchange.com/questions/55066/how-to-export-pca-to-use-in-another-program
-import pickle as pk
-
-import matplotlib.ticker as ticker
-import matplotlib.pyplot as plt
-
-import argparse
-
-
-def main(lstm_model, DATA_PATH):
+def compute_fixed_points(model_path, processed_data_path):
     ### SET LSTM MODEL PATH
 
-    # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_04-17-35-59/nn/last_AnymalTerrain_ep_2950_rew_20.14143.pth')
+    # model_file = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_04-17-35-59/nn/last_AnymalTerrain_ep_2950_rew_20.14143.pth')
 
     # # no bias
-    # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_25-14-47-18/nn/last_AnymalTerrain_ep_2950_rew_20.2923.pth')
+    # model_file = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_25-14-47-18/nn/last_AnymalTerrain_ep_2950_rew_20.2923.pth')
 
     # # AnymalTerrain (1) (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/o noise)
-    # # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_27-12-07-49/nn/last_AnymalTerrain_ep_1800_rew_21.021248.pth')
+    # # model_file = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_27-12-07-49/nn/last_AnymalTerrain_ep_1800_rew_21.021248.pth')
 
     # # AnymalTerrain (2) (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/o noise)
-    # # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_29-22-48-36/nn/last_AnymalTerrain_ep_4700_rew_20.763342.pth')
+    # # model_file = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_29-22-48-36/nn/last_AnymalTerrain_ep_4700_rew_20.763342.pth')
 
     # # AnymalTerrain (3) (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/ noise)
-    # # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_30-22-49-28/nn/last_AnymalTerrain_ep_4950_rew_20.344143.pth')
+    # # model_file = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_30-22-49-28/nn/last_AnymalTerrain_ep_4950_rew_20.344143.pth')
 
     # # AnymalTerrain (3a)  (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/ noise) (earlier in training, reward = 10)
-    # # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_30-22-49-28/nn/last_AnymalTerrain_ep_250_rew_10.102089.pth')
+    # # model_file = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_30-22-49-28/nn/last_AnymalTerrain_ep_250_rew_10.102089.pth')
 
     # # AnymalTerrain (3b)  (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/ noise) (earlier in training, reward = 15)
-    # # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_30-22-49-28/nn/last_AnymalTerrain_ep_2100_rew_15.587042.pth')
+    # # model_file = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_30-22-49-28/nn/last_AnymalTerrain_ep_2100_rew_15.587042.pth')
 
     # # AnymalTerrain (3-#2) (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/ noise) (2nd model)
-    # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_31-19-30-40/nn/last_AnymalTerrain_ep_7800_rew_20.086063.pth')
+    # model_file = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_31-19-30-40/nn/last_AnymalTerrain_ep_7800_rew_20.086063.pth')
 
     # # AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM16-DIST) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=horizon_length=16) (w/o bias)
-    # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_04-15-37-26/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth')
+    # model_file = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_04-15-37-26/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth')
 
     # # AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM4-DIST500) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=4, horizon_length=16) (w/o bias)
-    # # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_06-00-14-59/nn/last_AnymalTerrain_ep_6700_rew_20.21499.pth')
+    # # model_file = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_06-00-14-59/nn/last_AnymalTerrain_ep_6700_rew_20.21499.pth')
 
     # ### IMPORT TRANSFORMATION DATA
 
-    # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-26_09-57-04_u[0.4,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
-    # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_08-29-41_u[-1,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
-    # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_10-29-52_u[-1,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+    # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-26_09-57-04_u[0.4,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
+    # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_08-29-41_u[-1,1.0,7]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/'
+    # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_10-29-52_u[-1,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
     # # no bias but pos u and neg u, no noise/perturb
-    # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_17-11-41_u[-1,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+    # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-27_17-11-41_u[-1,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
     # # # AnymalTerrain (perturb longer)
-    # # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_08-13-39_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+    # # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_08-13-39_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
     # # AnymalTerrain (1) (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/o noise)
-    # # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_22-30-47_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+    # # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_22-30-47_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
     # # AnymalTerrain (2) (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/o noise)
-    # # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_13-54-22_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+    # # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-30_13-54-22_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
     # # AnymalTerrain (3) (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/ noise)
-    # # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_09-02-37_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+    # # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_09-02-37_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
     # # AnymalTerrain (3a)  (pos u and neg u) (no bias) (with HC = (HC, CX)) (w/ perturb w/ noise) (earlier in training, reward = 10)
-    # # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_15-54-36_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+    # # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_15-54-36_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
     # # AnymalTerrain (3-#2) (perturb longer w/ noise) (with HC = (HC, CX)) (2nd model)
-    # # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-01_08-11-32_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
-    # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-01_08-45-29_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+    # # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-01_08-11-32_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
+    # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-01_08-45-29_u[-1.0,1.0,21]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[10]/'
 
     # # AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM16-DIST500) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=horizon_length=16) (w/o bias)
-    # # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-05_11-01-54_u[0.3,1.0,16]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/ noise
-    # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-05_10-56-19_u[0.3,1.0,16]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/o noise
+    # # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-05_11-01-54_u[0.3,1.0,16]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/ noise
+    # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-05_10-56-19_u[0.3,1.0,16]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/o noise
 
     # # AnymalTerrain w/ 2 LSTM (no act in obs, no zero small commands) (BEST) (2-LSTM4-DIST500) (perturb +/- 500N, 1% begin, 98% cont) (seq_len=seq_length=4, horizon_length=16) (w/o bias)
-    # # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_09-42-13_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/o noise early
-    # # DATA_PATH = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_08-53-16_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/o noise
-
-
+    # # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_09-42-13_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/o noise early
+    # # data_path = '/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-06-06_08-53-16_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/' # w/o noise
 
     # **LSTM16-DIST500 4/4 steps, W/ TERRAIN ()
-    # lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
-    # DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-27-16-52_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
+    # model_file = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
+    # data_path = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-27-16-52_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
 
     # **LSTM16-NODIST 1/4 steps (CoRL), W/ TERRAIN ()
-    # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_07-03-29-04/nn/last_AnymalTerrain_ep_3800_rew_20.163399.pth')
-    # DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-27_16-52-26_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
+    # model_file = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_07-03-29-04/nn/last_AnymalTerrain_ep_3800_rew_20.163399.pth')
+    # data_path = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-27_16-52-26_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
 
     # *LSTM16-DIST500 4/4 steps, NO TERRAIN (LESS ROBUST W/O TERRAIN!!!)
-    # lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_14-17-13/nn/last_AnymalTerrain_ep_900_rew_20.139568.pth')
-    # DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-27_16-56-05_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
+    # model_file = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_14-17-13/nn/last_AnymalTerrain_ep_900_rew_20.139568.pth')
+    # data_path = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-08-27_16-56-05_u[0.4,1.0,14]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[50]/'
 
     # TRY RECREATING CoRL
 
     # **LSTM16-NODIST 1/4 steps (CoRL), W/ TERRAIN () --NOTES: CANNOT RECREATE THE 3 FIXED POINTS :( NOT SURE WHY, BUT MY RESULTS ARE INCONSISTENT, GETTING 1-3 FIXED POINTS, ALL CLOSE TO ONE ANOTHER
     # I THINK THERE IS AN ISSUE WITH THE CLUSTERING, I DON'T KNOW IF THEY ARE UNIQUE OR DUPLICATES. CHANGED # MIN POINTS FOR CLUSTER FROM 5 to 1.
 
-    # lstm_model = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_07-03-29-04/nn/last_AnymalTerrain_ep_3800_rew_20.163399.pth')
-    # DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/anymal_14speed_fixedpt_orig/'
+    # model_file = torch.load('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_07-03-29-04/nn/last_AnymalTerrain_ep_3800_rew_20.163399.pth')
+    # data_path = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/anymal_14speed_fixedpt_orig/'
 
     # TESTING OUT FRONTIERS ANYMAL MODEL --NOTES: 1 STABLE FIXED POINT
 
-    # lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
-    # DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/anymal_14speed_fixedpt_new/'
+    # model_file = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth')
+    # data_path = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/anymal_14speed_fixedpt_new/'
 
     # TESTING OUT A1 MODEL --NOTES: 1 STABLE FIXED POINT (BUT STREAMPLOT SHOWS AS SADDLE, POSITIONED IN BETWEEN TWO ATTRACTORS).
 
-    # lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/2024-01-31-23-57_A1Terrain/nn/last_A1Terrain_ep_10100_rew_17.263123.pth')
-    # DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_14speed_fixedpt_new/'
+    # model_file = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/2024-01-31-23-57_A1Terrain/nn/last_A1Terrain_ep_10100_rew_17.263123.pth')
+    # data_path = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/a1_14speed_fixedpt_new/'
 
     # TESTING OUT FRONTIERS ANYMAL MODEL (NODIST-NOTERR) --NOTES: ONE STABLE FIXED POINT
 
-    # lstm_model = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/2023-09-13-18-33_AnymalTerrain/nn/last_AnymalTerrain_ep_700_rew_20.361492.pth')
-    # DATA_PATH = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/anymal_nodist_noterr_14speed_fixedpt_new/'
+    # model_file = torch.load('/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/runs/2023-09-13-18-33_AnymalTerrain/nn/last_AnymalTerrain_ep_700_rew_20.361492.pth')
+    # data_path = '/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/anymal_nodist_noterr_14speed_fixedpt_new/'
 
+    # Check if the first file exists
+    if os.path.isfile(os.path.join(model_path, 'nn/A1Terrain.pth')):
+        model_file = torch.load(os.path.join(model_path, 'nn/A1Terrain.pth'))
+    if os.path.isfile(os.path.join(model_path, 'nn/AnymalTerrain.pth')):
+        model_file = torch.load(os.path.join(model_path, 'nn/AnymalTerrain.pth'))
 
-    state_dict = {key.replace('a2c_network.a_rnn.rnn.', ''): value for key, value in lstm_model['model'].items() if key.startswith('a2c_network.a_rnn.rnn')}
+    state_dict = {key.replace('a2c_network.a_rnn.rnn.', ''): value for key, value in model_file['model'].items() if key.startswith('a2c_network.a_rnn.rnn')}
 
     # get LSTM dimensions
     HIDDEN_SIZE = state_dict['weight_ih_l0'].size()[0] // 4
@@ -144,8 +134,8 @@ def main(lstm_model, DATA_PATH):
     a_rnn.load_state_dict(state_dict)
 
     # load scaler and pca transforms
-    scl = pk.load(open(DATA_PATH + 'A_LSTM_HC_SCL.pkl','rb'))
-    pca = pk.load(open(DATA_PATH + 'A_LSTM_HC_PCA.pkl','rb'))
+    scl = pk.load(open(processed_data_path + 'A_LSTM_HC_SCL.pkl','rb'))
+    pca = pk.load(open(processed_data_path + 'A_LSTM_HC_PCA.pkl','rb'))
 
     # specify parameters for fix point finder
     N_INITIAL_GUESSES = 4096 # 512
@@ -229,19 +219,18 @@ def main(lstm_model, DATA_PATH):
     hc_hist_fixedpt_ti_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt[0,:,:]).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
     hc_hist_fixedpt_tf_pc = pca.transform(scl.transform(torch.squeeze(hc_hist_fixedpt[-1,:,:]).reshape(-1, HIDDEN_SIZE * 2).detach().cpu().numpy()))
 
-
     # Save data to hdf5
-    with h5py.File(DATA_PATH + 'hc_hist_fixedpt.h5', 'w') as f:
+    with h5py.File(processed_data_path + 'hc_hist_fixedpt.h5', 'w') as f:
         f.create_dataset('hc_hist_fixedpt', data=hc_hist_fixedpt.detach().numpy())
-    with h5py.File(DATA_PATH + 'q_hist_fixedpt.h5', 'w') as f:
+    with h5py.File(processed_data_path + 'q_hist_fixedpt.h5', 'w') as f:
         f.create_dataset('q_hist_fixedpt', data=q_hist_fixedpt.detach().numpy())
 
 
     ### cluster to get unique fixed points
     fps, cnt = find_clusters(hc_hist_fixedpt[-1:,:].squeeze().detach())
     fps_pc = pca.transform(scl.transform(fps))
-    pd.DataFrame(fps).to_csv(DATA_PATH + 'fps.csv')
-    pd.DataFrame(fps_pc).to_csv(DATA_PATH + 'fps_pc.csv')
+    pd.DataFrame(fps).to_csv(processed_data_path + 'fps.csv')
+    pd.DataFrame(fps_pc).to_csv(processed_data_path + 'fps_pc.csv')
     fixed_points = torch.Tensor(fps)
 
     N_FIXED_POINTS = len(fps)
@@ -290,9 +279,9 @@ def main(lstm_model, DATA_PATH):
     max_imag = torch.imag(eval).max()
 
 
-    cycle_pc1 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_x_by_speed.csv', index_col=0)
-    cycle_pc2 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_y_by_speed.csv', index_col=0)
-    cycle_pc3 = pd.read_csv(DATA_PATH + 'info_A_LSTM_HC_z_by_speed.csv', index_col=0)
+    cycle_pc1 = pd.read_csv(processed_data_path + 'info_A_LSTM_HC_x_by_speed.csv', index_col=0)
+    cycle_pc2 = pd.read_csv(processed_data_path + 'info_A_LSTM_HC_y_by_speed.csv', index_col=0)
+    cycle_pc3 = pd.read_csv(processed_data_path + 'info_A_LSTM_HC_z_by_speed.csv', index_col=0)
 
     # df_perturb = pd.read_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_17-17-18_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[100]/RAW_DATA_AVG.csv')
     # df_perturb = pd.read_csv('/home/gene/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/isaacgymenvs/data/2023-05-31_17-57-45_u[1.0,1.0,1]_v[0.0,0.0,1]_r[0.0,0.0,1]_n[1]/RAW_DATA_AVG.csv')
@@ -435,8 +424,8 @@ def main(lstm_model, DATA_PATH):
     fig = plot_3d(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, cycle_pc3)
 
     filename = f"3d"
-    fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
-    fig.savefig(DATA_PATH + filename + '.svg', format='svg', dpi=600, facecolor=fig.get_facecolor())
+    fig.savefig(processed_data_path + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
+    fig.savefig(processed_data_path + filename + '.svg', format='svg', dpi=600, facecolor=fig.get_facecolor())
 
     for fp_idx, fp in enumerate(fps_pc):
 
@@ -466,8 +455,8 @@ def main(lstm_model, DATA_PATH):
         plt.show()
 
         filename = f"fixed_point_{fp_idx}"
-        fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
-        fig.savefig(DATA_PATH + filename + '.svg', format='svg', dpi=600, facecolor=fig.get_facecolor())
+        fig.savefig(processed_data_path + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
+        fig.savefig(processed_data_path + filename + '.svg', format='svg', dpi=600, facecolor=fig.get_facecolor())
 
         ### STREAMPLOT
         TRAJ_TIME_LENGTH = 100
@@ -516,24 +505,15 @@ def main(lstm_model, DATA_PATH):
         fig = plot_2d_streamplot(fp_idx, fps_pc, cycle_pc1, cycle_pc2, X, Y, U, V)
 
         filename = f"streamplot_slice_for_fixed_point_{fp_idx}"
-        fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
-        fig.savefig(DATA_PATH + filename + '.svg', format='svg', dpi=600, facecolor=fig.get_facecolor())
+        fig.savefig(processed_data_path + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
+        fig.savefig(processed_data_path + filename + '.svg', format='svg', dpi=600, facecolor=fig.get_facecolor())
 
         fig = plot_2d_traj(fp_idx, fps_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc)
 
         filename = f"2d_traj_for_fixed_point_{fp_idx}"
-        fig.savefig(DATA_PATH + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
-        fig.savefig(DATA_PATH + filename + '.svg', format='svg', dpi=600, facecolor=fig.get_facecolor())
+        fig.savefig(processed_data_path + filename + '.pdf', format='pdf', dpi=600, facecolor=fig.get_facecolor())
+        fig.savefig(processed_data_path + filename + '.svg', format='svg', dpi=600, facecolor=fig.get_facecolor())
 
         # plot_3d_traj(hc_hist_fixedpt_tf_pc, cycle_pc1, cycle_pc2, hc_zeroinput_tf_pc)
 
     print('done')
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Load LSTM model and set data path.")
-    parser.add_argument("--model_path", type=str, help="Path to the LSTM model file.")
-    parser.add_argument("--data_path", type=str, help="Path to the data directory.")
-
-    args = parser.parse_args()
-
-    main(args.model_path, args.data_path)

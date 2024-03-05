@@ -61,14 +61,13 @@ def append_speed_axis(df: pd.DataFrame, data_names: List[str], max_dims: int, no
         df_neuron = filt_data.loc[idx].values
         df_speed_cmd = spd_cmd.loc[idx].values
         df_speed_act = spd_act.loc[idx].values
-        df_tangling = tangl_data.loc[idx].values
+        df_tangling = tangl_data.loc[idx].values      
         
-
-        
-        n_components = min(len(filt_data.columns), max_dims)
+        n_components = min(filt_data.shape[0], filt_data.shape[1], max_dims)
         column_names_pc = np.char.mod(data_type + 'SPEED_PC_%03d', np.arange(n_components))
 
         if n_components > 0:
+            
             scl, pca, data_pc = compute_pca(df_neuron, n_components, norm_type)
 
             # create DataFrame

@@ -14,7 +14,7 @@ dataset_names:
     # - A_GRU_HX
     # - C_GRU_HX
 
-max_num_principal_components: 12
+max_num_principal_components: 256
 tangling_type: PC # RAW
 
 normalization_type: Z_SCORE
