@@ -2,13 +2,12 @@ import pandas as pd
 
 from utils.data_processing import filter_by_column_keywords
 from analysis.compute_avg_gait_cycle import compute_avg_gait_cycle
-# from analysis.analyze_traj import analyze_traj
 from analysis.append_pc import append_pc
 from analysis.append_speed_axis import append_speed_axis
 from analysis.compute_interpolation import compute_interpolation
 from analysis.plot_pc12_speed_axis import plot_pc12_speed_axis
 from analysis.append_tangling import append_tangling
-from analysis.create_pc_data import create_pc_data
+from analysis.append_pc_data import create_pc_data
 from analysis.compute_fixed_points import compute_fixed_points
 from plotting.dashboard import run_dashboard
 
@@ -42,6 +41,7 @@ def run_analysis():
     # Plot speed axis figures
     plot_pc12_speed_axis(avg_cycle_interp_df, cfg.dataset_names, cfg.output_path)
 
+    # export processed data
     avg_cycle_df.to_parquet(cfg.output_path + 'AVG_CYCLE_DATA.parquet')
     avg_cycle_df.to_csv(cfg.output_path + 'AVG_CYCLE_DATA.csv')
     avg_cycle_interp_df.to_parquet(cfg.output_path + 'AVG_CYCLE_INTERP_DATA.parquet')

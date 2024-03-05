@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 
 from analysis.analyze_pca import compute_pca
-from utils.io import export_pk
 
 import sklearn.preprocessing
 import sklearn.decomposition
