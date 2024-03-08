@@ -5,7 +5,6 @@
 # ./ANYMAL-1.0MASS-LSTM16-TERR.bash
 # ./ANYMAL-1.0MASS-LSTM16-DISTTERR.bash
 
-
 # ./ANYMAL-1.0MASS-FF-BASELINE.bash
 # ./ANYMAL-1.0MASS-FF-DIST.bash
 # ./ANYMAL-1.0MASS-FF-TERR.bash
@@ -16,6 +15,10 @@
 # ./ANYMAL-1.0MASS-LSTM16-DISTTERR.bash
 
 # ./A1-1.0MASS-FF-DISTTERR.bash
-./A1-1.0MASS-LSTM16-DISTTERR.bash
+# ./A1-1.0MASS-LSTM16-DISTTERR.bash
+
+bash ./ANYMAL-1.0MASS-LSTM16-DISTTERR.bash
+# ./ANYMAL-1.0MASS-LSTM16-TERR.bash
+
 
 echo "All scripts have been executed sequentially."

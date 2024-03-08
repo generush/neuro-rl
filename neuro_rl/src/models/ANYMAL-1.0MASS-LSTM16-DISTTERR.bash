@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Starting index for models
-START_INDEX=1
+START_INDEX=118
 
 # Number of models to train
-N=2
+N=1
 
 # Extract the base name of the script
 script_name=$(basename "$0")
@@ -38,6 +38,7 @@ for ((i=START_INDEX; i<START_INDEX+N; i++)); do
     wandb_entity=erush91 \
     task.env.terrain.terrainType=trimesh \
     task.env.learn.perturbRandom.perturbRandomOn=true \
+    train.params.config.max_epochs=10000 \
     +output_path=${export_path}/${script_name}-${id} \
     +train_dir=${export_path} \
     +full_experiment_name=${script_name}-${id} \

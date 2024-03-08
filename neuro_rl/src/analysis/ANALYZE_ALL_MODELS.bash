@@ -1,59 +1,83 @@
 #!/bin/bash
 
-run_name=(
-"ANYMAL-1.0MASS-LSTM16-DISTTERR-01_U-0.4-1.0-7-50_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-DISTTERR-01_U-0.4-1.0-14-25_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-DISTTERR-02_U-0.4-1.0-7-50_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-DISTTERR-02_U-0.4-1.0-14-25_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-DISTTERR-03_U-0.4-1.0-7-50_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-DISTTERR-03_U-0.4-1.0-14-25_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-TERR-01_U-0.4-1.0-7-50_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-TERR-01_U-0.4-1.0-14-25_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-TERR-02_U-0.4-1.0-7-50_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-TERR-02_U-0.4-1.0-14-25_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-TERR-03_U-0.4-1.0-7-50_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-TERR-03_U-0.4-1.0-14-25_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-DIST-01_U-0.4-1.0-7-50_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-DIST-01_U-0.4-1.0-14-25_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-DIST-02_U-0.4-1.0-7-50_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-DIST-02_U-0.4-1.0-14-25_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-DIST-03_U-0.4-1.0-7-50_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-DIST-03_U-0.4-1.0-14-25_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-BASELINE-01_U-0.4-1.0-7-50_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-BASELINE-01_U-0.4-1.0-14-25_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-BASELINE-02_U-0.4-1.0-7-50_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-BASELINE-02_U-0.4-1.0-14-25_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-BASELINE-03_U-0.4-1.0-7-50_UNPERTURBED/"
-"ANYMAL-1.0MASS-LSTM16-BASELINE-03_U-0.4-1.0-14-25_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DISTTERR-01_U-0.4-1.0-7-50_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DISTTERR-01_U-0.4-1.0-14-25_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DISTTERR-02_U-0.4-1.0-7-50_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DISTTERR-02_U-0.4-1.0-14-25_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DISTTERR-03_U-0.4-1.0-7-50_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DISTTERR-03_U-0.4-1.0-14-25_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-TERR-01_U-0.4-1.0-7-50_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-TERR-01_U-0.4-1.0-14-25_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-TERR-02_U-0.4-1.0-7-50_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-TERR-02_U-0.4-1.0-14-25_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-TERR-03_U-0.4-1.0-7-50_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-TERR-03_U-0.4-1.0-14-25_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DIST-01_U-0.4-1.0-7-50_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DIST-01_U-0.4-1.0-14-25_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DIST-02_U-0.4-1.0-7-50_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DIST-02_U-0.4-1.0-14-25_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DIST-03_U-0.4-1.0-7-50_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DIST-03_U-0.4-1.0-14-25_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-BASELINE-01_U-0.4-1.0-7-50_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-BASELINE-01_U-0.4-1.0-14-25_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-BASELINE-02_U-0.4-1.0-7-50_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-BASELINE-02_U-0.4-1.0-14-25_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-BASELINE-03_U-0.4-1.0-7-50_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-BASELINE-03_U-0.4-1.0-14-25_UNPERTURBED/"
+
+
+# "ANYMAL-1.0MASS-LSTM16-DISTTERR-99_U-0.4-1.0-14-25_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DISTTERR-99_U-0.4-1.0-7-50_UNPERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DISTTERR-99_U-1.0-1.0-1-400_PERTURBED/"
+# "ANYMAL-1.0MASS-LSTM16-DISTTERR-99_U-1.0-1.0-1-1_PERTURBED/"
+
+
+
+# Define an array with combined model_name/run_name pairs
+model_run_pairs=(
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-00/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-00/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-00/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-00/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
+
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
+
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-02/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-02/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-02/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-02/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
+
+    # "ANYMAL-1.0MASS-LSTM16-TERR-00/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-00/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-00/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-00/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
+
+    # "ANYMAL-1.0MASS-LSTM16-TERR-01/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-01/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-01/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-01/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
+
+    # "ANYMAL-1.0MASS-LSTM16-TERR-02/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-02/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-02/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-02/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
+
+
+    "ANYMAL-1.0MASS-LSTM16-TERR-122/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
 )
 
-for run_name in "${run_name[@]}"; do
-    (
-        # Operations to be performed, similar to the previous examples
-        # The commands here are executed in a subshell due to the surrounding parentheses
+# Loop through the model/run pairs
+for pair in "${model_run_pairs[@]}"; do
+    # Split the model and run using the '/' delimiter
+    IFS='/' read -r model_name run_name <<< "$pair"
 
-        # GET THE MODEL NAME
-        #----------------------------------------------------------------
-        # Save the old IFS value
-        oldIFS="$IFS"
+    echo "Processing Model: $model_name, Run: $run_name"
 
-        # Set IFS to underscore for splitting the hardcoded string
-        IFS='_'
-
-        # Read the split parts into an array
-        read -ra ADDR <<< "$run_name"
-
-        # Restore the old IFS
-        IFS="$oldIFS"
-
-        # Create a string that includes the first part of the hardcoded string
-        model_name=${ADDR[0]}
-
-        #----------------------------------------------------------------
-
-        # Call the Python script with the current hardcoded string
-        python ../../analysis_pipeline.py --config_path "../../cfg/analyze/analysis.yaml" --model_path "../../models/${model_name}" --data_path "../../data/raw/${run_name}" --output_path "../../data/processed/${run_name}"
-    )
+    # Call the Python script with the current model and run
+    python ../../analysis_pipeline_cycle_avg.py --config_path "../../cfg/analyze/analysis.yaml" --model_path "../../models/${model_name}/" --data_path "../../data/raw/${model_name}/${run_name}/" --output_path "../../data/processed/${model_name}/${run_name}/"
 done
 
 echo "All scripts have been executed sequentially."

@@ -7,7 +7,6 @@ from analysis.append_speed_axis import append_speed_axis
 from analysis.compute_interpolation import compute_interpolation
 from analysis.plot_pc12_speed_axis import plot_pc12_speed_axis
 from analysis.append_tangling import append_tangling
-from analysis.append_pc_data import create_pc_data
 from analysis.compute_fixed_points import compute_fixed_points
 from plotting.dashboard import run_dashboard
 
@@ -27,8 +26,8 @@ def run_analysis():
     avg_cycle_df = filter_by_column_keywords(avg_cycle_df, cfg.dataset_names, 'RAW')
 
     # Append pc data
-    avg_cycle_df, pca_dict = append_pc(avg_cycle_df, cfg.dataset_names, cfg.max_num_principal_components, cfg.normalization_type, cfg.output_path)
-
+    avg_cycle_df, pca_dict = append_pc(avg_cycle_df, cfg.dataset_names, cfg.max_num_principal_components, cfg.normalization_type, 'PC', cfg.output_path)
+    
     # Append tangling data
     avg_cycle_df = append_tangling(avg_cycle_df, cfg.dataset_names, cfg.tangling_type)
 
@@ -38,8 +37,7 @@ def run_analysis():
     # Compute interpolated dataset from cycle-average dataset
     avg_cycle_interp_df = compute_interpolation(avg_cycle_df)
 
-    # Plot speed axis figures
-    plot_pc12_speed_axis(avg_cycle_interp_df, cfg.dataset_names, cfg.output_path)
+    plot_pc12_speed_axis(avg_cycle_interp_df, ['ACT', 'A_LSTM_HC'], cfg.output_path)
 
     # export processed data
     avg_cycle_df.to_parquet(cfg.output_path + 'AVG_CYCLE_DATA.parquet')

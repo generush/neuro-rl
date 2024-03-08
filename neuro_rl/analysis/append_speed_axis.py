@@ -22,10 +22,10 @@ import pickle as pk
 
 from constants.normalization_types import NormalizationType
             
-def transform(X_raw, tf):
-    scaler = sklearn.preprocessing.StandardScaler()
-    X_scaled = scaler.fit_transform(X_raw)
-    X_transformed = np.matmul(X_scaled, tf)
+def transform(X_raw, scl, tf):
+    # scaler = sklearn.preprocessing.StandardScaler()
+    # X_scaled = scaler.fit_transform(X_raw)
+    X_transformed = np.matmul(scl.transform(X_raw), tf)
     return pd.DataFrame(X_transformed)
     
 # define the objective function to minimize
@@ -67,14 +67,20 @@ def append_speed_axis(df: pd.DataFrame, data_names: List[str], max_dims: int, no
 
         if n_components > 0:
             
-            scl, pca, data_pc = compute_pca(df_neuron, n_components, norm_type)
+            scl, pca = compute_pca(n_components, norm_type)
+            data_normalized = scl.fit_transform(filt_data)
+            data_pc = pca.fit_transform(data_normalized)
 
             # create DataFrame
             df_pc = pd.DataFrame(data_pc, columns=column_names_pc)
 
-            # export_pk(scl, data_type + '_SCL.pkl')
+            # export_pk(scl, data_type + '_SCL.pkl') 
             # export_pk(pca, data_type + '_PCA.pkl')
             # df_pc.to_csv(path + data_type + '_SPEED_PC_DATA' + file_suffix + '.csv')
+            
+
+        
+
         
         x_s = df_pc.iloc[:, 2:]
         v_bar = np.unique(df_speed_cmd)
@@ -109,8 +115,8 @@ def append_speed_axis(df: pd.DataFrame, data_names: List[str], max_dims: int, no
             pca.components_[2],
         ))
 
-        pc_12speed_df = transform(df_neuron, pc_12speed_tf)
-        pc_123_df = transform(df_neuron, pc_123_tf)
+        pc_12speed_df = transform(df_neuron, scl, pc_12speed_tf)
+        pc_123_df = transform(df_neuron, scl, pc_123_tf)
 
         pc_pc2_pc3_speedaxis_df = pd.concat([pc_123_df, pc_12speed_df.iloc[:, -1]], axis=1)
 

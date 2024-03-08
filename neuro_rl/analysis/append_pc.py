@@ -11,14 +11,15 @@ def append_pc(df: pd.DataFrame, data_names: List[str], max_dims: int, norm_type:
     for data_type in data_names:
 
         filt_data = df.loc[:,df.columns.str.contains(data_type + '_RAW')].values
-        n_dims = min(filt_data.shape[0], filt_data.shape[1], max_dims)
 
         if tf_path:
             scl = import_pk(tf_path + f'{data_type}_SCL.pkl')
             pca = import_pk(tf_path + f'{data_type}_PCA.pkl')
+            n_dims = pca.n_components_
             data_normalized = scl.transform(filt_data)
             data_pc = pca.transform(data_normalized)
         else:
+            n_dims = min(filt_data.shape[0], filt_data.shape[1], max_dims)
             scl, pca = compute_pca(n_dims, norm_type)
             data_normalized = scl.fit_transform(filt_data)
             data_pc = pca.fit_transform(data_normalized)

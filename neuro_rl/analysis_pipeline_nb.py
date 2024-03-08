@@ -1,6 +1,6 @@
 # %%
 import sys
-from .analysis_pipepline_cycle_avg import run_analysis
+from .analysis_pipeline_cycle_avg import run_analysis
 
 %matplotlib widget
 

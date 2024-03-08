@@ -63,17 +63,20 @@ def plot_data(x_data, y_data, z_data, c_data, cc_global_min, cc_global_max, data
 def plot_pc12_speed_axis(df, data_names, export_path):
     s_global_min = df.loc[:, df.columns.str.contains('OBS_RAW_009_u_star')].values.min()
     s_global_max = df.loc[:, df.columns.str.contains('OBS_RAW_009_u_star')].values.max()
-    t_global_min = df.loc[:, df.columns.str.contains('TANGLING')].values.min()
-    t_global_max = df.loc[:, df.columns.str.contains('TANGLING')].values.max()
+    # Creating a mask for columns to include: columns that contain include_keywords or don't contain exclude_keyword
+    filter_mask = df.columns.str.contains('|'.join(['ACT', "A_LSTM_HC'"])) & df.columns.str.contains('TANGLING')
+    
+    t_global_min = df.loc[:, filter_mask].values.min()
+    t_global_max = df.loc[:, filter_mask].values.max()
  
     # pd.DataFrame(pca.explained_variance_ratio_.cumsum()).to_csv(data_type + '_cumvar.csv')
  
     # Plot the data for each data_type
     for idx, data_type in enumerate(data_names):
         speed = df.loc[:, df.columns.str.contains('OBS_RAW_009_u_star')].values
-        pc1 = df.loc[:, df.columns.str.contains(data_type + '_PC_001')].values
-        pc2 = df.loc[:, df.columns.str.contains(data_type + '_PC_002')].values
-        pc3 = df.loc[:, df.columns.str.contains(data_type + '_PC_003')].values
+        pc1 = df.loc[:, df.columns.str.contains(data_type + '_PC_000')].values
+        pc2 = df.loc[:, df.columns.str.contains(data_type + '_PC_001')].values
+        pc3 = df.loc[:, df.columns.str.contains(data_type + '_PC_002')].values
         speed_axis = df.loc[:, df.columns.str.contains(data_type + '_SPEED_AXIS')].values
         tangling = df.loc[:, df.columns.str.contains(data_type + '_TANGLING')].values
 
@@ -81,13 +84,13 @@ def plot_pc12_speed_axis(df, data_names, export_path):
         plot_data(pc1, pc2, pc3, speed, s_global_min, s_global_max, data_type, 'PC 3', 'u [m/s]', 'Spectral', export_path, save_figs=True)
 
         # PC1, PC2, PC3, Tangling
-        plot_data(pc1, pc2, pc3, tangling, np.min(tangling), np.max(tangling), data_type, 'PC 3', 'Tangling', 'viridis', export_path, save_figs=True)
+        plot_data(pc1, pc2, pc3, tangling, t_global_min, t_global_max, data_type, 'PC 3', 'Tangling', 'viridis', export_path, save_figs=True)
 
         # PC1, PC2, SpeedAxis, Speed
         plot_data(pc1, pc2, speed_axis, speed, s_global_min, s_global_max, data_type, 'Speed Axis', 'u [m/s]', 'Spectral', export_path, save_figs=True)
 
         # PC1, PC2, SpeedAxis, Tangling
-        plot_data(pc1, pc2, speed_axis, tangling, np.min(tangling), np.max(tangling), data_type, 'Speed Axis', 'Tangling', 'viridis', export_path, save_figs=True)
+        plot_data(pc1, pc2, speed_axis, tangling, t_global_min, t_global_max, data_type, 'Speed Axis', 'Tangling', 'viridis', export_path, save_figs=True)
 
 
         # export some data for the paper/suppl matl
