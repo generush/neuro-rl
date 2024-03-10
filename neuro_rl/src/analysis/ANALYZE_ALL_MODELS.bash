@@ -66,7 +66,17 @@ model_run_pairs=(
     # "ANYMAL-1.0MASS-LSTM16-TERR-02/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
 
 
-    "ANYMAL-1.0MASS-LSTM16-TERR-122/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-122/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+
+
+    # "ANYMAL-1.0MASS-LSTM16-TERR-01/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-20"
+
+    # "ANYMAL-1.0MASS-LSTM4-TERR-01/U-0.4-1.0-14-20_UNPERTURBED"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_0.4_1.0_14_v_0._0._1_r_0._0._1_n_20"
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0.4_1.0_14_v_0._0._1_r_0._0._1_n_20"
+    "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0.4_1.0_14_v_0._0._1_r_0._0._1_n_201"
+
+
 )
 
 # Loop through the model/run pairs

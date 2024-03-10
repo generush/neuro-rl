@@ -46,6 +46,6 @@ python ../../../../IsaacGymEnvs/isaacgymenvs/train.py task=bash_AnymalTerrain_Ne
   task.env.specifiedCommandVelocityN.n_copies=400 \
   task.env.output.export_data=True \
   task.env.evaluate.perturbPrescribed.perturbPrescribedOn=True \
-  task.env.evaluate.perturbPrescribed.forceY=-3.0 \
+  task.env.evaluate.perturbPrescribed.forceY=-1 \
   +task.env.export_data_path=${export_path} \
   +output_path=${export_path}/${script_name}

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Starting index for models
-START_INDEX=200
+START_INDEX=120
 
 # Number of models to train
 N=1
@@ -44,8 +44,8 @@ for ((i=START_INDEX; i<START_INDEX+N; i++)); do
     task.env.learn.perturbRandom.forceY=0.5 \
     task.env.learn.perturbRandom.forceZ=0.5 \
     train.params.config.max_epochs=5000 \
-    train.params.config.seq_length=16 \
-    train.params.config.seq_len=16
+    train.params.config.seq_length=4 \
+    train.params.config.seq_len=4
     +output_path=${export_path}/${script_name}-${id} \
     +train_dir=${export_path} \
     +full_experiment_name=${script_name}-${id} \

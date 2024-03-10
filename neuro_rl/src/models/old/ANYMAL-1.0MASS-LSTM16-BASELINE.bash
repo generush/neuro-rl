@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Starting index for models
-START_INDEX=200
+START_INDEX=3
 
 # Number of models to train
-N=1
+N=5
 
 # Extract the base name of the script
 script_name=$(basename "$0")
@@ -27,8 +27,8 @@ for ((i=START_INDEX; i<START_INDEX+N; i++)); do
   export_path="../../neuro-rl/neuro_rl/models/"
 
   # Execute the python command with updated parameters
-  python train.py task=AnymalTerrain_NeuroRL_train \
-    train=AnymalTerrain_PPO_LSTM_NeuroRL \
+  python train.py task=bash_AnymalTerrain_NeuroRL_train \
+    train=AnymalTerrainPPO_LSTM_NeuroRL \
     capture_video=False \
     capture_video_len=1000 \
     force_render=False \
@@ -36,16 +36,9 @@ for ((i=START_INDEX; i<START_INDEX+N; i++)); do
     wandb_activate=True \
     wandb_project=frontiers \
     wandb_entity=erush91 \
-    task.env.terrain.terrainType=trimesh \
-    task.env.urdfAsset.mass.file=urdf/anymal_c/urdf/anymal_minimal.urdf \
-    task.env.urdfAsset.mass: 53.16426 \
-    task.env.learn.perturbRandom.perturbRandomOn=true \
-    task.env.learn.perturbRandom.forceX=0.5 \
-    task.env.learn.perturbRandom.forceY=0.5 \
-    task.env.learn.perturbRandom.forceZ=0.5 \
-    train.params.config.max_epochs=5000 \
-    train.params.config.seq_length=16 \
-    train.params.config.seq_len=16
+    task.env.terrain.terrainType=plane \
+    task.env.learn.perturbRandom.perturbRandomOn=false \
+    train.params.config.max_epochs=2000 \
     +output_path=${export_path}/${script_name}-${id} \
     +train_dir=${export_path} \
     +full_experiment_name=${script_name}-${id} \

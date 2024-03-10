@@ -15,116 +15,129 @@ export_path="../../data/raw"
 
 # positive forward speeds (N=7x50)
 declare -A run1=(
-  [num_envs]=350
+  [num_envs]=280
   [linear_x_range]='[0.4, 1.0]'
   [linear_y_range]='[0., 0.]'
   [yaw_rate_range]='[0., 0.]'
-  [linear_x_n]=7
+  [linear_x_n]=14
   [linear_y_n]=1
   [yaw_rate_n]=1
-  [n_copies]=50
+  [n_copies]=20
 )
 
-# positive lateral speeds (N=7x50)
-declare -A run2=(
-  [num_envs]=350
-  [linear_x_range]='[0, 0]'
-  [linear_y_range]='[0.4, 1]'
-  [yaw_rate_range]='[0, 0]'
-  [linear_x_n]=1
-  [linear_y_n]=7
-  [yaw_rate_n]=1
-  [n_copies]=50
-)
+# # positive forward speeds (N=7x50)
+# declare -A run1=(
+#   [num_envs]=350
+#   [linear_x_range]='[0.4, 1.0]'
+#   [linear_y_range]='[0., 0.]'
+#   [yaw_rate_range]='[0., 0.]'
+#   [linear_x_n]=7
+#   [linear_y_n]=1
+#   [yaw_rate_n]=1
+#   [n_copies]=50
+# )
 
-# negative+positive yaw rates (N=7x50)
-declare -A run3=(
-  [num_envs]=350
-  [linear_x_range]='[0, 0]'
-  [linear_y_range]='[0, 0]'
-  [yaw_rate_range]='[-1, 1]'
-  [linear_x_n]=1
-  [linear_y_n]=1
-  [yaw_rate_n]=7
-  [n_copies]=50
-)
+# # positive lateral speeds (N=7x50)
+# declare -A run2=(
+#   [num_envs]=350
+#   [linear_x_range]='[0, 0]'
+#   [linear_y_range]='[0.4, 1]'
+#   [yaw_rate_range]='[0, 0]'
+#   [linear_x_n]=1
+#   [linear_y_n]=7
+#   [yaw_rate_n]=1
+#   [n_copies]=50
+# )
 
-# positive forward speed (N=1)
-declare -A run4=(
-  [num_envs]=1
-  [linear_x_range]='[1, 1]'
-  [linear_y_range]='[0, 0]'
-  [yaw_rate_range]='[0, 0]'
-  [linear_x_n]=1
-  [linear_y_n]=1
-  [yaw_rate_n]=1
-  [n_copies]=1
-)
+# # negative+positive yaw rates (N=7x50)
+# declare -A run3=(
+#   [num_envs]=350
+#   [linear_x_range]='[0, 0]'
+#   [linear_y_range]='[0, 0]'
+#   [yaw_rate_range]='[-1, 1]'
+#   [linear_x_n]=1
+#   [linear_y_n]=1
+#   [yaw_rate_n]=7
+#   [n_copies]=50
+# )
 
-# negative forward speed (N=1)
-declare -A run5=(
-  [num_envs]=1
-  [linear_x_range]='[-1, -1]'
-  [linear_y_range]='[0, 0]'
-  [yaw_rate_range]='[0, 0]'
-  [linear_x_n]=1
-  [linear_y_n]=1
-  [yaw_rate_n]=1
-  [n_copies]=1
-)
+# # positive forward speed (N=1)
+# declare -A run4=(
+#   [num_envs]=1
+#   [linear_x_range]='[1, 1]'
+#   [linear_y_range]='[0, 0]'
+#   [yaw_rate_range]='[0, 0]'
+#   [linear_x_n]=1
+#   [linear_y_n]=1
+#   [yaw_rate_n]=1
+#   [n_copies]=1
+# )
 
-# positive lateral speed (N=1)
-declare -A run6=(
-  [num_envs]=1
-  [linear_x_range]='[0, 0]'
-  [linear_y_range]='[1, 1]'
-  [yaw_rate_range]='[0, 0]'
-  [linear_x_n]=1
-  [linear_y_n]=1
-  [yaw_rate_n]=1
-  [n_copies]=1
-)
+# # negative forward speed (N=1)
+# declare -A run5=(
+#   [num_envs]=1
+#   [linear_x_range]='[-1, -1]'
+#   [linear_y_range]='[0, 0]'
+#   [yaw_rate_range]='[0, 0]'
+#   [linear_x_n]=1
+#   [linear_y_n]=1
+#   [yaw_rate_n]=1
+#   [n_copies]=1
+# )
 
-# negative lateral speed (N=1)
-declare -A run7=(
-  [num_envs]=1
-  [linear_x_range]='[0, 0]'
-  [linear_y_range]='[-1, -1]'
-  [yaw_rate_range]='[0, 0]'
-  [linear_x_n]=1
-  [linear_y_n]=1
-  [yaw_rate_n]=1
-  [n_copies]=1
-)
+# # positive lateral speed (N=1)
+# declare -A run6=(
+#   [num_envs]=1
+#   [linear_x_range]='[0, 0]'
+#   [linear_y_range]='[1, 1]'
+#   [yaw_rate_range]='[0, 0]'
+#   [linear_x_n]=1
+#   [linear_y_n]=1
+#   [yaw_rate_n]=1
+#   [n_copies]=1
+# )
 
-# positive lateral speed (N=1)
-declare -A run8=(
-  [num_envs]=1
-  [linear_x_range]='[0, 0]'
-  [linear_y_range]='[0, 0]'
-  [yaw_rate_range]='[1, 1]'
-  [linear_x_n]=1
-  [linear_y_n]=1
-  [yaw_rate_n]=1
-  [n_copies]=1
-)
+# # negative lateral speed (N=1)
+# declare -A run7=(
+#   [num_envs]=1
+#   [linear_x_range]='[0, 0]'
+#   [linear_y_range]='[-1, -1]'
+#   [yaw_rate_range]='[0, 0]'
+#   [linear_x_n]=1
+#   [linear_y_n]=1
+#   [yaw_rate_n]=1
+#   [n_copies]=1
+# )
 
-# negative lateral speed (N=1)
-declare -A run9=(
-  [num_envs]=1
-  [linear_x_range]='[0, 0]'
-  [linear_y_range]='[0, 0]'
-  [yaw_rate_range]='[-1, -1]'
-  [linear_x_n]=1
-  [linear_y_n]=1
-  [yaw_rate_n]=1
-  [n_copies]=1
-)
+# # positive lateral speed (N=1)
+# declare -A run8=(
+#   [num_envs]=1
+#   [linear_x_range]='[0, 0]'
+#   [linear_y_range]='[0, 0]'
+#   [yaw_rate_range]='[1, 1]'
+#   [linear_x_n]=1
+#   [linear_y_n]=1
+#   [yaw_rate_n]=1
+#   [n_copies]=1
+# )
+
+# # negative lateral speed (N=1)
+# declare -A run9=(
+#   [num_envs]=1
+#   [linear_x_range]='[0, 0]'
+#   [linear_y_range]='[0, 0]'
+#   [yaw_rate_range]='[-1, -1]'
+#   [linear_x_n]=1
+#   [linear_y_n]=1
+#   [yaw_rate_n]=1
+#   [n_copies]=1
+# )
 
 # Add more runs as needed
 
 # Array of all runs
-runs=(run1 run2 run3 run4 run5 run6 run7 run8 run9)  # Add more run names as you define them
+runs=(run1)  # Add more run names as you define them
+# runs=(run1 run2 run3 run4 run5 run6 run7 run8 run9)  # Add more run names as you define them
 
 # Loop over each run
 for run in "${runs[@]}"; do
@@ -156,7 +169,7 @@ for run in "${runs[@]}"; do
     n_copies_val="${current_run[n_copies]}"
 
     python ../../../../IsaacGymEnvs/isaacgymenvs/train.py task=bash_AnymalTerrain_NeuroRL_exp \
-      train=AnymalTerrainPPO_LSTM_NeuroRL \
+      train=AnymalTerrain_PPO_LSTM_NeuroRL \
       capture_video=False \
       capture_video_len=1000 \
       force_render=True \
