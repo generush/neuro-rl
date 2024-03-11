@@ -37,8 +37,8 @@ for ((i=START_INDEX; i<START_INDEX+N; i++)); do
     wandb_project=frontiers \
     wandb_entity=erush91 \
     task.env.terrain.terrainType=trimesh \
-    task.env.urdfAsset.mass.file=urdf/anymal_c/urdf/anymal_minimal.urdf \
-    task.env.urdfAsset.mass: 53.16426 \
+    task.env.urdfAsset.file=urdf/anymal_c/urdf/anymal_minimal.urdf \
+    task.env.urdfAsset.mass=53.16426 \
     task.env.learn.perturbRandom.perturbRandomOn=true \
     task.env.learn.perturbRandom.forceX=0.5 \
     task.env.learn.perturbRandom.forceY=0.5 \
