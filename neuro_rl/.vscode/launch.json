@@ -1,0 +1,46 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "/media/GENE_EXT4_2TB/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/",
+
+            // "args": "cfg/analyze/analysis_anymal_1speed.yaml"
+            // "args": "cfg/analyze/analysis_anymal_7speed.yaml"
+            // "args": "cfg/analyze/analysis_a1_1speed.yaml"
+            // "args": "cfg/analyze/analysis_a1_7speed.yaml"
+            // "args": "cfg/analyze/analysis_anymal_7speed_fixedpt.yaml"
+            // "args": "cfg/analyze/analysis_anymal_14speed_fixedpt_new.yaml"
+            // "args": "cfg/analyze/analysis_a1_14speed_fixedpt_new.yaml"
+            // "args": "cfg/analyze/analysis_anymal_nodist_noterr_14speed_fixedpt_new.yaml"
+            // "args": "cfg/analyze/analysis_anymal_14speed_fixedpt_orig.yaml"
+            // "args": "cfg/analyze/analysis.yaml"
+            // "args": ["--config_path=cfg/analyze/analysis.yaml", "--model_path=models/ANYMAL-1.0MASS-LSTM16-DISTTERR-01/", "--data_path=data/raw/ANYMAL-1.0MASS-LSTM16-DISTTERR-01_U-0.4-1.0-14-25_UNPERTURBED/", "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-DISTTERR-01_U-0.4-1.0-7-50_UNPERTURBED/"]
+            
+            // "args": ["--config_path=cfg/analyze/analysis.yaml", "--model_path=models/ANYMAL-1.0MASS-LSTM16-DISTTERR-01/", "--data_path=data/raw/ANYMAL-1.0MASS-LSTM16-DISTTERR-01_U-1.0-1.0-1-1_PERTURBED/", "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-DISTTERR-01_U-1.0-1.0-1-1_PERTURBED/"]
+
+            // figuring out robustness features by looking at perturbed pca from robust model on robust model
+            // "args": ["--config_path=cfg/analyze/analysis.yaml", "--model_path=models/ANYMAL-1.0MASS-LSTM16-DISTTERR-99/", "--data_path=data/raw/ANYMAL-1.0MASS-LSTM16-DISTTERR-99_U-1.0-1.0-1-1_PERTURBED/", "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-DISTTERR-99_U-1.0-1.0-1-1_PERTURBED/"]
+
+            // figuring out robustness features by looking at perturbed pca from robust model on fragile model
+            // "args": ["--config_path=cfg/analyze/analysis.yaml", "--model_path=models/ANYMAL-1.0MASS-LSTM16-BASELINE-99/", "--data_path=data/raw/ANYMAL-1.0MASS-LSTM16-BASELINE-99_U-1.0-1.0-1-1_PERTURBED/", "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-BASELINE-99_U-1.0-1.0-1-1_PERTURBED/"]
+
+            // Exp 1
+            // "args": ["--config_path=cfg/analyze/analysis.yaml", "--model_path=models/ANYMAL-1.0MASS-LSTM16-DISTTERR-00/", "--data_path=data/raw/ANYMAL-1.0MASS-LSTM16-DISTTERR-00_U-0.4-1.0-14-25_UNPERTURBED/", "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-DISTTERR-00_U-0.4-1.0-14-25_UNPERTURBED/"]
+            
+            // "args": ["--config_path=cfg/analyze/analysis.yaml", "--model_path=models/ANYMAL-1.0MASS-LSTM16-DISTTERR-00/", "--data_path=data/raw/ANYMAL-1.0MASS-LSTM16-DISTTERR-00/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25/", "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-DISTTERR-00/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25/"]
+
+            "args": ["--config_path=cfg/analyze/analysis.yaml", "--model_path=models/ANYMAL-1.0MASS-LSTM16-TERR-122/", "--data_path=data/raw/ANYMAL-1.0MASS-LSTM16-TERR-00/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25/", "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-TERR-122/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25/"]
+
+
+
+        }
+    ]
+}

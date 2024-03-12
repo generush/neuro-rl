@@ -22,7 +22,9 @@
 
 # bash ./ANYMAL-1.0MASS-LSTM16-TERR.bash
 # bash ./ANYMAL-1.0MASS-LSTM4-BASELINE.bash
-bash ./A1-1.0MASS-LSTM16-DISTTERR.bash
+# bash ./A1-1.0MASS-LSTM16-DISTTERR.bash
+# bash ./ANYMAL-1.0MASS-LSTM16-TERR.bash
+bash ./A1-1.0MASS-LSTM16-TERR.bash
 
 
 echo "All scripts have been executed sequentially."

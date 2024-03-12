@@ -1,35 +1,11 @@
 #!/bin/bash
 
-# Get the model name from the first argument
-model_name="$1"
-
-# Check if model name is provided
-if [ -z "$model_name" ]; then
-    echo "Error: Model name not provided."
-    exit 1
-fi
+# Define an array of model names
+model_names=(
+    "ANYMAL-1.0MASS-LSTM16-DISTTERR-01"
+)
 
 export_path="../../data/raw"
-
-# Add more runs as needed
-
-# Array of all runs
-# runs=(run1)  # Add more run names as you define them
-runs=(run1 run2 run3 run4 run5 run6 run7 run8 run9 run10)  # Add more run names as you define them
-
-# Loop over each run
-for run in "${runs[@]}"; do
-  # Use 'declare -n' to create a nameref for easier access to associative array elements
-  declare -n current_run="$run"
-
-    # Custom setup for the subshell (if needed)
-    
-    # random_trial_val="${current_run[random_trial]}"
-    
-    model_path="${export_path}/${model_name}" \
-    # run_name="${}"
-    # run_path="u_${linear_x_range_val}_${linear_x_n_val}_v_${linear_y_range_val}_${linear_y_n_val}_r_${yaw_rate_range_val}_${yaw_rate_n_val}_n_${n_copies_val}"
-
 
 # Function to run the command with overridden parameters
 run_command() {
@@ -70,8 +46,8 @@ run_command() {
         task.env.ablate.targeted.hn_out=0 \
         task.env.ablate.targeted.hn_in=0 \
         task.env.ablate.targeted.cn_in=0 \
-        task.env.export_data_path=${model_path}/${run_name} \
-        +output_path=${model_path}/${run_name}
+        task.env.export_data_path=${export_path}/${model_name}/${run_name} \
+        +output_path=${export_path}/${model_name}/${run_name}
     )
 }
 done
@@ -83,31 +59,36 @@ hn_out_values=$(echo -n $(seq 0 1 16); echo $(seq 32 16 128))
 hn_in_values=$(echo -n $(seq 0 1 16); echo $(seq 32 16 128))
 cn_in_values=$(echo -n $(seq 0 1 16); echo $(seq 32 16 128))
 
-for hn_out in $hn_out_values; do
-    run_command "task.env.ablate.random_trial=true task.env.ablate.random.hn_out=$hn_out" "RANDOM-ABLATION-TRIAL-hn-out-${hn_out}"
+# Loop through the model names
+for model_name in "${model_names[@]}"
+do
+    echo "Running model: $model_name"
+
+    for hn_out in $hn_out_values; do
+        run_command "task.env.ablate.random_trial=true task.env.ablate.random.hn_out=$hn_out" "RANDOM-ABLATION-TRIAL-hn-out-${hn_out}"
+    done
+
+    for hn_in in $hn_in_values; do
+        run_command "task.env.ablate.random_trial=true task.env.ablate.random.hn_in=$hn_in" "RANDOM-ABLATION-TRIAL-hn-in-${hn_in}"
+    done
+
+    for cn_in in $cn_in_values; do
+        run_command "task.env.ablate.random_trial=true task.env.ablate.random.cn_in=$cn_in" "RANDOM-ABLATION-TRIAL-cn-in-${cn_in}"
+    done
+
+    for hn_out in $hn_out_values; do
+        run_command "task.env.ablate.targeted_trial=true task.env.ablate.random.hn_out=$hn_out" "TARGETED-ABLATION-TRIAL-hn-out-${hn_out}"
+    done
+
+    for hn_in in $hn_in_values; do
+        run_command "task.env.ablate.targeted_trial=true task.env.ablate.random.hn_in=$hn_in" "TARGETED-ABLATION-TRIAL-hn-in-${hn_in}"
+    done
+
+    for cn_in in $cn_in_values; do
+        run_command "task.env.ablate.targeted_trial=true task.env.ablate.random.cn_in=$cn_in" "TARGETED-ABLATION-TRIAL-cn-in-${cn_in}"
+    done
+
 done
-
-for hn_in in $hn_in_values; do
-    run_command "task.env.ablate.random_trial=true task.env.ablate.random.hn_in=$hn_in" "RANDOM-ABLATION-TRIAL-hn-in-${hn_in}"
-done
-
-for cn_in in $cn_in_values; do
-    run_command "task.env.ablate.random_trial=true task.env.ablate.random.cn_in=$cn_in" "RANDOM-ABLATION-TRIAL-cn-in-${cn_in}"
-done
-
-for hn_out in $hn_out_values; do
-    run_command "task.env.ablate.targeted_trial=true task.env.ablate.random.hn_out=$hn_out" "TARGETED-ABLATION-TRIAL-hn-out-${hn_out}"
-done
-
-for hn_in in $hn_in_values; do
-    run_command "task.env.ablate.targeted_trial=true task.env.ablate.random.hn_in=$hn_in" "TARGETED-ABLATION-TRIAL-hn-in-${hn_in}"
-done
-
-for cn_in in $cn_in_values; do
-    run_command "task.env.ablate.targeted_trial=true task.env.ablate.random.cn_in=$cn_in" "TARGETED-ABLATION-TRIAL-cn-in-${cn_in}"
-done
-
-
 
 # Wait for all background jobs to finish
 wait

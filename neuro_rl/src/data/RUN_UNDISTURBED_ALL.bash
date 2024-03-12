@@ -13,9 +13,13 @@ model_names=(
     # "ANYMAL-1.0MASS-LSTM16-TERR-01"
     # "2024-03-09-13-06_AnymalTerrain"
     # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01"
-    "ANYMAL-1.0MASS-LSTM16-DISTTERR-01"
-    "ANYMAL-1.0MASS-LSTM4-DISTTERR-01"
-    "ANYMAL-1.0MASS-LSTM4-TERR-01"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01"
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01"
+    # "ANYMAL-1.0MASS-LSTM4-TERR-01"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-201"
+    # "A1-1.0MASS-LSTM16-DISTTERR-203"
+    # "A1-1.0MASS-LSTM16-TERR-207"
+    "A1TERRAIN-1.0MASS-LSTM16-TERR-218"
     
 )
 
@@ -23,5 +27,5 @@ model_names=(
 for model_name in "${model_names[@]}"
 do
     echo "Running model: $model_name"
-    ./RUN_UNPETURBED.bash "$model_name"
+    ./RUN_UNDISTURBED_A1.bash "$model_name"
 done

@@ -28,7 +28,7 @@ script_name="${script_name%.*}"
 
 export_path="../../data/raw"
 
-python ../../../../IsaacGymEnvs/isaacgymenvs/train.py task=bash_AnymalTerrain_NeuroRL_exp \
+python ../../../../IsaacGymEnvs/isaacgymenvs/train.py task=AnymalTerrain_NeuroRL_exp \
   train=AnymalTerrain_PPO_LSTM_NeuroRL \
   capture_video=False \
   capture_video_len=1000 \
@@ -44,8 +44,10 @@ python ../../../../IsaacGymEnvs/isaacgymenvs/train.py task=bash_AnymalTerrain_Ne
   task.env.specifiedCommandVelocityN.linear_y=1 \
   task.env.specifiedCommandVelocityN.yaw_rate=1 \
   task.env.specifiedCommandVelocityN.n_copies=400 \
-  task.env.output.export_data=True \
+  task.env.export_data=false \
+  task.env.export_data_actor=false \
+  task.env.export_data_critic=false \
   task.env.evaluate.perturbPrescribed.perturbPrescribedOn=True \
-  task.env.evaluate.perturbPrescribed.forceY=-3.0 \
-  +task.env.export_data_path=${export_path} \
+  task.env.evaluate.perturbPrescribed.forceY=-3. \
+  task.env.export_data_path=${export_path} \
   +output_path=${export_path}/${script_name}
