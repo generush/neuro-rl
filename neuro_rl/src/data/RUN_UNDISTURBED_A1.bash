@@ -13,16 +13,16 @@ export_path="../../data/raw"
 
 # Define an associative array for each run with specific parameters
 
-# positive forward speeds (N=14x20)
+# positive forward speeds (N=28x10)
 declare -A run1=(
   [num_envs]=280
   [linear_x_range]='[0.4, 1]'
   [linear_y_range]='[0, 0]'
   [yaw_rate_range]='[0, 0]'
-  [linear_x_n]=14
+  [linear_x_n]=28
   [linear_y_n]=1
   [yaw_rate_n]=1
-  [n_copies]=20
+  [n_copies]=10
 )
 
 # positive forward speeds (N=7x40)
@@ -136,9 +136,8 @@ declare -A run10=(
 # Add more runs as needed
 
 # Array of all runs
-# runs=(run1)  # Add more run names as you define them
-runs=(run1 run2 run3 run4 run5 run6 run7 run8 run9 run10)  # Add more run names as you define them
 runs=(run1)  # Add more run names as you define them
+# runs=(run1 run2 run3 run4 run5 run6 run7 run8 run9 run10)  # Add more run names as you define them
 
 # Loop over each run
 for run in "${runs[@]}"; do

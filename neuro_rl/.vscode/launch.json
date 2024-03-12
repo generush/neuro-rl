@@ -37,7 +37,9 @@
             
             // "args": ["--config_path=cfg/analyze/analysis.yaml", "--model_path=models/ANYMAL-1.0MASS-LSTM16-DISTTERR-00/", "--data_path=data/raw/ANYMAL-1.0MASS-LSTM16-DISTTERR-00/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25/", "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-DISTTERR-00/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25/"]
 
-            "args": ["--config_path=cfg/analyze/analysis.yaml", "--model_path=models/ANYMAL-1.0MASS-LSTM16-TERR-122/", "--data_path=data/raw/ANYMAL-1.0MASS-LSTM16-TERR-00/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25/", "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-TERR-122/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25/"]
+            // "args": ["--config_path=cfg/analyze/analysis.yaml", "--model_path=models/ANYMAL-1.0MASS-LSTM16-TERR-122/", "--data_path=data/raw/ANYMAL-1.0MASS-LSTM16-TERR-00/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25/", "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-TERR-122/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25/"]
+
+            "args": ["--config_path=cfg/analyze/analysis.yaml", "--model_path=models/A1-1.0MASS-LSTM16-TERR-228/", "--data_path=data/raw/A1-1.0MASS-LSTM16-TERR-228/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10/", "--output_path=data/processed/A1-1.0MASS-LSTM16-TERR-228/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10/"]
 
 
 
