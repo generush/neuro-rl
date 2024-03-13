@@ -25,7 +25,7 @@ def run_analysis():
     # Compute pca for peturbed data
     traj_pc_df, pca_dict_perturbed = append_pc(traj_df, cfg.dataset_names, cfg.max_num_principal_components, cfg.normalization_type, 'PC', cfg.output_path)
 
-    tf_path = 'data/processed/ANYMAL-1.0MASS-LSTM16-DISTTERR-99_U-0.4-1.0-7-50_UNPERTURBED/'
+    tf_path = 'data/processed/old_2024_03_06/ANYMAL-1.0MASS-LSTM16-DISTTERR-99_U-0.4-1.0-7-50_UNPERTURBED/'
     traj_pc_df, pca_dict_unperturbed = append_pc(traj_pc_df, cfg.dataset_names, cfg.max_num_principal_components, cfg.normalization_type, 'UNPERTURBEDPC', cfg.output_path, tf_path)
 
     # Transform perturbed dataset to nominal unperturbed PCA space
@@ -36,7 +36,8 @@ def run_analysis():
     ax = fig.add_subplot(111, projection='3d')
 
     # plot figures with speed colors and tangling colors
-    ax.scatter(traj_pc_df['A_LSTM_HC_PC_000'], traj_pc_df['A_LSTM_HC_PC_001'], traj_pc_df['A_LSTM_HC_PC_002'], c=traj_pc_df['A_LSTM_HC_PC_002'], alpha=1, depthshade=True, rasterized=True)
+    # ax.scatter(traj_pc_df['A_LSTM_HC_PC_000'], traj_pc_df['A_LSTM_HC_PC_001'], traj_pc_df['A_LSTM_HC_PC_002'], c=traj_pc_df['A_LSTM_HC_PC_002'], alpha=1, depthshade=True, rasterized=True)
+    ax.scatter(traj_pc_df['ACT_PC_000'], traj_pc_df['ACT_PC_001'], traj_pc_df['ACT_PC_002'], c=traj_pc_df['ACT_PC_002'], alpha=1, depthshade=True, rasterized=True)
 
 
     traj_pc_df.to_parquet(cfg.output_path + 'TRAJPERTURBED_UNPERTURBEDPC_DATA.parquet')
@@ -51,9 +52,13 @@ def run_analysis():
     ax = fig.add_subplot(111, projection='3d')
 
     # plot figures with speed colors and tangling colors
-    ax.plot(traj_pc_df['A_LSTM_HC_PC_000'], traj_pc_df['A_LSTM_HC_PC_001'], traj_pc_df['A_LSTM_HC_PC_002'], alpha=1, rasterized=True)
+    # ax.plot(traj_pc_df['A_LSTM_HC_PC_000'], traj_pc_df['A_LSTM_HC_PC_001'], traj_pc_df['A_LSTM_HC_PC_002'], alpha=1, rasterized=True)
+    ax.plot(traj_pc_df['ACT_PC_000'], traj_pc_df['ACT_PC_001'], traj_pc_df['ACT_PC_002'], alpha=1, rasterized=True)
 
-
+    # Set labels and title
+    ax.set_xlabel('PC 000')
+    ax.set_ylabel('PC 001')
+    ax.set_zlabel('PC 002')
 
 
 
@@ -187,7 +192,8 @@ def run_analysis():
     ax = fig.add_subplot(111, projection='3d')
 
     # plot figures with speed colors and tangling colors
-    ax.plot(traj_pc_df['A_LSTM_HC_UNPERTURBEDPC_000'], traj_pc_df['A_LSTM_HC_UNPERTURBEDPC_001'], traj_pc_df['A_LSTM_HC_UNPERTURBEDPC_002'], alpha=1, rasterized=True)
+    # ax.plot(traj_pc_df['A_LSTM_HC_UNPERTURBEDPC_000'], traj_pc_df['A_LSTM_HC_UNPERTURBEDPC_001'], traj_pc_df['A_LSTM_HC_UNPERTURBEDPC_002'], alpha=1, rasterized=True)
+    ax.plot(traj_pc_df['ACT_UNPERTURBEDPC_000'], traj_pc_df['ACT_UNPERTURBEDPC_001'], traj_pc_df['ACT_UNPERTURBEDPC_002'], alpha=1, rasterized=True)
 
 
 

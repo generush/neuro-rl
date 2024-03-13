@@ -21,7 +21,8 @@ model_names=(
     # "A1-1.0MASS-LSTM16-TERR-207"
     # "A1TERRAIN-1.0MASS-LSTM16-TERR-218"
     # "A1-1.0MASS-LSTM16-TERR-228"
-    "A1-1.0MASS-LSTM16-TERR-01"
+    # "A1-1.0MASS-LSTM16-TERR-01"
+    "ANYMAL-0.5MASS-LSTM16-TERR-01"
     
 )
 
@@ -29,5 +30,5 @@ model_names=(
 for model_name in "${model_names[@]}"
 do
     echo "Running model: $model_name"
-    ./RUN_UNDISTURBED_A1.bash "$model_name"
+    ./RUN_UNDISTURBED_ANYMAL.bash "$model_name"
 done
