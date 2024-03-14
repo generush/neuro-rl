@@ -104,7 +104,9 @@ model_run_pairs=(
     # "A1-1.0MASS-LSTM16-TERR-228/u_0.4_1_14_v_0_0_1_r_0_0_1_n_20"
     # "A1-1.0MASS-LSTM16-TERR-228/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
     # "A1-1.0MASS-LSTM16-TERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
-    "ANYMAL-0.5MASS-LSTM16-TERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
+    # "ANYMAL-0.5MASS-LSTM16-TERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
+    # "ANYMAL-1.0MASS-LSTM16-DIST-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
+    "2024-03-14-01-16_A1Terrain/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
 
 )
 
