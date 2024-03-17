@@ -15,7 +15,7 @@ models_info=(
     # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-01" # -3.0, -3.5 # see if there is any difference between these two in terms of FPs, config is identical
     # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DISTTERR-01" # -3.0, -3.5]
 
-    "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-0.5MASS-LSTM16-TERR-01" # -3.0 -3.5
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-0.5MASS-LSTM16-TERR-01" # -3.0 -3.5
 
     # "A1Terrain_PPO_LSTM_NeuroRL:A1Terrain_NeuroRL_exp:A1-1.0MASS-LSTM16-TERR-01" # -3.0, -3.5
     
@@ -23,6 +23,9 @@ models_info=(
     # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-201" TO DO # see if there is any difference between these two in terms of FPs, config is identical
     # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-01-TERMINATION-1.0" # -3.0 (TERMINATION PENALTY DID NOT CREATE MONOTONIC ROBUSTNESS LIKE I HAD HOPED...)
     # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DIST-TERMINATION-1.0" # -3.0, -3.5 (TERMINATION PENALTY DID NOT CREATE MONOTONIC ROBUSTNESS LIKE I HAD HOPED...)
+
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-THESIS" # -2.0, -3.0
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DISTTERR-01-THESIS" #
 )
 
 export_path="../../data/raw"
@@ -34,7 +37,8 @@ process_file() {
     local model_type="$3"
     local model_name="$4"
     
-    local forceY=-2.0
+    local forceY=-3.
+
     local steps_after_stance_begins=0
 
     echo "------------------------------"
@@ -51,9 +55,9 @@ process_file() {
         test=True \
         capture_video=False \
         capture_video_len=1000 \
-        force_render=False \
-        headless=True \
-        checkpoint=../../models/$model_type/nn/$model_name \
+        force_render=True \
+        headless=False \
+        checkpoint=../../models/$model_type/nn/last_AnymalTerrain_ep_950_rew_20.688946.pth \
         num_envs=100 \
         task.env.specifiedCommandVelocityRanges.linear_x="[1, 1]" \
         task.env.specifiedCommandVelocityRanges.linear_y="[0, 0]" \
@@ -79,8 +83,8 @@ process_file() {
         task.env.ablate.targeted.hn_out=0 \
         task.env.ablate.targeted.hn_in=0 \
         task.env.ablate.targeted.cn_in=0 \
-        task.env.export_data_path=$export_path/$model_type/find_most_robust_model_diffgaitcriteria/$steps_after_stance_begins/$forceY/$model_name \
-        +output_path=$export_path/$model_type/find_most_robust_model_diffgaitcriteria/$steps_after_stance_begins/$forceY/$model_name \
+        task.env.export_data_path=$export_path/$model_type/find_most_robust_model_redo/$steps_after_stance_begins/$forceY/$model_name \
+        +output_path=$export_path/$model_type/find_most_robust_model_redo/$steps_after_stance_begins/$forceY/$model_name \
     )
 }  
 

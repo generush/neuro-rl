@@ -14,7 +14,7 @@ models_info=(
     # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-201:model_name" # see if there is any difference between these two in terms of FPs, config is identical
     # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DISTTERR-01:last_AnymalTerrain_ep_3900_rew_18.605728.pth"
     # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-01-TERMINATION-1.0:last_AnymalTerrain_ep_1800_rew_18.509405.pth"
-    "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DIST-TERMINATION-1.0:last_AnymalTerrain_ep_900_rew_18.777004.pth"
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DIST-TERMINATION-1.0:last_AnymalTerrain_ep_900_rew_18.777004.pth"
 )
 
 forceY_values=-3.5 # $(seq -0.5 -0.5 -4)
