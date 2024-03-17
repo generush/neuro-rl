@@ -34,7 +34,7 @@ def aggregate_data(root_folder):
         if not found_csv and subdir in data:
             del data[subdir]  # Remove the directory entry if no CSV files were found
 
-    # Convert the aggregated data to a DataFrame
+    # Convert the aggregated data to a DataFrame  
     main_df = pd.DataFrame.from_dict(data, orient='index', columns=['Recoveries', 'Trials']).reset_index()
     main_df.rename(columns={'index': 'FolderPath'}, inplace=True)
 

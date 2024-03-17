@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Starting index for models
-START_INDEX=200
+START_INDEX=400
 
 # Number of models to train
 N=1

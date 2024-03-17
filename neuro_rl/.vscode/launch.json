@@ -42,8 +42,9 @@
             // "args": ["--config_path=cfg/analyze/analysis.yaml", "--model_path=models/A1-1.0MASS-LSTM16-TERR-228/", "--data_path=data/raw/A1-1.0MASS-LSTM16-TERR-228/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10/", "--output_path=data/processed/A1-1.0MASS-LSTM16-TERR-228/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10/"]
 
             // figuring out robustness features by looking at perturbed pca from robust model on fragile model
-            "args": ["--config_path=cfg/analyze/analysis.yaml", "--model_path=models/old_2024_03_09/ANYMAL-1.0MASS-LSTM16-DISTTERR-00/", "--data_path=data/raw/old_2024_03_06/ANYMAL-1.0MASS-LSTM16-DISTTERR-99_U-1.0-1.0-1-1_PERTURBED/", "--output_path=data/processed/old_2024_03_06/ANYMAL-1.0MASS-LSTM16-DISTTERR-99_U-1.0-1.0-1-1_PERTURBED/"]
+            // "args": ["--config_path=cfg/analyze/analysis.yaml", "--model_path=models/old_2024_03_09/ANYMAL-1.0MASS-LSTM16-DISTTERR-00/", "--data_path=data/raw/old_2024_03_06/ANYMAL-1.0MASS-LSTM16-DISTTERR-99_U-1.0-1.0-1-1_PERTURBED/", "--output_path=data/processed/old_2024_03_06/ANYMAL-1.0MASS-LSTM16-DISTTERR-99_U-1.0-1.0-1-1_PERTURBED/"]
 
+            
         }
     ]
 }

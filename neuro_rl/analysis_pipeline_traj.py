@@ -230,3 +230,38 @@ def run_analysis():
 
 if __name__ == "__main__":
     run_analysis()
+
+
+
+
+import re
+
+def update_mass_values(urdf_file_path, output_file_path):
+    # Read the original URDF file
+    with open(urdf_file_path, 'r') as file:
+        urdf_content = file.read()
+
+    # Define a regular expression to find the mass value attributes
+    mass_value_pattern = re.compile(r'(<mass value=")([\d\.]+)(")')
+
+    # Function to calculate the new mass value (50% of the original)
+    def half_mass(match):
+        original_value = float(match.group(2))
+        new_value = original_value * 2.0
+        return f'{match.group(1)}{new_value}{match.group(3)}'
+
+    # Update all mass values in the file content
+    updated_urdf_content = re.sub(mass_value_pattern, half_mass, urdf_content)
+
+    # Write the updated URDF content to a new file
+    with open(output_file_path, 'w') as file:
+        file.write(updated_urdf_content)
+
+# Replace 'path/to/your/urdf_file.urdf' with the actual path to your URDF file
+urdf_file_path = '/media/gene/fd75d0c8-aee1-476d-b68c-b17d9e0c1c14/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/assets/urdf/anymal_c/urdf/anymal_minimal.urdf'
+
+# Specify the output file path where the updated URDF will be saved
+output_file_path = '/media/gene/fd75d0c8-aee1-476d-b68c-b17d9e0c1c14/code/NEURO/neuro-rl-sandbox/IsaacGymEnvs/assets/urdf/anymal_c/urdf/anymal_minimal_2pt0MASS.urdf'
+
+# Call the function to update mass values
+update_mass_values(urdf_file_path, output_file_path)

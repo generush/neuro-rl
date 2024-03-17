@@ -2,18 +2,17 @@
 
 # Define an array of model names
 models_info=(
-  # Could go and re-select most robust models in each folder...?
-  "A1Terrain_PPO_LSTM_NeuroRL:A1Terrain_NeuroRL_exp:A1-1.0MASS-LSTM16-TERR-01" # need to rerun training for longer epochs (model did not yet converge)
-  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-0.5MASS-LSTM16-TERR-01"
-  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-BASELINE-01"
-  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DIST-01"
-  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-TERR-01"
-  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DISTTERR-01"
-  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-BASELINE-01"
-  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DIST-01"
-  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-01" # see if there is any difference between these two in terms of FPs, config is identical
-  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-201" # see if there is any difference between these two in terms of FPs, config is identical
-  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DISTTERR-01"
+  # "A1Terrain_PPO_LSTM_NeuroRL:A1Terrain_NeuroRL_exp:A1-1.0MASS-LSTM16-TERR-01:last_A1Terrain_ep_13350_rew_19.288048.pth"
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-0.5MASS-LSTM16-TERR-01:model"
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-BASELINE-01:model"
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DIST-01:model"
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-TERR-01:model"
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DISTTERR-01:last_AnymalTerrain_ep_5200_rew_15.612257.pth"
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-BASELINE-01:model"
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DIST-01:model:last_AnymalTerrain_ep_3500_rew_22.270075.pth"
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-01:last_AnymalTerrain_ep_2550_rew_19.31447.pth" # see if there is any difference between these two in terms of FPs, config is identical
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-201:model" # see if there is any difference between these two in terms of FPs, config is identical
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DISTTERR-01:last_AnymalTerrain_ep_3900_rew_18.605728.pth"
 )
 
 export_path="../../data/raw"
@@ -21,16 +20,19 @@ export_path="../../data/raw"
 # Loop through the model names and call the sub-script for each one
 for model_info in "${models_info[@]}"
 do
-  
+   
   echo "Running model: $model_info"
 
   # Split model_info into its components
-  IFS=':' read -r train_file task_file model_name <<< "$model_info"
+  IFS=':' read -r train_cfg_file task_cfg_file model_type model_name <<< "$model_info"
 
+  echo "------------------------------"
   echo "MODEL PROCESSING:"
-  echo "Train File: $train_file"
-  echo "Task File: $task_file"
+  echo "Train File: $train_cfg_file"
+  echo "Task File: $task_cfg_file"
+  echo "Model Type: $model_type"
   echo "Model Name: $model_name"
+  echo "------------------------------"
 
   # Define an associative array for each run with specific parameters
 
@@ -188,17 +190,17 @@ do
       yaw_rate_n_val="${current_run[yaw_rate_n]}"
       n_copies_val="${current_run[n_copies]}"
 
-      out_path="${export_path}/${model_name}/u_${linear_x_range_val}_${linear_x_n_val}_v_${linear_y_range_val}_${linear_y_n_val}_r_${yaw_rate_range_val}_${yaw_rate_n_val}_n_${n_copies_val}"
+      out_path="${export_path}/${model_type}/u_${linear_x_range_val}_${linear_x_n_val}_v_${linear_y_range_val}_${linear_y_n_val}_r_${yaw_rate_range_val}_${yaw_rate_n_val}_n_${n_copies_val}"
 
       python ../../../../IsaacGymEnvs/isaacgymenvs/train.py \
-        task=${task_file} \
-        train=${train_file}\
+        task=${task_cfg_file} \
+        train=${train_cfg_file}\
         test=True \
         capture_video=False \
         capture_video_len=1000 \
         force_render=False \
         headless=True \
-        checkpoint=../../models/${model_name}/nn/model.pth \
+        checkpoint=../../models/${model_type}/nn/$model_name \
         num_envs=${current_run[num_envs]} \
         task.env.specifiedCommandVelocityRanges.linear_x="${current_run[linear_x_range]}" \
         task.env.specifiedCommandVelocityRanges.linear_y="${current_run[linear_y_range]}" \
