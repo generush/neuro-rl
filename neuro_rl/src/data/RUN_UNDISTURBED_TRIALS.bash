@@ -2,23 +2,28 @@
 
 # Define an array of model names
 models_info=(
-  # "A1Terrain_PPO_LSTM_NeuroRL:A1Terrain_NeuroRL_exp:A1-1.0MASS-LSTM16-TERR-01:last_A1Terrain_ep_13350_rew_19.288048.pth"
-  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-0.5MASS-LSTM16-TERR-01:model"
-  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-BASELINE-01:model"
-  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DIST-01:model"
-  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-TERR-01:model"
-  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DISTTERR-01:last_AnymalTerrain_ep_5200_rew_15.612257.pth"
-  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-BASELINE-01:model"
-  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DIST-01:model:last_AnymalTerrain_ep_3500_rew_22.270075.pth"
-  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-01:last_AnymalTerrain_ep_2550_rew_19.31447.pth" # see if there is any difference between these two in terms of FPs, config is identical
-  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-201:model" # see if there is any difference between these two in terms of FPs, config is identical
-  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DISTTERR-01:last_AnymalTerrain_ep_3900_rew_18.605728.pth"
+  
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-BASELINE-01:last_AnymalTerrain_ep_1000_rew_20.962988.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DIST-01:model:last_AnymalTerrain_ep_5000_rew_16.480799.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-01:last_AnymalTerrain_ep_2000_rew_18.73817.pth"
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DISTTERR-01:last_AnymalTerrain_ep_4600_rew_15.199695.pth"
+
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-BASELINE-01:last_AnymalTerrain_ep_150_rew_8.168549.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DIST-01:last_AnymalTerrain_ep_4800_rew_20.043377.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-TERR-01:last_AnymalTerrain_ep_1800_rew_18.174595.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DISTTERR-01:last_AnymalTerrain_ep_4800_rew_14.132425.pth"
+
+
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-0.5MASS-LSTM16-TERR-01:last_AnymalTerrain_ep_3200_rew_21.073418.pth"
+
+  "A1Terrain_PPO_LSTM_NeuroRL:A1Terrain_NeuroRL_exp:A1-1.0MASS-LSTM16-TERR-01:last_A1Terrain_ep_4600_rew_16.256865.pth"
+  
 )
 
 export_path="../../data/raw"
 
 # Loop through the model names and call the sub-script for each one
-for model_info in "${models_info[@]}"
+for model_info in "${models_info[@]}";
 do
    
   echo "Running model: $model_info"
@@ -36,55 +41,67 @@ do
 
   # Define an associative array for each run with specific parameters
 
-  # positive forward speeds (N=14x20)
-  declare -A u_pos_28x10=(
-    [num_envs]=280
+  # positive forward speeds (N=14x25)
+  declare -A u_pos_28x15=(
+    [num_envs]=420
     [linear_x_range]='[0.4, 1]'
     [linear_y_range]='[0, 0]'
     [yaw_rate_range]='[0, 0]'
     [linear_x_n]=28
     [linear_y_n]=1
     [yaw_rate_n]=1
-    [n_copies]=10
+    [n_copies]=15
   )
 
-  # positive forward speeds (N=7x40)
-  declare -A u_pos_7x40=(
-    [num_envs]=280
+  # positive forward speeds (N=14x25)
+  declare -A u_pos_14x25=(
+    [num_envs]=350
+    [linear_x_range]='[0.4, 1]'
+    [linear_y_range]='[0, 0]'
+    [yaw_rate_range]='[0, 0]'
+    [linear_x_n]=14
+    [linear_y_n]=1
+    [yaw_rate_n]=1
+    [n_copies]=25
+  )
+
+  # positive forward speeds (N=7x50)
+  declare -A u_pos_7x50=(
+    [num_envs]=350
     [linear_x_range]='[0.4, 1]'
     [linear_y_range]='[0, 0]'
     [yaw_rate_range]='[0, 0]'
     [linear_x_n]=7
     [linear_y_n]=1
     [yaw_rate_n]=1
-    [n_copies]=40
+    [n_copies]=50
   )
 
-  # positive lateral speeds (N=7x40)
-  declare -A v_pos_7x40=(
-    [num_envs]=280
+  # positive lateral speeds (N=7x50)
+  declare -A v_pos_7x50=(
+    [num_envs]=350
     [linear_x_range]='[0, 0]'
     [linear_y_range]='[0.4, 1]'
     [yaw_rate_range]='[0, 0]'
     [linear_x_n]=1
     [linear_y_n]=7
     [yaw_rate_n]=1
-    [n_copies]=40
+    [n_copies]=50
   )
 
-  # negative+positive yaw rates (N=7x40)
-  declare -A r_pos_7x40=(
-    [num_envs]=280
+  # negative+positive yaw rates (N=7x50)
+  declare -A r_pos_7x50=(
+    [num_envs]=350
     [linear_x_range]='[0, 0]'
     [linear_y_range]='[0, 0]'
     [yaw_rate_range]='[0, 1]'
     [linear_x_n]=1
     [linear_y_n]=1
     [yaw_rate_n]=7
-    [n_copies]=40
+    [n_copies]=50
   )
 
-  # positive forward speed (N=1)
+  # positive forward speed (N=100)
   declare -A u_pos_1x100=(
     [num_envs]=100
     [linear_x_range]='[1, 1]'
@@ -96,7 +113,7 @@ do
     [n_copies]=100
   )
 
-  # negative forward speed (N=1)
+  # negative forward speed (N=100)
   declare -A u_neg_1x100=(
     [num_envs]=100
     [linear_x_range]='[-1, -1]'
@@ -108,7 +125,7 @@ do
     [n_copies]=100
   )
 
-  # positive lateral speed (N=1)
+  # positive lateral speed (N=100)
   declare -A v_pos_1x100=(
     [num_envs]=100
     [linear_x_range]='[0, 0]'
@@ -120,7 +137,7 @@ do
     [n_copies]=100
   )
 
-  # negative lateral speed (N=1)
+  # negative lateral speed (N=100)
   declare -A v_neg_1x100=(
     [num_envs]=100
     [linear_x_range]='[0, 0]'
@@ -132,7 +149,7 @@ do
     [n_copies]=100
   )
 
-  # positive lateral speed (N=1)
+  # positive lateral speed (N=100)
   declare -A r_pos_1x100=(
     [num_envs]=100
     [linear_x_range]='[1, 1]'
@@ -144,7 +161,7 @@ do
     [n_copies]=100
   )
 
-  # negative lateral speed (N=1)
+  # negative lateral speed (N=100)
   declare -A r_neg_1x100=(
     [num_envs]=100
     [linear_x_range]='[1, 1]'
@@ -156,12 +173,25 @@ do
     [n_copies]=100
   )
 
+  # # negative lateral speed (N=1)
+  # declare -A u_pos_1x1=(
+  #   [num_envs]=1
+  #   [linear_x_range]='[1, 1]'
+  #   [linear_y_range]='[0, 0]'
+  #   [yaw_rate_range]='[0, 0]'
+  #   [linear_x_n]=1
+  #   [linear_y_n]=1
+  #   [yaw_rate_n]=1
+  #   [n_copies]=1
+  # )
+
   # Add more runs as needed
 
   # Array of all runs
-  runs=(u_pos_28x10 u_pos_7x40 v_pos_7x40 r_pos_7x40 u_pos_1x100 u_neg_1x100 v_pos_1x100 v_neg_1x100 r_pos_1x100 r_neg_1x100)  # Add more run names as you define them
+  # runs=(u_pos_28x15 u_pos_14x25 u_pos_7x50 v_pos_7x50 r_pos_7x50 u_pos_1x100 u_neg_1x100 v_pos_1x100 v_neg_1x100 r_pos_1x100 r_neg_1x100 u_pos_1x1)  # Add more run names as you define them
+  runs=(u_pos_28x15)  # Add more run names as you define them
   
-  # Loop over each run
+    # Loop over each run
   for run in "${runs[@]}"; do
     # Use 'declare -n' to create a nameref for easier access to associative array elements
     declare -n current_run="$run"

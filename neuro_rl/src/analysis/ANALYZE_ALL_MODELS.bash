@@ -33,7 +33,7 @@
 
 
 
-# Define an array with combined model_name/run_name pairs
+# Define an array with combined model_type/run_name pairs
 model_run_pairs=(
     # "ANYMAL-1.0MASS-LSTM16-DISTTERR-00/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
     # "ANYMAL-1.0MASS-LSTM16-DISTTERR-00/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
@@ -107,19 +107,29 @@ model_run_pairs=(
     # "ANYMAL-0.5MASS-LSTM16-TERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
     # "ANYMAL-1.0MASS-LSTM16-DIST-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
     # "2024-03-14-01-16_A1Terrain/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
-    "ANYMAL-0.5MASS-LSTM16-TERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
+    # "ANYMAL-0.5MASS-LSTM16-TERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
 
+    "ANYMAL-1.0MASS-LSTM16-BASELINE-01/last_AnymalTerrain_ep_1000_rew_20.962988.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    "ANYMAL-1.0MASS-LSTM16-DIST-01/model:last_AnymalTerrain_ep_5000_rew_16.480799.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    "ANYMAL-1.0MASS-LSTM16-TERR-01/last_AnymalTerrain_ep_2000_rew_18.73817.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/last_AnymalTerrain_ep_4600_rew_15.199695.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    "ANYMAL-1.0MASS-LSTM4-BASELINE-01/last_AnymalTerrain_ep_150_rew_8.168549.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    "ANYMAL-1.0MASS-LSTM4-DIST-01/last_AnymalTerrain_ep_4800_rew_20.043377.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    "ANYMAL-1.0MASS-LSTM4-TERR-01/last_AnymalTerrain_ep_1800_rew_18.174595.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/last_AnymalTerrain_ep_4800_rew_14.132425.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    "ANYMAL-0.5MASS-LSTM16-TERR-01/last_AnymalTerrain_ep_3200_rew_21.073418.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    "A1-1.0MASS-LSTM16-TERR-01:last_A1Terrain_ep_4600_rew_16.256865.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
 )
 
 # Loop through the model/run pairs
 for pair in "${model_run_pairs[@]}"; do
     # Split the model and run using the '/' delimiter
-    IFS='/' read -r model_name run_name <<< "$pair"
+    IFS='/' read -r model_type model_name run_name <<< "$pair"
 
-    echo "Processing Model: $model_name, Run: $run_name"
+    echo "Processing Model Type: $model_type / Model Name: $model_name / Run: $run_name"
 
     # Call the Python script with the current model and run
-    python ../../analysis_pipeline_cycle_avg.py --config_path "../../cfg/analyze/analysis.yaml" --model_path "../../models/${model_name}/" --data_path "../../data/raw/${model_name}/${run_name}/" --output_path "../../data/processed/${model_name}/${run_name}/"
+    python ../../analysis_pipeline_cycle_avg.py --config_path "../../cfg/analyze/analysis.yaml" --model_path "../../models/$model_type/nn/$model_name" --data_path "../../data/raw/$model_type/$run_name/" --output_path "../../data/processed/$model_type/$run_name/"
 done
 
 echo "All scripts have been executed sequentially."

@@ -151,7 +151,8 @@ def compute_fixed_points(model_path, processed_data_path):
 
 
     # Check if the first file exists
-    model_file = torch.load(os.path.join(model_path, 'nn/model.pth'))
+    print(model_path)
+    model_file = torch.load(model_path)
     state_dict = {key.replace('a2c_network.a_rnn.rnn.', ''): value for key, value in model_file['model'].items() if key.startswith('a2c_network.a_rnn.rnn')}
 
 

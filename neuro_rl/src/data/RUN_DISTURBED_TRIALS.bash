@@ -2,23 +2,21 @@
 
 # Define an array of model names
 models_info=(
-    # "A1Terrain_PPO_LSTM_NeuroRL:A1Terrain_NeuroRL_exp:A1-1.0MASS-LSTM16-TERR-01:last_A1Terrain_ep_13350_rew_19.288048.pth"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-0.5MASS-LSTM16-TERR-01:model_name"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-BASELINE-01:model_name"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DIST-01:model_name"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DISTTERR-01:last_AnymalTerrain_ep_5200_rew_15.612257.pth"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-BASELINE-01:last_AnymalTerrain_ep_950_rew_20.688946.pth"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DIST-01:last_AnymalTerrain_ep_3500_rew_22.270075.pth"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-01:last_AnymalTerrain_ep_2550_rew_19.31447.pth" # see if there is any difference between these two in terms of FPs, config is identical
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-02:last_AnymalTerrain_ep_3950_rew_18.507545.pth"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-201:model_name" # see if there is any difference between these two in terms of FPs, config is identical
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DISTTERR-01:last_AnymalTerrain_ep_3900_rew_18.605728.pth"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-01-TERMINATION-1.0:last_AnymalTerrain_ep_1800_rew_18.509405.pth"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DIST-TERMINATION-1.0:last_AnymalTerrain_ep_900_rew_18.777004.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-BASELINE-01:last_AnymalTerrain_ep_1000_rew_20.962988.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DIST-01:last_AnymalTerrain_ep_5000_rew_16.480799.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-01:last_AnymalTerrain_ep_2000_rew_18.73817.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DISTTERR-01:last_AnymalTerrain_ep_4600_rew_15.199695.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-BASELINE-01:last_AnymalTerrain_ep_150_rew_8.168549.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DIST-01:last_AnymalTerrain_ep_4800_rew_20.043377.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-TERR-01:last_AnymalTerrain_ep_1800_rew_18.174595.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DISTTERR-01:last_AnymalTerrain_ep_4800_rew_14.132425.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-0.5MASS-LSTM16-TERR-01:last_AnymalTerrain_ep_3200_rew_21.073418.pth"
+  "A1Terrain_PPO_LSTM_NeuroRL:A1Terrain_NeuroRL_exp:A1-1.0MASS-LSTM16-TERR-01:last_A1Terrain_ep_4600_rew_16.256865.pth"
 )
 
-forceY_values=-3.5 # $(seq -0.5 -0.5 -4)
-steps_after_stance_begins_values=0
+steps_after_stance_begins_values=$(seq 0 1 20)
+length_s=0.02
+forceY_values=$(seq -12 2 12)
 
 export_path="../../data/raw"
 
@@ -30,7 +28,8 @@ run_command() {
     local model_name="$4"
     
     local steps_after_stance_begins="$5"
-    local forceY="$6"
+    local length_s="$6"
+    local forceY="$7"
 
     # Execute Python command in a subshell with parameters from the current run
     (
@@ -40,22 +39,23 @@ run_command() {
         test=True \
         capture_video=False \
         capture_video_len=1000 \
-        force_render=True \
-        headless=False \
+        force_render=False \
+        headless=True \
         checkpoint=../../models/$model_type/nn/$model_name \
-        num_envs=400 \
+        num_envs=100 \
         task.env.specifiedCommandVelocityRanges.linear_x="[1, 1]" \
         task.env.specifiedCommandVelocityRanges.linear_y="[0, 0]" \
         task.env.specifiedCommandVelocityRanges.yaw_rate="[0, 0]" \
         task.env.specifiedCommandVelocityN.linear_x=1 \
         task.env.specifiedCommandVelocityN.linear_y=1 \
         task.env.specifiedCommandVelocityN.yaw_rate=1 \
-        task.env.specifiedCommandVelocityN.n_copies=400 \
+        task.env.specifiedCommandVelocityN.n_copies=100 \
         task.env.export_data=false \
         task.env.export_data_actor=false \
         task.env.export_data_critic=false \
         task.env.evaluate.perturbPrescribed.perturbPrescribedOn=true \
         task.env.evaluate.perturbPrescribed.steps_after_stance_begins=$steps_after_stance_begins \
+        task.env.evaluate.perturbPrescribed.length_s=$length_s \
         task.env.evaluate.perturbPrescribed.forceY=$forceY \
         task.env.ablate.wait_until_disturbance=false \
         task.env.ablate.random_trial=false \
@@ -93,10 +93,11 @@ for model_info in "${models_info[@]}"; do
         for steps_after_stance_begins in $steps_after_stance_begins_values; do
             echo "------------------------------"
             echo "RUN PROCESSING:"
-            echo "forceY_values: $forceY"
             echo "steps_after_stance_begins_values: $steps_after_stance_begins"
+            echo "length_s: $length_s"
+            echo "forceY_values: $forceY"
             echo "------------------------------"
-            run_command "$train_cfg_file" "$task_cfg_file" "$model_type" "$model_name" "$steps_after_stance_begins" "$forceY"
+            run_command "$train_cfg_file" "$task_cfg_file" "$model_type" "$model_name" "$steps_after_stance_begins" "$length_s" "$forceY"
         done
 
     done
