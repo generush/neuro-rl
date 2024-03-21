@@ -51,11 +51,30 @@
         //     "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-TERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10/"
             // ]
 
+            // "args": ["--config_path=cfg/analyze/analysis.yaml", 
+            // "--model_path=models/ANYMAL-1.0MASS-LSTM16-DISTTERR-01/", 
+            // "--data_path=data/raw/ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15/", 
+            // "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-TERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15/"
+            // ]
+
+            // "args": ["--config_path=cfg/analyze/analysis.yaml", 
+            // "--model_path=models/ANYMAL-1.0MASS-LSTM4-DISTTERR-01/nn/last_AnymalTerrain_ep_1200_rew_12.890905.pth", 
+            // "--data_path=data/raw/ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15/", 
+            // "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-TERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15/"
+            // ]
+
+            // "args": ["--config_path=cfg/analyze/analysis.yaml", 
+            // "--model_path=models/ANYMAL-1.0MASS-LSTM4-DISTTERR-01/nn/last_AnymalTerrain_ep_4800_rew_14.132425.pth", 
+            // "--data_path=data/raw/ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15/", 
+            // "--output_path=data/processed/ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15/last_AnymalTerrain_ep_1200_rew_12.890905.pth"
+            // ]
+
+
             "args": ["--config_path=cfg/analyze/analysis.yaml", 
-            "--model_path=models/ANYMAL-1.0MASS-LSTM16-DISTTERR-01/", 
-            "--data_path=data/raw/ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15/", 
-            "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-TERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15/"
-    ]
+            "--model_path=models/ANYMAL-1.0MASS-LSTM4-DISTTERR-01/nn/last_AnymalTerrain_ep_1200_rew_12.890905.pth", 
+            "--data_path=data/raw/ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15/", 
+            "--output_path=data/processed/ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15/last_AnymalTerrain_ep_1200_rew_12.890905.pth"
+            ]
 
         }
     ]

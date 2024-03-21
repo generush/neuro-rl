@@ -30,7 +30,7 @@ a.rename(columns={'Subfolder_6':'model_name'}, inplace=True)
 
 
 # Further filter for rows starting with the base path, if needed
-a = a[a['run_type'] == 'evaluate_robustness_throughout_training']
+a = a[a['run_type'] == 'final_model_robustness']
 
 # Parse 'model_name' to extract 'episode_number' and 'reward'
 # Make sure 'model_name' is treated as a string column
@@ -52,8 +52,100 @@ a['Trials'] = a['Trials'].astype(int)
 
 # Create the 'robustness' column as the ratio of 'Recoveries' to 'Trials'
 a['Robustness'] = a['Recoveries'] / a['Trials']
+
+
+
 import matplotlib.pyplot as plt
-import pandas as pd
+from mpl_toolkits.mplot3d import Axes3D
+from scipy import interpolate
+import numpy as np
+
+# Assuming 'a' DataFrame is already loaded and processed
+
+# Get unique model types from the entire DataFrame
+model_types = a['model_type'].unique()
+
+all_steps_after_stance_begins = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
+all_forceY = np.array([-12, -10, -8, -6, -4, -2, 2, 4, 6, 8, 10, 12])
+
+for i, model_type in enumerate(model_types):
+    # Create a new figure for each model type
+    fig = plt.figure(figsize=(10, 7))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.set_title(f'Model Type: {model_type}', pad=20, fontsize=14)
+    
+    model_df = a[a['model_type'] == model_type]
+
+    # Ensure there's data for this model_type before proceeding
+    if not model_df.empty:
+        pivot_table = model_df.pivot_table(index='steps_after_stance_begins', columns='forceY', values='Robustness', aggfunc='mean')
+        Z = pivot_table.values
+
+        # Handling cases where pivot result might have NaNs due to missing combinations in data
+        Z[np.isnan(Z)] = 0
+        
+        X, Y = np.meshgrid(all_forceY, all_steps_after_stance_begins)
+
+        # Smooth the data
+        f = interpolate.interp2d(all_forceY, all_steps_after_stance_begins, Z, kind='linear')
+        x_smooth = np.linspace(all_forceY.min(), all_forceY.max(), 100)
+        y_smooth = np.linspace(all_steps_after_stance_begins.min(), all_steps_after_stance_begins.max(), 100)
+        X_smooth, Y_smooth = np.meshgrid(x_smooth, y_smooth)
+        Z_smooth = f(x_smooth, y_smooth)
+
+        # Create the surface plot
+        orig_map = plt.cm.get_cmap('plasma')
+        reversed_map = orig_map.reversed()
+        surf = ax.plot_surface(X_smooth, Y_smooth, Z_smooth, cmap=reversed_map, vmin=0, vmax=1, linewidth=0, edgecolor='none', alpha=1.0)
+
+        # Set labels for axes
+        ax.set_xlabel('ForceY')
+        ax.set_ylabel('Steps After Stance Begins')
+        ax.set_zlabel('Robustness')
+        
+    else:
+        print(f"No data available for model type: {model_type}")
+
+# Show the plot for this model type
+plt.show()
+
+print('hi')
+
+
+
+
+
+
+
+
+
+
+
+import torch
+# model = torch.load('/media/gene/fd75d0c8-aee1-476d-b68c-b17d9e0c1c14/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/models/A1-1.0MASS-LSTM16-TERR-01/nn/last_A1Terrain_ep_4600_rew_16.256865.pth')
+
+# model = torch.load('/media/gene/fd75d0c8-aee1-476d-b68c-b17d9e0c1c14/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/models/ANYMAL-1.0MASS-LSTM16-TERR-01/nn/last_AnymalTerrain_ep_2000_rew_18.73817.pth')
+
+model = torch.load('/media/gene/fd75d0c8-aee1-476d-b68c-b17d9e0c1c14/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/models/ANYMAL-1.0MASS-LSTM4-CORLDISTTERR/nn/last_AnymalTerrain_ep_6700_rew_20.21499.pth')
+
+
+state_dict = {key.replace('a2c_network.a_rnn.rnn.', ''): value for key, value in model['model'].items() if key.startswith('a2c_network.a_rnn.rnn')}
+
+
+
+a = state_dict['bias_ih_l0']
+b = state_dict['bias_hh_l0']
+c = model['model']['a2c_network.actor_mlp.0.weight'][:,176:]
+
+
+
+
+
+
+
+
+
+
 
 # Load your DataFrame 'a' here
 # a = pd.read_csv('your_data.csv')
@@ -61,6 +153,9 @@ import pandas as pd
 # Assuming 'a' is already prepared as per your initial code
 
 # Define your array of forceY values for low, mid, and high categories
+
+
+
 low_impulse_forceY = [-0.333, -1, -4]
 mid_impulse_forceY = [-0.667, -2, -8]
 high_impulse_forceY = [-1, -3, -12]

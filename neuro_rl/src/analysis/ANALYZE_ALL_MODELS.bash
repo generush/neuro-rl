@@ -35,101 +35,118 @@
 
 # Define an array with combined model_type/run_name pairs
 model_run_pairs=(
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-00/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-00/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-00/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-00/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-00:u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-00:u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-00:u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-00:u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
 
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
 
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-02/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-02/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-02/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-02/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-02:u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-02:u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-02:u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-02:u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
 
-    # "ANYMAL-1.0MASS-LSTM16-TERR-00/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
-    # "ANYMAL-1.0MASS-LSTM16-TERR-00/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
-    # "ANYMAL-1.0MASS-LSTM16-TERR-00/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
-    # "ANYMAL-1.0MASS-LSTM16-TERR-00/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-00:u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-00:u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-00:u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-00:u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
 
-    # "ANYMAL-1.0MASS-LSTM16-TERR-01/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
-    # "ANYMAL-1.0MASS-LSTM16-TERR-01/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
-    # "ANYMAL-1.0MASS-LSTM16-TERR-01/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
-    # "ANYMAL-1.0MASS-LSTM16-TERR-01/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-01:u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-01:u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-01:u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-01:u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
 
-    # "ANYMAL-1.0MASS-LSTM16-TERR-02/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
-    # "ANYMAL-1.0MASS-LSTM16-TERR-02/u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
-    # "ANYMAL-1.0MASS-LSTM16-TERR-02/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
-    # "ANYMAL-1.0MASS-LSTM16-TERR-02/u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
-
-
-    # "ANYMAL-1.0MASS-LSTM16-TERR-122/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-02:u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-02:u-0.4_1.0-14-v-0._0.-1-r-0._0.-1-n-25"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-02:u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-1"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-02:u-1.0_1.0-1-v-0._0.-1-r-0._0.-1-n-400"
 
 
-    # "ANYMAL-1.0MASS-LSTM16-TERR-01/u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-20"
-
-    # "ANYMAL-1.0MASS-LSTM4-TERR-01/U-0.4-1.0-14-20_UNPERTURBED"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_0.4_1.0_14_v_0._0._1_r_0._0._1_n_20"
-    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0.4_1.0_14_v_0._0._1_r_0._0._1_n_20"
-    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0.4_1.0_14_v_0._0._1_r_0._0._1_n_201"
-
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_0.4_1.0_14_v_0._0._1_r_0._0._1_n_20"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-122:u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-50"
 
 
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_0.4_1_14_v_0_0_1_r_0_0_1_n_20"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_0.4_1_7_v_0_0_1_r_0_0_1_n_40"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_0_0_1_v_0.4_1_7_r_0_0_1_n_40"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_0_0_1_v_0_0_1_r_-1_1_7_n_40"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_0_0_1_v_0_0_1_r_1_1_1_n_1"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_0_0_1_v_0_0_1_r_-1_-1_1_n_1"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_0_0_1_v_-1_-1_1_r_0_0_1_n_1"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_0_0_1_v_1_1_1_r_0_0_1_n_1"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_-1_-1_1_v_0_0_1_r_0_0_1_n_1"
-    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/u_1_1_1_v_0_0_1_r_0_0_1_n_1"
-    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0.4_1_14_v_0_0_1_r_0_0_1_n_20"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-01:u-0.4_1.0-7-v-0._0.-1-r-0._0.-1-n-20"
 
-    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0.4_1_7_v_0_0_1_r_0_0_1_n_40"
-    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0_0_1_v_0.4_1_7_r_0_0_1_n_40"
-    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0_0_1_v_0_0_1_r_-1_1_7_n_40"
-    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0_0_1_v_0_0_1_r_1_1_1_n_1"
-    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0_0_1_v_0_0_1_r_-1_-1_1_n_1"
-    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0_0_1_v_-1_-1_1_r_0_0_1_n_1"
-    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0_0_1_v_1_1_1_r_0_0_1_n_1"
-    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_-1_-1_1_v_0_0_1_r_0_0_1_n_1"
-    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_1_1_1_v_0_0_1_r_0_0_1_n_1"
+    # "ANYMAL-1.0MASS-LSTM4-TERR-01:U-0.4-1.0-14-20_UNPERTURBED"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u_0.4_1.0_14_v_0._0._1_r_0._0._1_n_20"
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01:u_0.4_1.0_14_v_0._0._1_r_0._0._1_n_20"
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01:u_0.4_1.0_14_v_0._0._1_r_0._0._1_n_201"
 
-    # "A1-1.0MASS-LSTM16-TERR-228/u_0.4_1_14_v_0_0_1_r_0_0_1_n_20"
-    # "A1-1.0MASS-LSTM16-TERR-228/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
-    # "A1-1.0MASS-LSTM16-TERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
-    # "ANYMAL-0.5MASS-LSTM16-TERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
-    # "ANYMAL-1.0MASS-LSTM16-DIST-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
-    # "2024-03-14-01-16_A1Terrain/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
-    # "ANYMAL-0.5MASS-LSTM16-TERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u_0.4_1.0_14_v_0._0._1_r_0._0._1_n_20"
 
-    "ANYMAL-1.0MASS-LSTM16-BASELINE-01/last_AnymalTerrain_ep_1000_rew_20.962988.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
-    "ANYMAL-1.0MASS-LSTM16-DIST-01/model:last_AnymalTerrain_ep_5000_rew_16.480799.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
-    "ANYMAL-1.0MASS-LSTM16-TERR-01/last_AnymalTerrain_ep_2000_rew_18.73817.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
-    "ANYMAL-1.0MASS-LSTM16-DISTTERR-01/last_AnymalTerrain_ep_4600_rew_15.199695.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
-    "ANYMAL-1.0MASS-LSTM4-BASELINE-01/last_AnymalTerrain_ep_150_rew_8.168549.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
-    "ANYMAL-1.0MASS-LSTM4-DIST-01/last_AnymalTerrain_ep_4800_rew_20.043377.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
-    "ANYMAL-1.0MASS-LSTM4-TERR-01/last_AnymalTerrain_ep_1800_rew_18.174595.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
-    "ANYMAL-1.0MASS-LSTM4-DISTTERR-01/last_AnymalTerrain_ep_4800_rew_14.132425.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
-    "ANYMAL-0.5MASS-LSTM16-TERR-01/last_AnymalTerrain_ep_3200_rew_21.073418.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
-    "A1-1.0MASS-LSTM16-TERR-01:last_A1Terrain_ep_4600_rew_16.256865.pth/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u_0.4_1_14_v_0_0_1_r_0_0_1_n_20"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u_0.4_1_7_v_0_0_1_r_0_0_1_n_40"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u_0_0_1_v_0.4_1_7_r_0_0_1_n_40"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u_0_0_1_v_0_0_1_r_-1_1_7_n_40"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u_0_0_1_v_0_0_1_r_1_1_1_n_1"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u_0_0_1_v_0_0_1_r_-1_-1_1_n_1"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u_0_0_1_v_-1_-1_1_r_0_0_1_n_1"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u_0_0_1_v_1_1_1_r_0_0_1_n_1"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u_-1_-1_1_v_0_0_1_r_0_0_1_n_1"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:u_1_1_1_v_0_0_1_r_0_0_1_n_1"
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01:u_0.4_1_14_v_0_0_1_r_0_0_1_n_20"
+
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01:u_0.4_1_7_v_0_0_1_r_0_0_1_n_40"
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01:u_0_0_1_v_0.4_1_7_r_0_0_1_n_40"
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01:u_0_0_1_v_0_0_1_r_-1_1_7_n_40"
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01:u_0_0_1_v_0_0_1_r_1_1_1_n_1"
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01:u_0_0_1_v_0_0_1_r_-1_-1_1_n_1"
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01:u_0_0_1_v_-1_-1_1_r_0_0_1_n_1"
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01:u_0_0_1_v_1_1_1_r_0_0_1_n_1"
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01:u_-1_-1_1_v_0_0_1_r_0_0_1_n_1"
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01:u_1_1_1_v_0_0_1_r_0_0_1_n_1"
+
+    # "A1-1.0MASS-LSTM16-TERR-228:u_0.4_1_14_v_0_0_1_r_0_0_1_n_20"
+    # "A1-1.0MASS-LSTM16-TERR-228:u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
+    # "A1-1.0MASS-LSTM16-TERR-01:u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
+    # "ANYMAL-0.5MASS-LSTM16-TERR-01:u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
+    # "ANYMAL-1.0MASS-LSTM16-DIST-01:u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
+    # "2024-03-14-01-16_A1Terrain:u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
+    # "ANYMAL-0.5MASS-LSTM16-TERR-01:u_0.4_1_28_v_0_0_1_r_0_0_1_n_10"
+
+    # "ANYMAL-1.0MASS-LSTM16-BASELINE-01:last_AnymalTerrain_ep_1000_rew_20.962988.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    # "ANYMAL-1.0MASS-LSTM16-DIST-01:model:last_AnymalTerrain_ep_5000_rew_16.480799.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    # "ANYMAL-1.0MASS-LSTM16-TERR-01:last_AnymalTerrain_ep_2000_rew_18.73817.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    # "ANYMAL-1.0MASS-LSTM16-DISTTERR-01:last_AnymalTerrain_ep_4600_rew_15.199695.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    # "ANYMAL-1.0MASS-LSTM4-BASELINE-01:last_AnymalTerrain_ep_150_rew_8.168549.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    # "ANYMAL-1.0MASS-LSTM4-DIST-01:last_AnymalTerrain_ep_4800_rew_20.043377.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    # "ANYMAL-1.0MASS-LSTM4-TERR-01:last_AnymalTerrain_ep_1800_rew_18.174595.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01:last_AnymalTerrain_ep_4800_rew_14.132425.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+    # "ANYMAL-0.5MASS-LSTM16-TERR-01:last_AnymalTerrain_ep_3200_rew_21.073418.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+
+    # "A1-1.0MASS-LSTM16-TERR-01:last_A1Terrain_ep_4600_rew_16.256865.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+
+
+
+    # "A1-1.0MASS-LSTM16-TERR-01:last_A1Terrain_ep_4600_rew_16.256865.pth:u_0.6_1_30_v_0_0_1_r_0_0_1_n_15"
+    # "A1-1.0MASS-LSTM16-TERR-01:last_A1Terrain_ep_6550_rew_17.543756.pth:u_0.6_1_30_v_0_0_1_r_0_0_1_n_15"
+    # "A1-1.0MASS-LSTM16-TERR-01:last_A1Terrain_ep_14000_rew_19.912346.pth:u_0.6_1_30_v_0_0_1_r_0_0_1_n_15"
+
+
+    # "ANYMAL-1.0MASS-LSTM4-DISTTERR-01:last_AnymalTerrain_ep_1200_rew_12.890905.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+
+  "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_1100_rew_14.392729.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+  "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_2200_rew_19.53241.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+  "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3800_rew_20.310041.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+#   "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3900_rew_20.14785.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+#   "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4000_rew_20.387749.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+  "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4100_rew_20.68903.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
 )
 
 # Loop through the model/run pairs
 for pair in "${model_run_pairs[@]}"; do
     # Split the model and run using the '/' delimiter
-    IFS='/' read -r model_type model_name run_name <<< "$pair"
+    IFS=':' read -r model_type model_name run_name <<< "$pair"
 
     echo "Processing Model Type: $model_type / Model Name: $model_name / Run: $run_name"
 
     # Call the Python script with the current model and run
-    python ../../analysis_pipeline_cycle_avg.py --config_path "../../cfg/analyze/analysis.yaml" --model_path "../../models/$model_type/nn/$model_name" --data_path "../../data/raw/$model_type/$run_name/" --output_path "../../data/processed/$model_type/$run_name/"
+    python ../../analysis_pipeline_cycle_avg.py --config_path "../../cfg/analyze/analysis.yaml" --model_path "../../models/$model_type/nn/$model_name" --data_path "../../data/raw/$model_type/$run_name/$model_name/" --output_path "../../data/processed/$model_type/$run_name/"
 done
 
 echo "All scripts have been executed sequentially."

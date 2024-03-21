@@ -244,7 +244,7 @@ def compute_fixed_points(model_path, processed_data_path):
 
     # specify parameters for optimizer
     LEARNING_RATE = 0.001
-    TOLERANCE = 5e-2
+    TOLERANCE = 4.3e-2
     optimizer = torch.optim.Adam([hc], lr=LEARNING_RATE)  # You may need to adjust learning rate based on your problem
 
     # initialize as empty lists
