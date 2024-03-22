@@ -133,8 +133,8 @@ model_run_pairs=(
   "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_1100_rew_14.392729.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
   "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_2200_rew_19.53241.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
   "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3800_rew_20.310041.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
-#   "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3900_rew_20.14785.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
-#   "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4000_rew_20.387749.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+  "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3900_rew_20.14785.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+  "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4000_rew_20.387749.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
   "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4100_rew_20.68903.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
 )
 
@@ -146,7 +146,7 @@ for pair in "${model_run_pairs[@]}"; do
     echo "Processing Model Type: $model_type / Model Name: $model_name / Run: $run_name"
 
     # Call the Python script with the current model and run
-    python ../../analysis_pipeline_cycle_avg.py --config_path "../../cfg/analyze/analysis.yaml" --model_path "../../models/$model_type/nn/$model_name" --data_path "../../data/raw/$model_type/$run_name/$model_name/" --output_path "../../data/processed/$model_type/$run_name/"
+    python ../../analysis_pipeline_cycle_avg.py --config_path "../../cfg/analyze/analysis.yaml" --model_path "../../models/$model_type/nn/$model_name" --data_path "../../data/raw/$model_type/$run_name/$model_name/" --output_path "../../data/processed/$model_type/$run_name/$model_name"
 done
 
 echo "All scripts have been executed sequentially."

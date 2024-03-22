@@ -15,16 +15,16 @@ models_info=(
 
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_1100_rew_14.392729.pth"
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_2200_rew_19.53241.pth"
-#   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3800_rew_20.310041.pth"
-#   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3900_rew_20.14785.pth"
-#   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4000_rew_20.387749.pth" 
-#   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4100_rew_20.68903.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3800_rew_20.310041.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3900_rew_20.14785.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4000_rew_20.387749.pth" 
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4100_rew_20.68903.pth"
 
 )
 
-steps_after_stance_begins_values=$(seq 0 1 25)
-length_s_values=(0.02 0.1 0.4)
-forceY_values=(-12 -3 -1)
+steps_after_stance_begins_values=0
+length_s_values=(0.4 0.4 0.4 0.1 0.1 0.1 0.02 0.02 0.02)
+forceY_values=(-0.333 -0.667 -1 -1 -2 -3 -4 -8 -12)
 
 # length_s=0.02
 # forceY_values=$(seq -12 2 12)
@@ -53,16 +53,16 @@ run_command() {
         force_render=False \
         headless=True \
         checkpoint=../../models/$model_type/nn/$model_name \
-        num_envs=100 \
+        num_envs=1 \
         task.env.specifiedCommandVelocityRanges.linear_x="[1, 1]" \
         task.env.specifiedCommandVelocityRanges.linear_y="[0, 0]" \
         task.env.specifiedCommandVelocityRanges.yaw_rate="[0, 0]" \
         task.env.specifiedCommandVelocityN.linear_x=1 \
         task.env.specifiedCommandVelocityN.linear_y=1 \
         task.env.specifiedCommandVelocityN.yaw_rate=1 \
-        task.env.specifiedCommandVelocityN.n_copies=100 \
-        task.env.export_data=false \
-        task.env.export_data_actor=false \
+        task.env.specifiedCommandVelocityN.n_copies=1 \
+        task.env.export_data=true \
+        task.env.export_data_actor=true \
         task.env.export_data_critic=false \
         task.env.evaluate.perturbPrescribed.perturbPrescribedOn=true \
         task.env.evaluate.perturbPrescribed.steps_after_stance_begins=$steps_after_stance_begins \
@@ -79,8 +79,8 @@ run_command() {
         task.env.ablate.targeted.hn_out=0 \
         task.env.ablate.targeted.hn_in=0 \
         task.env.ablate.targeted.cn_in=0 \
-        task.env.export_data_path=$export_path/$model_type/final_model_robustness/$steps_after_stance_begins/$length_s/$forceY/$model_name \
-        +output_path=$export_path/$model_type/final_model_robustness/$steps_after_stance_begins/$length_s/$forceY/$model_name
+        task.env.export_data_path=$export_path/$model_type/robustness_gradients_analysis/$steps_after_stance_begins/$length_s/$forceY/$model_name \
+        +output_path=$export_path/$model_type/robustness_gradients_analysis/$steps_after_stance_begins/$length_s/$forceY/$model_name
     )
 }
 

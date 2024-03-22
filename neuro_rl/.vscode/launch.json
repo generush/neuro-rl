@@ -70,12 +70,20 @@
             // ]
 
 
-            "args": ["--config_path=cfg/analyze/analysis.yaml", 
-            "--model_path=models/ANYMAL-1.0MASS-LSTM4-DISTTERR-01/nn/last_AnymalTerrain_ep_1200_rew_12.890905.pth", 
-            "--data_path=data/raw/ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15/", 
-            "--output_path=data/processed/ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15/last_AnymalTerrain_ep_1200_rew_12.890905.pth"
-            ]
+            // "args": ["--config_path=cfg/analyze/analysis.yaml", 
+            // "--model_path=models/ANYMAL-1.0MASS-LSTM4-DISTTERR-01/nn/last_AnymalTerrain_ep_1200_rew_12.890905.pth", 
+            // "--data_path=data/raw/ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15/", 
+            // "--output_path=data/processed/ANYMAL-1.0MASS-LSTM4-DISTTERR-01/u_0.4_1_28_v_0_0_1_r_0_0_1_n_15/last_AnymalTerrain_ep_1200_rew_12.890905.pth"
+            // ]
 
+            
+            "args": [
+                "--config_path=cfg/analyze/analysis.yaml",
+                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
+                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-9/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-9/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
+                "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\"]"
+            ]
         }
+
     ]
 }

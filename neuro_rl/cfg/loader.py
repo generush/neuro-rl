@@ -1,6 +1,7 @@
 import os
 import yaml
 import argparse
+import json
 
 from utils.common import dict_to_simplenamespace  # Adjust the import path based on your project structure
 
@@ -30,9 +31,15 @@ def load_configuration():
     # Override input_path and output_path if provided in command line arguments
     if args.model_path is not None:
         cfg.model_path = args.model_path
+        if cfg.model_path.startswith('['):
+            cfg.model_path = json.loads(cfg.model_path)
     if args.data_path is not None:
         cfg.data_path = args.data_path
+        if cfg.data_path.startswith('['):
+            cfg.data_path = json.loads(cfg.data_path)
     if args.output_path is not None:
         cfg.output_path = args.output_path
-
+        cfg.output_path = args.output_path
+        if cfg.output_path.startswith('['):
+            cfg.output_path = json.loads(cfg.output_path)
     return cfg
