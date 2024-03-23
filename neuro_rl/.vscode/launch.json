@@ -77,12 +77,81 @@
             // ]
 
             
+
+            
+
+            // 0.4, -0.333
             "args": [
                 "--config_path=cfg/analyze/analysis.yaml",
-                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
-                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-9/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-9/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
+                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_1100_rew_14.392729.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_2200_rew_19.53241.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
+                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.333/last_AnymalTerrain_ep_1100_rew_14.392729.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.333/last_AnymalTerrain_ep_2200_rew_19.53241.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.333/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.333/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
+                "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.333\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.333\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.333\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.333\"]"
+            ]
+
+            // 0.4, -0.667
+            "args": [
+                "--config_path=cfg/analyze/analysis.yaml",
+                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_1100_rew_14.392729.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_2200_rew_19.53241.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
+                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.667/last_AnymalTerrain_ep_1100_rew_14.392729.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.667/last_AnymalTerrain_ep_2200_rew_19.53241.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.667/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.667/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
+                "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.667\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.667\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.667\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.667\"]"
+            ]
+
+            // 0.4, -1
+            "args": [
+                "--config_path=cfg/analyze/analysis.yaml",
+                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_1100_rew_14.392729.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_2200_rew_19.53241.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
+                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_1100_rew_14.392729.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_2200_rew_19.53241.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
+                "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1\"]"
+            ]
+
+            // 0.1, -1
+            "args": [
+                "--config_path=cfg/analyze/analysis.yaml",
+                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_1100_rew_14.392729.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_2200_rew_19.53241.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
+                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-1/last_AnymalTerrain_ep_1100_rew_14.392729.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-1/last_AnymalTerrain_ep_2200_rew_19.53241.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-1/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-1/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
+                "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-1\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-1\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-1\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-1\"]"
+            ]
+
+            // 0.1, -2
+            "args": [
+                "--config_path=cfg/analyze/analysis.yaml",
+                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_1100_rew_14.392729.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_2200_rew_19.53241.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
+                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-2/last_AnymalTerrain_ep_1100_rew_14.392729.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-2/last_AnymalTerrain_ep_2200_rew_19.53241.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-2/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-2/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
+                "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-2\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-2\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-2\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-2\"]"
+            ]
+
+            // 0.1, -3
+            "args": [
+                "--config_path=cfg/analyze/analysis.yaml",
+                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_1100_rew_14.392729.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_2200_rew_19.53241.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
+                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-3/last_AnymalTerrain_ep_1100_rew_14.392729.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-3/last_AnymalTerrain_ep_2200_rew_19.53241.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-3/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-3/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
+                "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-3\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-3\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-3\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.1/-3\"]"
+            ]
+
+            // 0.02, -4
+            "args": [
+                "--config_path=cfg/analyze/analysis.yaml",
+                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_1100_rew_14.392729.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_2200_rew_19.53241.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
+                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-4/last_AnymalTerrain_ep_1100_rew_14.392729.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-4/last_AnymalTerrain_ep_2200_rew_19.53241.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-4/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-4/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
                 "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\"]"
             ]
+
+            // 0.02, -8
+            "args": [
+                "--config_path=cfg/analyze/analysis.yaml",
+                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_1100_rew_14.392729.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_2200_rew_19.53241.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
+                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-8/last_AnymalTerrain_ep_1100_rew_14.392729.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-8/last_AnymalTerrain_ep_2200_rew_19.53241.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-8/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-8/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
+                "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\"]"
+            ]
+
+            // 0.02, -12
+            "args": [
+                "--config_path=cfg/analyze/analysis.yaml",
+                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_1100_rew_14.392729.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_2200_rew_19.53241.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
+                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_1100_rew_14.392729.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_2200_rew_19.53241.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
+                "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\"]"
+            ]
+
         }
 
     ]

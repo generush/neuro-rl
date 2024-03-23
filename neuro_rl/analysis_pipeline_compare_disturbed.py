@@ -27,16 +27,33 @@ def run_analysis():
         # Load DataFrame
         raw_df = pd.read_parquet(data_path + 'RAW_DATA' + '.parquet')
 
+        # Conver to deg
+        raw_df['OBS_RAW_012_dof_pos_01'] = 180 / np.pi * (raw_df['OBS_RAW_012_dof_pos_01'])
+        raw_df['OBS_RAW_013_dof_pos_02'] = 180 / np.pi * (raw_df['OBS_RAW_013_dof_pos_02'])
+        raw_df['OBS_RAW_014_dof_pos_03'] = 180 / np.pi * (raw_df['OBS_RAW_014_dof_pos_03'])
+        raw_df['OBS_RAW_015_dof_pos_04'] = 180 / np.pi * (raw_df['OBS_RAW_015_dof_pos_04'])
+        raw_df['OBS_RAW_016_dof_pos_05'] = 180 / np.pi * (raw_df['OBS_RAW_016_dof_pos_05'])
+        raw_df['OBS_RAW_017_dof_pos_06'] = 180 / np.pi * (raw_df['OBS_RAW_017_dof_pos_06'])
+        raw_df['OBS_RAW_018_dof_pos_07'] = 180 / np.pi * (raw_df['OBS_RAW_018_dof_pos_07'])
+        raw_df['OBS_RAW_019_dof_pos_08'] = 180 / np.pi * (raw_df['OBS_RAW_019_dof_pos_08'])
+        raw_df['OBS_RAW_020_dof_pos_09'] = 180 / np.pi * (raw_df['OBS_RAW_020_dof_pos_09'])
+        raw_df['OBS_RAW_021_dof_pos_10'] = 180 / np.pi * (raw_df['OBS_RAW_021_dof_pos_10'])
+        raw_df['OBS_RAW_022_dof_pos_11'] = 180 / np.pi * (raw_df['OBS_RAW_022_dof_pos_11'])
+        raw_df['OBS_RAW_023_dof_pos_12'] = 180 / np.pi * (raw_df['OBS_RAW_023_dof_pos_12'])
+
+        # Compute OBS_RAW_007_theta
+        raw_df['OBS_RAW_006_phi_proj'] = 180 / np.pi * np.arcsin(raw_df['OBS_RAW_007_theta_proj'])
+        raw_df['OBS_RAW_007_theta_proj'] = 180 / np.pi * np.arcsin(raw_df['OBS_RAW_006_phi_proj'])
+        
         # Find the index where PERTURB == 1 and align the TIME column based on this index
         perturb_index = raw_df[raw_df['PERTURB'] == 1].index[0]
         raw_df['TIME'] -= raw_df.loc[perturb_index, 'TIME']
 
         # Add columns for foot contacts
-        raw_df['FT_CONTACT_LF'] = np.where(raw_df['FT_FORCE_RAW_000'] > 0, 4, np.nan)
         raw_df['FT_CONTACT_LH'] = np.where(raw_df['FT_FORCE_RAW_001'] > 0, 1, np.nan)
-        raw_df['FT_CONTACT_RF'] = np.where(raw_df['FT_FORCE_RAW_002'] > 0, 3, np.nan)
         raw_df['FT_CONTACT_RH'] = np.where(raw_df['FT_FORCE_RAW_003'] > 0, 2, np.nan)
-
+        raw_df['FT_CONTACT_RF'] = np.where(raw_df['FT_FORCE_RAW_002'] > 0, 3, np.nan)
+        raw_df['FT_CONTACT_LF'] = np.where(raw_df['FT_FORCE_RAW_000'] > 0, 4, np.nan)
         # Load additional DataFrames
         data_frames = {
             'NETWORK_OBS': pd.read_csv(data_path + 'obs.csv', header=None),
@@ -71,15 +88,29 @@ def run_analysis():
         print('hi')
     import matplotlib.pyplot as plt
 
-    def plot_data(dfs_collection):
-        # Create a figure and axes for subplots outside the loop
-        fig, axs = plt.subplots(15, 1, figsize=(10, 12), sharex=True)
+    def plot_data(dfs_collection, start_time=-1, end_time=1):
+
+        for idx in dfs_collection:
+            # Directly update the DataFrame in dfs_collection with the filtered data
+            dfs_collection[idx] = dfs_collection[idx][(dfs_collection[idx]['TIME'] >= start_time) & (dfs_collection[idx]['TIME'] <= end_time)]
+    
         colors = ['k', 'b', 'g', 'r']  # Define colors for plotting
-        fields_to_plot = [
+        
+        fields_to_plot1 = [
             'OBS_RAW_001_v',
             'ACT_RAW_009_RH_HAA',
             'OBS_RAW_021_dof_pos_10',
-            'OBS_RAW_007_theta_proj',
+            'OBS_RAW_006_phi_proj',
+        ]
+
+        fields_to_plot2 = [
+            'FT_CONTACT_LF',
+            'FT_CONTACT_RF',
+            'FT_CONTACT_LH',
+            'FT_CONTACT_RH',
+        ]
+
+        fields_to_plot3 = [
             'ACT_RAW_000_LF_HAA',
             'ACT_RAW_001_LF_HFE',
             'ACT_RAW_002_LF_KFE',
@@ -89,57 +120,112 @@ def run_analysis():
             'ACT_RAW_006_RF_HAA',
             'ACT_RAW_007_RF_HFE',
             'ACT_RAW_008_RF_KFE',
+            'ACT_RAW_009_RH_HAA',
             'ACT_RAW_010_RH_HFE',
             'ACT_RAW_011_RH_KFE'
         ]
-        field_nicknames = [
+
+        fields_to_plot4 = [
+            'OBS_RAW_012_dof_pos_01',
+            'OBS_RAW_013_dof_pos_02',
+            'OBS_RAW_014_dof_pos_03',
+            'OBS_RAW_015_dof_pos_04',
+            'OBS_RAW_016_dof_pos_05',
+            'OBS_RAW_017_dof_pos_06',
+            'OBS_RAW_018_dof_pos_07',
+            'OBS_RAW_019_dof_pos_08',
+            'OBS_RAW_020_dof_pos_09',
+            'OBS_RAW_021_dof_pos_10',
+            'OBS_RAW_022_dof_pos_11',
+            'OBS_RAW_023_dof_pos_12'
+        ]
+
+        field_nicknames1 = [
             'v [m/s]',
             'RH \nHip Torque \nCommand \n[Nm]',
             'RH \nHip Position \n[deg]',
-            r'$\phi$ [deg/s]',
-            'ACT_RAW_000_LF_HAA',
-            'ACT_RAW_001_LF_HFE',
-            'ACT_RAW_002_LF_KFE',
-            'ACT_RAW_003_LH_HAA',
-            'ACT_RAW_004_LH_HFE',
-            'ACT_RAW_005_LH_KFE',
-            'ACT_RAW_006_RF_HAA',
-            'ACT_RAW_007_RF_HFE',
-            'ACT_RAW_008_RF_KFE',
-            'ACT_RAW_010_RH_HFE',
-            'ACT_RAW_011_RH_KFE'
+            r'$\phi$ [deg/s]'
         ]
 
-        # Loop through the collection of DataFrames
-        for idx, df in dfs_collection.items():
-            # Plot specific fields on the same set of axes
-            for j, col in enumerate(fields_to_plot):
-                if col in df.columns:
-                    axs[j].plot(df['TIME'], df[col], label=f'DF{idx}', color=colors[idx % len(colors)])
-                    axs[j].set_ylabel(field_nicknames[j], rotation=0, labelpad=50)
-                else:
-                    print(f"Column {col} not in DataFrame {idx}")
+        field_nicknames2 = [
+            'LF',
+            'RF',
+            'LH',
+            'RH'
+        ]
+        
+        field_nicknames3 = [
+            'ACT_LF_HAA',
+            'ACT_LF_HFE',
+            'ACT_LF_KFE',
+            'ACT_LH_HAA',
+            'ACT_LH_HFE',
+            'ACT_LH_KFE',
+            'ACT_RF_HAA',
+            'ACT_RF_HFE',
+            'ACT_RF_KFE',
+            'ACT_RH_HAA',
+            'ACT_RH_HFE',
+            'ACT_RH_KFE'
+        ]
+        
+        field_nicknames4 = [
+            'POS_LF_HAA',
+            'POS_LF_HFE',
+            'POS_LF_KFE',
+            'POS_LH_HAA',
+            'POS_LH_HFE',
+            'POS_LH_KFE',
+            'POS_RF_HAA',
+            'POS_RF_HFE',
+            'POS_RF_KFE',
+            'POS_RH_HAA',
+            'POS_RH_HFE',
+            'POS_RH_KFE'
+        ]
 
-        # Add light gray translucent region to each subplot (adjust times as needed)
-        translucent_time_range = (0.0, 0.08)
-        for ax in axs:
-            ax.axvspan(translucent_time_range[0], translucent_time_range[1], facecolor='lightgray', alpha=0.5)
+        # Function to create plots for a given set of fields and nicknames
+        def overlay_plot_signal(fields, nicknames, fig_width=10, fig_height=3):
+            fig, axs = plt.subplots(len(fields), 1, figsize=(fig_width, fig_height * len(fields)), sharex=True)
+            for idx, df in dfs_collection.items():
+                for j, col in enumerate(fields):
+                    if col in df.columns:
+                        axs[j].plot(df['TIME'], df[col], label=f'DF{idx}', color=colors[idx % len(colors)])
+                        axs[j].set_ylabel(nicknames[j], rotation=0, labelpad=50, fontsize='small')
+                    else:
+                        print(f"Column {col} not in DataFrame {idx}")
+            for ax in axs:
+                ax.axvspan(-0.02, -0.02+0.02, facecolor='lightgray', alpha=0.5)  # Translucent region
+                ax.legend()
+                ax.set_xlabel('Time [s]')
+            plt.tight_layout()
 
-        # Customize legend and labels for each subplot
-        for ax in axs:
-            ax.legend()
-            # ax.set_xlim(-0.8, 1.2)
-            ax.set_xlabel('Time')
 
-        # Save or show the figure
-        plt.tight_layout()
+        # Function to create plots for a given set of fields and nicknames
+        def overlay_plot_gait(fields, nicknames, fig_width=10, fig_height=3):
+            fig, axs = plt.subplots(len(fields), 1, figsize=(fig_width, fig_height * len(fields)), sharex=True)
 
-    # Call plot_data with your dfs_collection after it's been populated
-    # plot_data(dfs_collection)
+            for idx, col in enumerate(fields):
+                for j, df in dfs_collection.items():
+                    if col in df.columns:
+                        axs[j].plot(df['TIME'], df[col], label=nicknames[idx], color=colors[j % len(colors)])
+                        axs[j].set_ylabel(j, rotation=0, labelpad=50, fontsize='small')
+                    else:
+                        print(f"Column {col} not in DataFrame {idx}")
+            for ax in axs:
+                ax.axvspan(-0.02, -0.02+0.02, facecolor='lightgray', alpha=0.5)  # Translucent region
+                ax.legend()
+                ax.set_xlabel('Time [s]')
+            plt.tight_layout()
 
+        # Create the first plot
+        overlay_plot_signal(fields_to_plot1, field_nicknames1, fig_width=8, fig_height=1.5)
+        overlay_plot_gait(fields_to_plot2, field_nicknames2, fig_width=8, fig_height=1)
+        overlay_plot_signal(fields_to_plot3, field_nicknames3, fig_width=8, fig_height=1.5)
+        overlay_plot_signal(fields_to_plot4, field_nicknames4, fig_width=8, fig_height=1.5)
 
     # At the end of your run_analysis function, call plot_data
-    plot_data(dfs_collection)
+    plot_data(dfs_collection, start_time=-1, end_time=1)
 
     plt.show()
 

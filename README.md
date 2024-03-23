@@ -5,32 +5,44 @@ Comprehensive Exam
 - Testing (0.25s)
 
 CoRL
-- Training (98% continue --> mean disturbance = 1/.02 * 0.02s = 1s)
-- Testing (0.1s, 0.2s)
+- Disturbance Training Curriculum Type 1 (DIST1) (98% continue --> mean disturbance = 1/.02 * 0.02s = 1s)
+- Disturbance Testing (0.1s, 0.2s)
 
-ANYMAL-1.0MASS-FF-CORLTERR runs/AnymalTerrain_05-12-53-48/nn/AnymalTerrain.pth
-ANYMAL-1.0MASS-FF-CORLDISTTERR runs/AnymalTerrain_04-01-13-21/nn/last_AnymalTerrain_ep_19250_rew_20.038643.pth
+ANYMAL-1.0MASS-FF-CORLTERR (ANYMAL-1.0MASS-FF-TERR-NODIST) AnymalTerrain_05-12-53-48/nn/AnymalTerrain.pth
+ANYMAL-1.0MASS-FF-CORLDISTTERR (ANYMAL-1.0MASS-FF-TERR-DIST1) runs/AnymalTerrain_04-01-13-21/nn/last_AnymalTerrain_ep_19250_rew_20.038643.pth
 
-ANYMAL-1.0MASS-LSTM4-CORLTERR runs/AnymalTerrain_06-17-40-50/nn/last_AnymalTerrain_ep_3300_rew_20.003773.pth
-ANYMAL-1.0MASS-LSTM16-CORLTERR runs/AnymalTerrain_07-03-29-04/nn/last_AnymalTerrain_ep_3800_rew_20.163399.pth
+ANYMAL-1.0MASS-LSTM4-CORLTERR (ANYMAL-1.0MASS-LSTM4-TERR-NODIST) AnymalTerrain_06-17-40-50/nn/last_AnymalTerrain_ep_3300_rew_20.003773.pth
+ANYMAL-1.0MASS-LSTM16-CORLTERR (ANYMAL-1.0MASS-LST16-TERR-NODIST) AnymalTerrain_07-03-29-04/nn/last_AnymalTerrain_ep_3800_rew_20.163399.pth
 
-ANYMAL-1.0MASS-LSTM4-CORLDISTTERR isaacgymenvs/runs/AnymalTerrain_06-00-14-59/nn/last_AnymalTerrain_ep_6700_rew_20.21499.pth
-ANYMAL-1.0MASS-LSTM16-CORLDISTTERR isaacgymenvs/runs/AnymalTerrain_04-15-37-26/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth
-
-ANYMAL-1.0MASS-LSTM16-CORLDISTTERR2 runs/AnymalTerrain_08-04-24-44/nn/last_AnymalTerrain_ep_4500_rew_20.877975.pth
-
+ANYMAL-1.0MASS-LSTM4-CORLDISTTERR (ANYMAL-1.0MASS-LSTM4-TERR-DIST1) AnymalTerrain_06-00-14-59/nn/last_AnymalTerrain_ep_6700_rew_20.21499.pth
+ANYMAL-1.0MASS-LSTM16-CORLDISTTERR (ANYMAL-1.0MASS-LSTM16-TERR-DIST1) AnymalTerrain_04-15-37-26/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth
 
 Frontiers
-- Training (4/4 steps, 98% continue --> mean disturbance = 1/.02 * 0.02s = 1s)
-- Testing (0.08s)
+- Disturbance Training Curriculum Type 2 (DIST2) (4/4 steps, 98% continue --> mean disturbance = 1/.02 * 0.02s = 1s)
+- Disturbance Testing (0.08s)
 
 Robustness Surface Plots
-LSTM16-DISTTERR neuro-rl/neuro_rl/runs/AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth
-LSTM16-TERR neuro-rl/neuro_rl/runs/2023-08-27-17-23_AnymalTerrain/nn/last_AnymalTerrain_ep_2900_rew_20.2482.pth
-LSTM16-DIST neuro-rl/neuro_rl/runs/AnymalTerrain_2023-08-24_14-17-13/nn/last_AnymalTerrain_ep_900_rew_20.139568.pth
-LSTM16-BASELINE neuro-rl/neuro_rl/runs/2023-09-13-18-33_AnymalTerrain/nn/last_AnymalTerrain_ep_700_rew_20.361492.pth
+ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR (ANYMAL-1.0MASS-LSTM16-TERR-DIST2) AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth
+ANYMAL-1.0MASS-LSTM16-FRONTIERSTERR (ANYMAL-1.0MASS-LSTM16-TERR-NODIST) AnymalTerrain_2023-08-27_17-23-34/AnymalTerrain/nn/last_AnymalTerrain_ep_2900_rew_20.2482.pth
+ANYMAL-1.0MASS-LSTM16-FRONTIERSDIST (ANYMAL-1.0MASS-LSTM16-NOTERR-DIST2) AnymalTerrain_2023-08-24_14-17-13/nn/last_AnymalTerrain_ep_900_rew_20.139568.pth
+ANYMAL-1.0MASS-LSTM16-FRONTIERSBASELINE (ANYMAL-1.0MASS-LSTM16-NOTERR-NODIST) 2023-09-13-18-33_AnymalTerrain/nn/last_AnymalTerrain_ep_700_rew_20.361492.pth
 
 Thesis
-- Training (4/4 steps, 96% continue --> mean disturbance = 1/.04 * 0.005s = 0.125s)
-- Testing (0.02, 0.1, 0.4s)
+- Disturbance Training Curriculum Type 3 (DIST3) (4/4 steps, 96% continue --> mean disturbance = 1/.04 * 0.005s = 0.125s)
+- Disturbance Testing (0.02, 0.1, 0.4s)
+
+ANYMAL-1.0MASS-LSTM4-BASELINE (ANYMAL-1.0MASS-LSTM4-NOTERR-NODIST) ANYMAL-1.0MASS-LSTM4-BASELINE-01/nn/last_AnymalTerrain_ep_150_rew_8.168549.pth
+ANYMAL-1.0MASS-LSTM4-TERR (ANYMAL-1.0MASS-LSTM4-TERR-NODIST) ANYMAL-1.0MASS-LSTM4-TERR-01/nn/last_AnymalTerrain_ep_1800_rew_18.174595.pth
+ANYMAL-1.0MASS-LSTM4-DIST (ANYMAL-1.0MASS-LSMT4-NOTERR-DIST3) ANYMAL-1.0MASS-LSTM4-DIST-01/nn/last_AnymalTerrain_ep_4800_rew_20.043377.pth
+ANYMAL-1.0MASS-LSTM4-DISTTERR (ANYMAL-1.0MASS-LSTM4-TERR-DIST3) ANYMAL-1.0MASS-LSTM4-DISTTERR-01/nn/last_AnymalTerrain_ep_4800_rew_14.132425.pth
+
+ANYMAL-1.0MASS-LSTM16-BASELINE (ANYMAL-1.0MASS-LSTM16-NOTERR-NODIST) ANYMAL-1.0MASS-LSTM16-BASELINE-01/nn/last_AnymalTerrain_ep_1000_rew_20.962988.pth
+ANYMAL-1.0MASS-LSTM16-TERR (ANYMAL-1.0MASS-LSTM16-TERR-NODIST) ANYMAL-1.0MASS-LSTM16-TERR-01/nn/last_AnymalTerrain_ep_2000_rew_18.73817.pth
+ANYMAL-1.0MASS-LSTM16-DIST (ANYMAL-1.0MASS-LSMT16-NOTERR-DIST3) ANYMAL-1.0MASS-LSTM16-DIST-01/nn/last_AnymalTerrain_ep_5000_rew_16.480799.pth
+ANYMAL-1.0MASS-LSTM16-DISTTERR (ANYMAL-1.0MASS-LSTM16-TERR-DIST3) ANYMAL-1.0MASS-LSTM16-DISTTERR-01/nn/last_AnymalTerrain_ep_4600_rew_15.199695.pth
+
+ANYMAL-0.5MASS-LSTM16-TERR (ANYMAL-0.5MASS-LSTM16-TERR-NODIST) ANYMAL-0.5MASS-LSTM16-TERR-01/nn/last_AnymalTerrain_ep_3200_rew_21.073418.pth
+
+A1-1.0MASS-LSTM16-TERR (A1-1.0MASS-LSTM16-TERR-NODIST) A1-1.0MASS-LSTM16-TERR-01/nn/last_A1Terrain_ep_4600_rew_16.256865.pt
+
 
