@@ -13,12 +13,12 @@ models_info=(
 #   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-0.5MASS-LSTM16-TERR-01:last_AnymalTerrain_ep_3200_rew_21.073418.pth"
 #   "A1Terrain_PPO_LSTM_NeuroRL:A1Terrain_NeuroRL_exp:A1-1.0MASS-LSTM16-TERR-01:last_A1Terrain_ep_4600_rew_16.256865.pth"
 
-#   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_1100_rew_14.392729.pth"
-#   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_2200_rew_19.53241.pth"
-#   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3800_rew_20.310041.pth"
-#   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3900_rew_20.14785.pth"
-#   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4000_rew_20.387749.pth" 
-#   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4100_rew_20.68903.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_1100_rew_14.392729.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_2200_rew_19.53241.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3800_rew_20.310041.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3900_rew_20.14785.pth"
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4000_rew_20.387749.pth" 
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4100_rew_20.68903.pth"
 
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-CORLDISTTERR:last_AnymalTerrain_ep_200_rew_6.8250656.pth"
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-CORLDISTTERR:last_AnymalTerrain_ep_300_rew_10.119753.pth"
@@ -27,6 +27,7 @@ models_info=(
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-CORLDISTTERR:last_AnymalTerrain_ep_1000_rew_14.850766.pth"
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-CORLDISTTERR:last_AnymalTerrain_ep_2000_rew_16.889687.pth"
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-CORLDISTTERR:last_AnymalTerrain_ep_3000_rew_16.622911.pth"
+
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-CORLDISTTERR:last_AnymalTerrain_ep_4000_rew_18.484495.pth"
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-CORLDISTTERR:last_AnymalTerrain_ep_5000_rew_16.690823.pth"
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-CORLDISTTERR:last_AnymalTerrain_ep_6000_rew_20.090017.pth"
@@ -38,6 +39,7 @@ models_info=(
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLDISTTERR:last_AnymalTerrain_ep_500_rew_11.477056.pth"
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLDISTTERR:last_AnymalTerrain_ep_1000_rew_15.300709.pth"
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLDISTTERR:last_AnymalTerrain_ep_1500_rew_15.248126.pth"
+
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLDISTTERR:last_AnymalTerrain_ep_2000_rew_16.601225.pth"
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLDISTTERR:last_AnymalTerrain_ep_2500_rew_16.594769.pth"
   "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLDISTTERR:last_AnymalTerrain_ep_3000_rew_14.874878.pth"

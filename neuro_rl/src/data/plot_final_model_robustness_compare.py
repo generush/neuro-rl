@@ -116,3 +116,5 @@ for i, forceY in enumerate(forceY_values, 1):
 
 plt.tight_layout()
 plt.show()
+
+print('hi')

@@ -54,6 +54,13 @@ def run_analysis():
         raw_df['FT_CONTACT_RH'] = np.where(raw_df['FT_FORCE_RAW_003'] > 0, 2, np.nan)
         raw_df['FT_CONTACT_RF'] = np.where(raw_df['FT_FORCE_RAW_002'] > 0, 3, np.nan)
         raw_df['FT_CONTACT_LF'] = np.where(raw_df['FT_FORCE_RAW_000'] > 0, 4, np.nan)
+
+        # Add columns for foot contacts
+        raw_df['FT_Y_LH'] = raw_df['FT_Y_RAW_001'].replace(0, np.nan)
+        raw_df['FT_Y_RH'] = raw_df['FT_Y_RAW_003'].replace(0, np.nan)
+        raw_df['FT_Y_RF'] = raw_df['FT_Y_RAW_002'].replace(0, np.nan)
+        raw_df['FT_Y_LF'] = raw_df['FT_Y_RAW_000'].replace(0, np.nan)
+
         # Load additional DataFrames
         data_frames = {
             'NETWORK_OBS': pd.read_csv(data_path + 'obs.csv', header=None),
@@ -140,6 +147,14 @@ def run_analysis():
             'OBS_RAW_023_dof_pos_12'
         ]
 
+        fields_to_plot5 = [
+            'FT_Y_LF',
+            'FT_Y_RF',
+            'FT_Y_LH',
+            'FT_Y_RH',
+            'COM_Y',
+        ]
+
         field_nicknames1 = [
             'v [m/s]',
             'RH \nHip Torque \nCommand \n[Nm]',
@@ -184,6 +199,14 @@ def run_analysis():
             'POS_RH_KFE'
         ]
 
+        field_nicknames5 = [
+            'FT_Y_LF',
+            'FT_Y_RF',
+            'FT_Y_LH',
+            'FT_Y_RH',
+            'COM_Y',
+        ]
+
         # Function to create plots for a given set of fields and nicknames
         def overlay_plot_signal(fields, nicknames, fig_width=10, fig_height=3):
             fig, axs = plt.subplots(len(fields), 1, figsize=(fig_width, fig_height * len(fields)), sharex=True)
@@ -208,7 +231,7 @@ def run_analysis():
             for idx, col in enumerate(fields):
                 for j, df in dfs_collection.items():
                     if col in df.columns:
-                        axs[j].plot(df['TIME'], df[col], label=nicknames[idx], color=colors[j % len(colors)])
+                        axs[j].plot(df['TIME'], df[col], label=nicknames[idx])
                         axs[j].set_ylabel(j, rotation=0, labelpad=50, fontsize='small')
                     else:
                         print(f"Column {col} not in DataFrame {idx}")
@@ -223,6 +246,7 @@ def run_analysis():
         overlay_plot_gait(fields_to_plot2, field_nicknames2, fig_width=8, fig_height=1)
         overlay_plot_signal(fields_to_plot3, field_nicknames3, fig_width=8, fig_height=1.5)
         overlay_plot_signal(fields_to_plot4, field_nicknames4, fig_width=8, fig_height=1.5)
+        overlay_plot_gait(fields_to_plot5, field_nicknames5, fig_width=8, fig_height=3)
 
     # At the end of your run_analysis function, call plot_data
     plot_data(dfs_collection, start_time=-1, end_time=1)
@@ -238,3 +262,7 @@ if __name__ == "__main__":
     run_analysis()
 
     print('done')
+
+
+
+raw_df2 = pd.read_parquet('/media/gene/fd75d0c8-aee1-476d-b68c-b17d9e0c1c14/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_4100_rew_20.68903.pth/RAW_DATA.parquet')

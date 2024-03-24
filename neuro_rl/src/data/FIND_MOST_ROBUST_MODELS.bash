@@ -6,68 +6,36 @@
 
 # Define an array of model names
 models_info=(
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-BASELINE-01" # -3.0, -3.5
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DIST-01" # -3.0, -3.5
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DISTTERR-01" # -3.0, -3.5
 
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-BASELINE-01" # -3.0, -3.5
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DIST-01" # -3.0,
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-01" # -3.0, -3.5 # see if there is any difference between these two in terms of FPs, config is identical
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DISTTERR-01" # -3.0, -3.5]
-
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-0.5MASS-LSTM16-TERR-01" # -3.0 -3.5
-
-    # "A1Terrain_PPO_LSTM_NeuroRL:A1Terrain_NeuroRL_exp:A1-1.0MASS-LSTM16-TERR-01" # -3.0, -3.5
-    
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-02" # -3.5 # see if there is any difference between these two in terms of FPs, config is identical
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-201" TO DO # see if there is any difference between these two in terms of FPs, config is identical
-
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-01-TERMINATION-1.0" # -3.0 (TERMINATION PENALTY DID NOT CREATE MONOTONIC ROBUSTNESS LIKE I HAD HOPED...)
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DIST-TERMINATION-1.0" # -3.0, -3.5 (TERMINATION PENALTY DID NOT CREATE MONOTONIC ROBUSTNESS LIKE I HAD HOPED...)
-
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-THESIS" # -2.0, -3.0
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DISTTERR-01-THESIS" #
-
-
-
-
-
-
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-BASELINE-01-CONDENSED"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DIST-01-CONDENSED"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-TERR-01-CONDENSED"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DISTTERR-01-CONDENSED"
-
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-BASELINE-01-CONDENSED"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DIST-01-CONDENSED"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-01-CONDENSED"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DISTTERR-01-CONDENSED"
-
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-0.5MASS-LSTM16-TERR-01-CONDENSED"
-    
-    # "A1Terrain_PPO_LSTM_NeuroRL:A1Terrain_NeuroRL_exp:A1-1.0MASS-LSTM16-TERR-01-CONDENSED"
-
-
-
-
-    # "A1Terrain_PPO_LSTM_NeuroRL:A1Terrain_NeuroRL_exp:A1-1.0MASS-LSTM16-TERR-01-CONDENSEDLONG"
-
-
-
-
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSTERR"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDIST"
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSBASELINE"
-
-    "AnymalTerrainPPO_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-FF-CORLTERR" # AnymalTerrain_05-12-53-48/nn/AnymalTerrain.pth
-    "AnymalTerrainPPO_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-FF-CORLDISTTERR" # AnymalTerrain_04-01-13-21/nn/last_AnymalTerrain_ep_19250_rew_20.038643.pth
+    # "AnymalTerrainPPO_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-FF-CORLTERR" # AnymalTerrain_05-12-53-48/nn/AnymalTerrain.pth
+    # "AnymalTerrainPPO_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-FF-CORLDISTTERR" # AnymalTerrain_04-01-13-21/nn/last_AnymalTerrain_ep_19250_rew_20.038643.pth
     # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-CORLTERR" # AnymalTerrain_06-17-40-50/nn/last_AnymalTerrain_ep_3300_rew_20.003773.pth
-    "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLTERR" # AnymalTerrain_07-03-29-04/nn/last_AnymalTerrain_ep_3800_rew_20.163399.pth
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLTERR" # AnymalTerrain_07-03-29-04/nn/last_AnymalTerrain_ep_3800_rew_20.163399.pth
     # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-CORLDISTTERR" # runs/AnymalTerrain_06-00-14-59/nn/last_AnymalTerrain_ep_6700_rew_20.21499.pth
-    "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLDISTTERR" # runs/AnymalTerrain_04-15-37-26/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth
-    "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLDISTTERR2" # AnymalTerrain_08-04-24-44/nn/last_AnymalTerrain_ep_4500_rew_20.877975.pth
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLDISTTERR" # runs/AnymalTerrain_04-15-37-26/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLDISTTERR2" # AnymalTerrain_08-04-24-44/nn/last_AnymalTerrain_ep_4500_rew_20.877975.pth
 
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR" # AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSTERR" # AnymalTerrain_2023-08-27_17-23-34/AnymalTerrain/nn/last_AnymalTerrain_ep_2900_rew_20.2482.pth
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDIST" # AnymalTerrain_2023-08-24_14-17-13/nn/last_AnymalTerrain_ep_900_rew_20.139568.pth
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSBASELINE" # 2023-09-13-18-33_AnymalTerrain/nn/last_AnymalTerrain_ep_700_rew_20.361492.pth
+
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DISTTERR-01-CONDENSED" # ANYMAL-1.0MASS-LSTM4-DISTTERR-01/nn/last_AnymalTerrain_ep_4800_rew_14.132425.pth
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-TERR-01-CONDENSED" # ANYMAL-1.0MASS-LSTM4-TERR-01/nn/last_AnymalTerrain_ep_1800_rew_18.174595.pth
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DIST-01-CONDENSED" # ANYMAL-1.0MASS-LSTM4-DIST-01/nn/last_AnymalTerrain_ep_4800_rew_20.043377.pth
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-BASELINE-01-CONDENSED" # ANYMAL-1.0MASS-LSTM4-BASELINE-01/nn/last_AnymalTerrain_ep_150_rew_8.168549.pth
+
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DISTTERR-01-CONDENSED" # ANYMAL-1.0MASS-LSTM16-DISTTERR-01/nn/last_AnymalTerrain_ep_4600_rew_15.199695.pth
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-TERR-01-CONDENSED" # ANYMAL-1.0MASS-LSTM16-TERR-01/nn/last_AnymalTerrain_ep_2000_rew_18.73817.pth
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-DIST-01-CONDENSED" # ANYMAL-1.0MASS-LSTM16-DIST-01/nn/last_AnymalTerrain_ep_5000_rew_16.480799.pth
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-BASELINE-01-CONDENSED" # ANYMAL-1.0MASS-LSTM16-BASELINE-01/nn/last_AnymalTerrain_ep_1000_rew_20.962988.pth
+
+    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-0.5MASS-LSTM16-TERR-01-CONDENSED" # ANYMAL-0.5MASS-LSTM16-TERR-01/nn/last_AnymalTerrain_ep_3200_rew_21.073418.pth
+    
+    # "A1Terrain_PPO_LSTM_NeuroRL:A1Terrain_NeuroRL_exp:A1-1.0MASS-LSTM16-TERR-01-CONDENSED" # A1-1.0MASS-LSTM16-TERR-01/nn/last_A1Terrain_ep_4600_rew_16.256865.pth
+    # "A1Terrain_PPO_LSTM_NeuroRL:A1Terrain_NeuroRL_exp:A1-1.0MASS-LSTM16-TERR-01-CONDENSEDLONG" # A1-1.0MASS-LSTM16-TERR-01/nn/last_A1Terrain_ep_4600_rew_16.256865.pth
+
+    # COULD REVISIT DOING THE UNCONDENSED MODELS FOR THE THESIS MODELS
 
 )
 

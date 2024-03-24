@@ -33,7 +33,7 @@ a.rename(columns={'Subfolder_6':'model_name'}, inplace=True)
 a = a[a['run_type'] == 'evaluate_robustness_throughout_training']
 
 # Filter out rows where 'model_type' contains 'CORL'
-a = a[~a['model_type'].str.contains("CORL")]
+# a = a[~a['model_type'].str.contains("CORL")]
 
 # Parse 'model_name' to extract 'episode_number' and 'reward'
 # Make sure 'model_name' is treated as a string column
@@ -83,7 +83,7 @@ forceY_categories = ['Low', 'Mid', 'High']  # For labeling purposes
 
 
 # Get unique model types from the entire DataFrame
-model_types = a['model_type'].unique()
+model_types = sorted(a['model_type'].unique())
 
 # Colors for the lines
 colors = ['black', 'red', 'blue']
