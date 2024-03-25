@@ -1,0 +1,325 @@
+task:
+  name: A1Terrain
+  train: false
+  physics_engine: physx
+  env:
+    numEnvs: ${resolve_default:4096,${...num_envs}}
+    numObservations: 188
+    numActions: 12
+    envSpacing: 0.0
+    enableDebugVis: false
+    neuroRLExperiment: true
+    specifiedCommandVelocityRanges:
+      linear_x:
+      - 1
+      - 1
+      linear_y:
+      - 0
+      - 0
+      yaw_rate:
+      - 0
+      - 0
+    specifiedCommandVelocityN:
+      linear_x: 1
+      linear_y: 1
+      yaw_rate: 1
+      n_copies: 100
+    terrain:
+      terrainType: plane
+      staticFriction: 1.0
+      dynamicFriction: 1.0
+      restitution: 0.0
+      curriculum: true
+      maxInitMapLevel: 0
+      mapLength: 40.0
+      mapWidth: 40.0
+      numLevels: 1
+      numTerrains: 1
+      terrainProportions:
+      - 0.0
+      - 1.0
+      - 0.0
+      - 0.0
+      - 0.0
+      slopeTreshold: 0.01
+    baseInitState:
+      pos:
+      - 20.0
+      - 20.0
+      - 0.62
+      rot:
+      - 0.0
+      - 0.0
+      - 0.0
+      - 1.0
+      vLinear:
+      - 0.0
+      - 0.0
+      - 0.0
+      vAngular:
+      - 0.0
+      - 0.0
+      - 0.0
+    randomCommandVelocityRanges:
+      linear_x:
+      - -1.0
+      - 1.0
+      linear_y:
+      - -1.0
+      - 1.0
+      yaw:
+      - -3.14
+      - 3.14
+    control:
+      stiffness: 20.0
+      damping: 0.5
+      actionScale: 0.25
+      decimation: 4
+    defaultJointAngles:
+      FL_hip_joint: 0.1
+      RL_hip_joint: 0.1
+      FR_hip_joint: -0.1
+      RR_hip_joint: -0.1
+      FL_thigh_joint: 0.8
+      RL_thigh_joint: 1.0
+      FR_thigh_joint: 0.8
+      RR_thigh_joint: 1.0
+      FL_calf_joint: -1.5
+      RL_calf_joint: -1.5
+      FR_calf_joint: -1.5
+      RR_calf_joint: -1.5
+    urdfAsset:
+      file: urdf/a1/urdf/a1.urdf
+      mass: 12.454
+      footName: foot
+      kneeName:
+      - thigh
+      - calf
+      collapseFixedJoints: true
+      fixBaseLink: false
+      defaultDofDriveMode: 4
+    learn:
+      allowKneeContacts: true
+      terminalReward: 0.0
+      linearVelocityXYRewardScale: 1.0
+      linearVelocityZRewardScale: -4.0
+      angularVelocityXYRewardScale: -0.05
+      angularVelocityZRewardScale: 0.5
+      orientationRewardScale: -0.0
+      torqueRewardScale: -0.0006
+      jointAccRewardScale: -0.0005
+      baseHeightRewardScale: -0.0
+      feetAirTimeRewardScale: 1.0
+      kneeCollisionRewardScale: -0.25
+      feetStumbleRewardScale: -0.0
+      actionRateRewardScale: -0.01
+      hipRewardScale: -0.0
+      linearVelocityScale: 2.0
+      angularVelocityScale: 0.25
+      dofPositionScale: 1.0
+      dofVelocityScale: 0.05
+      heightMeasurementScale: 5.0
+      addNoise: false
+      noiseLevel: 0.0
+      dofPositionNoise: 0.0
+      dofVelocityNoise: 0.0
+      linearVelocityNoise: 0.0
+      angularVelocityNoise: 0.0
+      gravityNoise: 0.0
+      heightMeasurementNoise: 0.0
+      frictionRange:
+      - 0.5
+      - 1.25
+      pushRobots: false
+      pushInterval_s: 15.0
+      episodeLength_s: 5.02
+      perturbRandom:
+        perturbRandomOn: false
+        forceX: 0
+        forceY: 0
+        forceZ: 0
+        torqueX: 0
+        torqueY: 0
+        torqueZ: 0
+        probabilityStart: 0.01
+        probabilityEnd: 0.96
+    evaluate:
+      perturbPrescribed:
+        perturbPrescribedOn: true
+        length_s: 0.02
+        interval_s: 3.0
+        steps_after_stance_begins: 0
+        forceX: 0
+        forceY: -12
+        forceZ: 0
+        torqueX: 0
+        torqueY: 0
+        torqueZ: 0
+    ablate:
+      wait_until_disturbance: false
+      scl_pca_path: u_0.4_1.0_14_v_0._0._1_r_0._0._1_n_20
+      random_trial: false
+      random:
+        obs_in: 0
+        hn_out: 0
+        hn_in: 0
+        cn_in: 0
+      targeted_trial: false
+      targeted:
+        obs_in: 0
+        hn_out: 0
+        hn_in: 0
+        cn_in: 0
+    import_data: ''
+    export_data: false
+    export_data_actor: false
+    export_data_critic: false
+    export_data_path: ''
+    live_plot: false
+    viewer:
+      refEnv: 0
+      pos:
+      - 18.5
+      - 18.5
+      - 1.5
+      lookat:
+      - 20
+      - 19
+      - 1.25
+    enableCameraSensors: false
+  sim:
+    dt: 0.005
+    substeps: 1
+    up_axis: z
+    use_gpu_pipeline: ${eq:${...pipeline},"gpu"}
+    gravity:
+    - 0.0
+    - 0.0
+    - -9.81
+    physx:
+      num_threads: ${....num_threads}
+      solver_type: ${....solver_type}
+      use_gpu: ${contains:"cuda",${....sim_device}}
+      num_position_iterations: 4
+      num_velocity_iterations: 1
+      contact_offset: 0.02
+      rest_offset: 0.0
+      bounce_threshold_velocity: 0.2
+      max_depenetration_velocity: 100.0
+      default_buffer_size_multiplier: 5.0
+      max_gpu_contact_pairs: 8388608
+      num_subscenes: ${....num_subscenes}
+      contact_collection: 1
+  task:
+    randomize: false
+train:
+  params:
+    seed: ${...seed}
+    algo:
+      name: a2c_continuous
+    model:
+      name: continuous_a2c_logstd
+    network:
+      name: actor_critic
+      separate: true
+      space:
+        continuous:
+          mu_activation: None
+          sigma_activation: None
+          mu_init:
+            name: default
+          sigma_init:
+            name: const_initializer
+            val: 0.0
+          fixed_sigma: true
+      mlp:
+        units:
+        - 512
+        - 256
+        activation: elu
+        d2rl: false
+        initializer:
+          name: default
+        regularizer:
+          name: None
+      rnn:
+        name: lstm
+        units: 128
+        layers: 1
+        before_mlp: false
+        concat_input: false
+        layer_norm: false
+    load_checkpoint: ${if:${...checkpoint},True,False}
+    load_path: ${...checkpoint}
+    config:
+      name: ${resolve_default:A1Terrain,${....experiment}}
+      full_experiment_name: ${.name}
+      env_name: rlgpu
+      multi_gpu: false
+      ppo: true
+      mixed_precision: false
+      normalize_input: true
+      normalize_value: true
+      normalize_advantage: true
+      value_bootstrap: true
+      clip_actions: false
+      num_actors: ${....task.env.numEnvs}
+      reward_shaper:
+        scale_value: 1.0
+      gamma: 0.99
+      tau: 0.95
+      e_clip: 0.2
+      entropy_coef: 0.0
+      learning_rate: 0.0003
+      lr_schedule: adaptive
+      kl_threshold: 0.008
+      truncate_grads: true
+      grad_norm: 1.0
+      horizon_length: 16
+      minibatch_size: 16384
+      mini_epochs: 4
+      critic_coef: 2
+      clip_value: false
+      seq_length: 16
+      seq_len: 16
+      bounds_loss_coef: 0.001
+      zero_arnn_bias_ih_l0: true
+      zero_arnn_bias_hh_l0: true
+      zero_action_feedback: true
+      max_epochs: ${resolve_default:24000,${....max_iterations}}
+      save_best_after: 50
+      score_to_win: 20000
+      save_frequency: 50
+      print_stats: true
+      player:
+        games_num: ${.....task.env.numEnvs}
+task_name: ${task.name}
+experiment: ''
+num_envs: 100
+seed: 42
+torch_deterministic: false
+max_iterations: ''
+physics_engine: physx
+pipeline: gpu
+sim_device: cuda:0
+rl_device: cuda:0
+graphics_device_id: 0
+num_threads: 4
+solver_type: 1
+num_subscenes: 4
+test: true
+checkpoint: /media/gene/fd75d0c8-aee1-476d-b68c-b17d9e0c1c14/code/NEURO/neuro-rl-sandbox/neuro-rl/neuro_rl/src/data/../../models/A1-1.0MASS-LSTM16-DISTTERR-01-CONDENSED/nn/A1Terrain.pth
+sigma: ''
+multi_gpu: false
+wandb_activate: false
+wandb_group: ''
+wandb_name: ${train.params.config.name}
+wandb_entity: ''
+wandb_project: isaacgymenvs
+wandb_tags: []
+wandb_logcode_dir: ''
+capture_video: false
+capture_video_freq: 1464
+capture_video_len: 1000
+force_render: true
+headless: false

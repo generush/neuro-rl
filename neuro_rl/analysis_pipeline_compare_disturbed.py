@@ -35,7 +35,7 @@ def precompute_segments(df, contact_fields):
         segments_info[field] = {'starts': starts, 'ends': ends}
     return segments_info
 
-def overlay_plot_signal(fields_and_nicknames, dfs_collection, segments_collections, colors, fig_width, fig_height):
+def overlay_plot_signal(fields_and_nicknames, dfs_collection, segments_collections, colors, fig_width, fig_height, additional_features=None):
 
     # Determine the global min and max of the 'TIME_RAW' column across all DataFrames
     global_min_time = min(df['TIME_RAW'].min() for df in dfs_collection.values())
@@ -47,40 +47,54 @@ def overlay_plot_signal(fields_and_nicknames, dfs_collection, segments_collectio
     # Define the figure
     fig = plt.figure(figsize=(fig_width, num_subplots * fig_height), constrained_layout=True)
 
-    for idx, (field, nickname) in enumerate(fields_and_nicknames):
+    for field_idx, (x_field, y_field, nickname) in enumerate(fields_and_nicknames):
 
-        ax = fig.add_subplot(num_subplots, 1, idx + 1)  # Create a new subplot for each DataFrame
+        ax = fig.add_subplot(num_subplots, 1, field_idx + 1)  # Create a new subplot for each DataFrame
 
-        for idx, df in dfs_collection.items():
+        for df_idx, df in dfs_collection.items():
 
-            if field in df.columns:
-                if any(key in field for key in segments_collections[0].keys()):
-                    ax.plot(df['TIME_RAW'], df[field], label=f'DF{idx}', color=colors[idx], linewidth=0.5)
+            if y_field in df.columns:
+                if any(key in y_field for key in segments_collections[0].keys()):
+                    ax.plot(df[x_field], df[y_field], label=f'DF{df_idx}', color=colors[df_idx], linewidth=0.5)
 
-                    matching_keys = [key for key in segments_collections[idx].keys() if key in field]
+                    matching_keys = [key for key in segments_collections[df_idx].keys() if key in y_field]
                     if matching_keys:
                         for key in matching_keys:
-                            segments_info = segments_collections[idx]
+                            segments_info = segments_collections[df_idx]
                             for start, end in zip(segments_info[key]['starts'], segments_info[key]['ends']):
-                                ax.plot(df.loc[start:end, 'TIME_RAW'], df.loc[start:end, field], color=colors[idx], linewidth=2)
+                                ax.plot(df.loc[start:end, x_field], df.loc[start:end, y_field], color=colors[df_idx], linewidth=2)
                 else:
-                    ax.plot(df['TIME_RAW'], df[field], label=f'DF{idx}', color=colors[idx], linewidth=1)
+                    ax.plot(df[x_field], df[y_field], label=f'DF{df_idx}', color=colors[df_idx], linewidth=1)
                 
-        # Find the start and end of the chunk where PERTURB_RAW=1
-        if 'PERTURB_RAW' in df.columns:
-            perturb_start = df[df['PERTURB_RAW'] == 1].min()['TIME_RAW']
-            perturb_end = df[df['PERTURB_RAW'] == 1].max()['TIME_RAW']
+        if additional_features and additional_features.get('draw_perturb_shaded_box', False):
 
-            # Check if there is a perturb chunk in the DataFrame
-            if pd.notna(perturb_start) and pd.notna(perturb_end):
-                ax.axvspan(perturb_start, perturb_end, facecolor='lightgray', alpha=0.5)  # Translucent region
+            # Find the start and end of the chunk where PERTURB_RAW=1
+            if 'PERTURB_RAW' in df.columns:
+                perturb_start_idx = df.index[df['PERTURB_RAW'] == 1].min()
+                perturb_end_idx = df.index[df['PERTURB_RAW'] == 1].max()
+
+                # Extend perturb_end_idx by one step, if it's not the last index
+                if perturb_start_idx > df.index[0]:
+                    perturb_start_idx -= 1
+
+                # Convert indices back to TIME_RAW values
+                perturb_start = df.loc[perturb_start_idx, 'TIME_RAW']
+                perturb_end = df.loc[perturb_end_idx, 'TIME_RAW']
+
+                # Check if there is a perturb chunk in the DataFrame
+                if pd.notna(perturb_start) and pd.notna(perturb_end):
+                    ax.axvspan(perturb_start, perturb_end, facecolor='lightgray', alpha=0.5)  # Translucent region
+
+        if additional_features and additional_features.get('draw_centerline', False):
+            # Draw a centerline
+            ax.axhline(y=0, color='gray', linestyle='--', linewidth=1)
 
         ax.set_xlim([global_min_time, global_max_time])  # Set the same x-axis range for all subplots
         ax.set_xlabel('Time [s]')
         ax.set_ylabel(nickname, rotation=0)
-        ax.legend()
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
 
-def overlay_plot_gait(fields_and_nicknames, dfs_collection, segments_collections, colors, fig_width, fig_height):
+def overlay_plot_gait(fields_and_nicknames, dfs_collection, segments_collections, colors, fig_width, fig_height, additional_features=None):
     
     # Determine the global min and max of the 'TIME_RAW' column across all DataFrames
     global_min_time = min(df['TIME_RAW'].min() for df in dfs_collection.values())
@@ -93,48 +107,70 @@ def overlay_plot_gait(fields_and_nicknames, dfs_collection, segments_collections
     fig = plt.figure(figsize=(fig_width, num_subplots * fig_height), constrained_layout=True)
     
     # Iterate over each DataFrame in the collection
-    for idx, (df_key, df) in enumerate(dfs_collection.items()):
+    for df_idx, (df_key, df) in enumerate(dfs_collection.items()):
 
-        ax = fig.add_subplot(num_subplots, 1, idx + 1)  # Create a new subplot for each DataFrame
+        ax = fig.add_subplot(num_subplots, 1, df_idx + 1)  # Create a new subplot for each DataFrame
 
         # Iterate over each signal field you want to plot for this DataFrame
-        for field, nickname in fields_and_nicknames:
-            if field in df.columns:
-                if any(key in field for key in segments_collections[0].keys()):
-                    ax.plot(df['TIME_RAW'], df[field], label=nickname, color=colors[idx], linewidth=0.5)
+        for field_idx, (x_field, y_field, nickname) in enumerate(fields_and_nicknames):
+            if y_field in df.columns:
+                if any(key in y_field for key in segments_collections[0].keys()):
+                    ax.plot(df[x_field], df[y_field], label=nickname, color=colors[field_idx], linewidth=0.5)
 
                 # Check for matching segment keys
-                matching_keys = [key for key in segments_collections[df_key].keys() if key in field]
+                matching_keys = [key for key in segments_collections[df_key].keys() if key in y_field]
 
                 if matching_keys:
                     for key in matching_keys:
                         segments_info = segments_collections[df_key]
                         for start, end in zip(segments_info[key]['starts'], segments_info[key]['ends']):
-                            ax.plot(df.loc[start:end, 'TIME_RAW'], df.loc[start:end, field], color=colors[idx], linewidth=2)
+                            ax.plot(df.loc[start:end, x_field], df.loc[start:end, y_field], color=colors[field_idx], linewidth=2)
                 else:
-                    ax.plot(df['TIME_RAW'], df[field], label=nickname, color=colors[idx], linewidth=1)
+                    ax.plot(df[x_field], df[y_field], label=nickname, color=colors[field_idx], linewidth=1)
 
+        if additional_features and additional_features.get('draw_perturb_shaded_box', False):
 
-        # Find the start and end of the chunk where PERTURB_RAW=1
-        if 'PERTURB_RAW' in df.columns:
-            perturb_start = df[df['PERTURB_RAW'] == 1].min()['TIME_RAW']
-            perturb_end = df[df['PERTURB_RAW'] == 1].max()['TIME_RAW']
+            # Find the start and end of the chunk where PERTURB_RAW=1
+            if 'PERTURB_RAW' in df.columns:
+                perturb_start_idx = df.index[df['PERTURB_RAW'] == 1].min()
+                perturb_end_idx = df.index[df['PERTURB_RAW'] == 1].max()
 
-            # Check if there is a perturb chunk in the DataFrame
-            if pd.notna(perturb_start) and pd.notna(perturb_end):
-                ax.axvspan(perturb_start, perturb_end, facecolor='lightgray', alpha=0.5)  # Translucent region
+                # Extend perturb_end_idx by one step, if it's not the last index
+                if perturb_start_idx > df.index[0]:
+                    perturb_start_idx -= 1
+
+                # Convert indices back to TIME_RAW values
+                perturb_start = df.loc[perturb_start_idx, 'TIME_RAW']
+                perturb_end = df.loc[perturb_end_idx, 'TIME_RAW']
+
+                # Check if there is a perturb chunk in the DataFrame
+                if pd.notna(perturb_start) and pd.notna(perturb_end):
+                    ax.axvspan(perturb_start, perturb_end, facecolor='lightgray', alpha=0.5)  # Translucent region
                 
-        ax.set_xlim([global_min_time, global_max_time])  # Set the same x-axis range for all subplots
-        ax.set_xlabel('Time [s]')
+        if additional_features and additional_features.get('draw_centerline', False):
+            # Draw a centerline
+            ax.axhline(y=0, color='gray', linestyle='--', linewidth=1)
+
+
+                
+        if x_field == 'TIME_RAW':
+            ax.set_xlim([global_min_time, global_max_time])  # Set the same x-axis range for all subplots
+            ax.set_xlabel('Time [s]')
+        else:
+            ax.set_xlabel(x_field)
+            # Set the aspect ratio to be equal
+            ax.set_aspect('equal', adjustable='box')
+            
         ax.set_ylabel(f'DF{df_key}')
-        ax.legend()
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
         
 def run_analysis():
     cfg = load_configuration()
+
     dfs_collection = {}
     segments_collections = {}
     contact_fields = ['LF', 'LH', 'RH', 'RF']
-    colors = ['k', 'b', 'g', 'r']
+    colors = ['k', 'r', 'b', 'g', 'm']
 
     for idx, (data_path, model_path, output_path) in enumerate(zip(cfg.data_path, cfg.model_path, cfg.output_path)):
 
@@ -180,16 +216,43 @@ def run_analysis():
         raw_df['RH'] = np.where(raw_df['FT_FORCE_RAW_003'] > 0, 2, np.nan)
 
         # Create new columns with LF, LH, RH, RF in column name
+        raw_df['FT_X_RAW_000_LF'] = raw_df['FT_X_RAW_000']
+        raw_df['FT_X_RAW_001_LH'] = raw_df['FT_X_RAW_001']
+        raw_df['FT_X_RAW_002_RF'] = raw_df['FT_X_RAW_002']
+        raw_df['FT_X_RAW_003_RH'] = raw_df['FT_X_RAW_003']
+
+        # Create new columns with LF, LH, RH, RF in column name
         raw_df['FT_Y_RAW_000_LF'] = raw_df['FT_Y_RAW_000']
         raw_df['FT_Y_RAW_001_LH'] = raw_df['FT_Y_RAW_001']
         raw_df['FT_Y_RAW_002_RF'] = raw_df['FT_Y_RAW_002']
         raw_df['FT_Y_RAW_003_RH'] = raw_df['FT_Y_RAW_003']
         
         # Create new columns with LF, LH, RH, RF in column name
+        raw_df['FT_Z_RAW_000_LF'] = raw_df['FT_Z_RAW_000']
+        raw_df['FT_Z_RAW_001_LH'] = raw_df['FT_Z_RAW_001']
+        raw_df['FT_Z_RAW_002_RF'] = raw_df['FT_Z_RAW_002']
+        raw_df['FT_Z_RAW_003_RH'] = raw_df['FT_Z_RAW_003']
+        
+        # Create new columns with LF, LH, RH, RF in column name
         raw_df['FT_FORCE_RAW_000_LF'] = raw_df['FT_FORCE_RAW_000']
         raw_df['FT_FORCE_RAW_001_LH'] = raw_df['FT_FORCE_RAW_001']
-        raw_df['FT_FORCE_RAW_003_RF'] = raw_df['FT_FORCE_RAW_002']
-        raw_df['FT_FORCE_RAW_002_RH'] = raw_df['FT_FORCE_RAW_003']
+        raw_df['FT_FORCE_RAW_002_RF'] = raw_df['FT_FORCE_RAW_002']
+        raw_df['FT_FORCE_RAW_003_RH'] = raw_df['FT_FORCE_RAW_003']
+
+        # cos(psi) - sin(psi)
+        raw_df['FT_X_RAW_000_LF_body'] = (raw_df['FT_X_RAW_000_LF'] - raw_df['COM_X_RAW']) * np.cos(-raw_df['COM_YAW_RAW']) - (raw_df['FT_Y_RAW_000_LF'] - raw_df['COM_Y_RAW']) * np.sin(-raw_df['COM_YAW_RAW'])
+        raw_df['FT_X_RAW_001_LH_body'] = (raw_df['FT_X_RAW_001_LH'] - raw_df['COM_X_RAW']) * np.cos(-raw_df['COM_YAW_RAW']) - (raw_df['FT_Y_RAW_001_LH'] - raw_df['COM_Y_RAW']) * np.sin(-raw_df['COM_YAW_RAW'])
+        raw_df['FT_X_RAW_002_RF_body'] = (raw_df['FT_X_RAW_002_RF'] - raw_df['COM_X_RAW']) * np.cos(-raw_df['COM_YAW_RAW']) - (raw_df['FT_Y_RAW_002_RF'] - raw_df['COM_Y_RAW']) * np.sin(-raw_df['COM_YAW_RAW'])
+        raw_df['FT_X_RAW_003_RH_body'] = (raw_df['FT_X_RAW_003_RH'] - raw_df['COM_X_RAW']) * np.cos(-raw_df['COM_YAW_RAW']) - (raw_df['FT_Y_RAW_003_RH'] - raw_df['COM_Y_RAW']) * np.sin(-raw_df['COM_YAW_RAW'])
+
+        # sin(psi) + cos(psi)
+        raw_df['FT_Y_RAW_000_LF_body'] = (raw_df['FT_X_RAW_000_LF'] - raw_df['COM_X_RAW']) * np.sin(-raw_df['COM_YAW_RAW']) + (raw_df['FT_Y_RAW_000_LF'] - raw_df['COM_Y_RAW']) * np.cos(-raw_df['COM_YAW_RAW'])
+        raw_df['FT_Y_RAW_001_LH_body'] = (raw_df['FT_X_RAW_001_LH'] - raw_df['COM_X_RAW']) * np.sin(-raw_df['COM_YAW_RAW']) + (raw_df['FT_Y_RAW_001_LH'] - raw_df['COM_Y_RAW']) * np.cos(-raw_df['COM_YAW_RAW'])
+        raw_df['FT_Y_RAW_002_RF_body'] = (raw_df['FT_X_RAW_002_RF'] - raw_df['COM_X_RAW']) * np.sin(-raw_df['COM_YAW_RAW']) + (raw_df['FT_Y_RAW_002_RF'] - raw_df['COM_Y_RAW']) * np.cos(-raw_df['COM_YAW_RAW'])
+        raw_df['FT_Y_RAW_003_RH_body'] = (raw_df['FT_X_RAW_003_RH'] - raw_df['COM_X_RAW']) * np.sin(-raw_df['COM_YAW_RAW']) + (raw_df['FT_Y_RAW_003_RH'] - raw_df['COM_Y_RAW']) * np.cos(-raw_df['COM_YAW_RAW'])
+
+        # sin(psi) + cos(psi)
+        raw_df['COP_Y_body'] = ( raw_df['FT_Y_RAW_000_LF_body'] * raw_df['FT_FORCE_RAW_000_LF'] + raw_df['FT_Y_RAW_001_LH_body'] * raw_df['FT_FORCE_RAW_001_LH'] + raw_df['FT_Y_RAW_002_RF_body'] * raw_df['FT_FORCE_RAW_002_RF'] + raw_df['FT_Y_RAW_003_RH_body'] * raw_df['FT_FORCE_RAW_003_RH'] ) / (raw_df['FT_FORCE_RAW_000_LF'] + raw_df['FT_FORCE_RAW_001_LH'] + raw_df['FT_FORCE_RAW_002_RF'] + raw_df['FT_FORCE_RAW_003_RH']) 
 
         # Load additional DataFrames
         data_frames = {
@@ -224,342 +287,138 @@ def run_analysis():
         dfs_collection[idx] = raw_df
         segments_collections[idx] = precompute_segments(raw_df, contact_fields)
 
+
+        # Define the global time window here
+        global_time_window = (-1, 1.5)  # Replace 'start_time' and 'end_time' with actual values or references to cfg
+
+        # Filter each DataFrame in dfs_collection according to the global_time_window
+        for idx, df in dfs_collection.items():
+            # Ensure TIME_RAW is within the global_time_window
+            dfs_collection[idx] = df[(df['TIME_RAW'] >= global_time_window[0]) & (df['TIME_RAW'] <= global_time_window[1])]
+
+
         print('hi')
 
-    # Plotting
-    for idx, df in dfs_collection.items():
-        fig, axs = plt.subplots(5, 1, figsize=(10, 15), sharex=True)
-
-        fields_and_nicknames1 = [
-            ('OBS_RAW_001_v', 'v [m/s]'),
-            ('ACT_RAW_009_RH_HAA', 'RH Hip Torque Command [Nm]'),
-            ('OBS_RAW_018_dof_pos_angle_deg_07_RF_HAA', 'RH Hip Position [deg]'),
-            ('OBS_RAW_006_phi_proj', r'$\phi$ [deg/s]')
-        ]
-        
-        fields_and_nicknames2 = [
-            ('LF', 'LF'),
-            ('LH', 'LH'),
-            ('RH', 'RH'),
-            ('RF', 'RF'),
-        ]
-
-        fields_and_nicknames3 = [
-            ('ACT_RAW_000_LF_HAA', 'ACT_LF_HAA'),
-            ('ACT_RAW_001_LF_HFE', 'ACT_LF_HFE'),
-            ('ACT_RAW_002_LF_KFE', 'ACT_LF_KFE'),
-            ('ACT_RAW_003_LH_HAA', 'ACT_LH_HAA'),
-            ('ACT_RAW_004_LH_HFE', 'ACT_LH_HFE'),
-            ('ACT_RAW_005_LH_KFE', 'ACT_LH_KFE'),
-            ('ACT_RAW_006_RF_HAA', 'ACT_RF_HAA'),
-            ('ACT_RAW_007_RF_HFE', 'ACT_RF_HFE'),
-            ('ACT_RAW_008_RF_KFE', 'ACT_RF_KFE'),
-            ('ACT_RAW_009_RH_HAA', 'ACT_RH_HAA'),
-            ('ACT_RAW_010_RH_HFE', 'ACT_RH_HFE'),
-            ('ACT_RAW_011_RH_KFE', 'ACT_RH_KFE')
-        ]
-
-        fields_and_nicknames4 = [
-            ('OBS_RAW_012_dof_pos_angle_deg_01_LF_HAA', 'POS_LF_HAA'),
-            ('OBS_RAW_013_dof_pos_angle_deg_02_LF_HFE', 'POS_LF_HFE'),
-            ('OBS_RAW_014_dof_pos_angle_deg_03_LF_KFE', 'POS_LF_KFE'),
-            ('OBS_RAW_015_dof_pos_angle_deg_04_LH_HAA', 'POS_LH_HAA'),
-            ('OBS_RAW_016_dof_pos_angle_deg_05_LH_HFE', 'POS_LH_HFE'),
-            ('OBS_RAW_017_dof_pos_angle_deg_06_LH_KFE', 'POS_LH_KFE'),
-            ('OBS_RAW_018_dof_pos_angle_deg_07_RF_HAA', 'POS_RF_HAA'),
-            ('OBS_RAW_019_dof_pos_angle_deg_08_RF_HFE', 'POS_RF_HFE'),
-            ('OBS_RAW_020_dof_pos_angle_deg_09_RF_KFE', 'POS_RF_KFE'),
-            ('OBS_RAW_021_dof_pos_angle_deg_10_RH_HAA', 'POS_RH_HAA'),
-            ('OBS_RAW_022_dof_pos_angle_deg_11_RH_HFE', 'POS_RH_HFE'),
-            ('OBS_RAW_023_dof_pos_angle_deg_12_RH_KFE', 'POS_RH_KFE')
-        ]
-
-        fields_and_nicknames5 = [
-            ('FT_Y_RAW_000_LF', 'FT_Y_LF'),
-            ('FT_Y_RAW_001_LH', 'FT_Y_LH'),
-            ('FT_Y_RAW_003_RH', 'FT_Y_RH'),
-            ('FT_Y_RAW_002_RF', 'FT_Y_RF'),
-            ('COM_Y_RAW', 'COM_Y'),
-        ]
-
-
-        fields_and_nicknames6 = [
-            ('FT_FORCE_RAW_000_LF', 'FT_FORCE_LF'),
-            ('FT_FORCE_RAW_001_LH', 'FT_FORCE_LH'),
-            ('FT_FORCE_RAW_003_RH', 'FT_FORCE_RH'),
-            ('FT_FORCE_RAW_002_RF', 'FT_FORCE_RF'),
-        ]
-
-    # Define fields and nicknames for all plots
-    all_fields_and_nicknames = [
-        (fields_and_nicknames1, overlay_plot_signal, 8, 1.5),
-        (fields_and_nicknames2, overlay_plot_gait, 8, 1),
-        (fields_and_nicknames3, overlay_plot_signal, 8, 1.5),
-        (fields_and_nicknames4, overlay_plot_signal, 8, 1.5),
-        (fields_and_nicknames5, overlay_plot_gait, 8, 3),
-        (fields_and_nicknames6, overlay_plot_signal, 8, 3),
+    all_plot_configurations = [
+        {
+            'fields_and_nicknames': [
+                ('TIME_RAW', 'OBS_RAW_001_v', 'v [m/s]'),
+                ('TIME_RAW', 'ACT_RAW_009_RH_HAA', 'RH Hip Torque Command [Nm]'),
+                ('TIME_RAW', 'OBS_RAW_018_dof_pos_angle_deg_07_RF_HAA', 'RH Hip Position [deg]'),
+                ('TIME_RAW', 'OBS_RAW_007_theta_angle_deg', r'$\phi$ [deg]')
+            ],
+            'plot_func': overlay_plot_signal,
+            'fig_width': 6,
+            'fig_height': 1.5,
+            'additional_features': {
+                'draw_perturb_shaded_box': True,
+            },
+        },
+        {
+            'fields_and_nicknames': [
+                ('TIME_RAW', 'LF', 'LF'),
+                ('TIME_RAW', 'LH', 'LH'),
+                ('TIME_RAW', 'RH', 'RH'),
+                ('TIME_RAW', 'RF', 'RF'),
+            ],
+            'plot_func': overlay_plot_gait,
+            'fig_width': 6,
+            'fig_height': 1.25,
+            'additional_features': {
+                'draw_perturb_shaded_box': True,
+            },
+        },
+        {
+            'fields_and_nicknames': [
+                ('TIME_RAW', 'ACT_RAW_000_LF_HAA', 'ACT_LF_HAA'),
+                ('TIME_RAW', 'ACT_RAW_001_LF_HFE', 'ACT_LF_HFE'),
+                ('TIME_RAW', 'ACT_RAW_002_LF_KFE', 'ACT_LF_KFE'),
+                ('TIME_RAW', 'ACT_RAW_003_LH_HAA', 'ACT_LH_HAA'),
+                ('TIME_RAW', 'ACT_RAW_004_LH_HFE', 'ACT_LH_HFE'),
+                ('TIME_RAW', 'ACT_RAW_005_LH_KFE', 'ACT_LH_KFE'),
+                ('TIME_RAW', 'ACT_RAW_006_RF_HAA', 'ACT_RF_HAA'),
+                ('TIME_RAW', 'ACT_RAW_007_RF_HFE', 'ACT_RF_HFE'),
+                ('TIME_RAW', 'ACT_RAW_008_RF_KFE', 'ACT_RF_KFE'),
+                ('TIME_RAW', 'ACT_RAW_009_RH_HAA', 'ACT_RH_HAA'),
+                ('TIME_RAW', 'ACT_RAW_010_RH_HFE', 'ACT_RH_HFE'),
+                ('TIME_RAW', 'ACT_RAW_011_RH_KFE', 'ACT_RH_KFE'),
+            ],
+            'plot_func': overlay_plot_signal,
+            'fig_width': 6,
+            'fig_height': 1.5,
+            'additional_features': {
+                'draw_perturb_shaded_box': True,
+            },
+        },
+        {
+            'fields_and_nicknames': [
+                ('TIME_RAW', 'OBS_RAW_012_dof_pos_angle_deg_01_LF_HAA', 'POS_LF_HAA'),
+                ('TIME_RAW', 'OBS_RAW_013_dof_pos_angle_deg_02_LF_HFE', 'POS_LF_HFE'),
+                ('TIME_RAW', 'OBS_RAW_014_dof_pos_angle_deg_03_LF_KFE', 'POS_LF_KFE'),
+                ('TIME_RAW', 'OBS_RAW_015_dof_pos_angle_deg_04_LH_HAA', 'POS_LH_HAA'),
+                ('TIME_RAW', 'OBS_RAW_016_dof_pos_angle_deg_05_LH_HFE', 'POS_LH_HFE'),
+                ('TIME_RAW', 'OBS_RAW_017_dof_pos_angle_deg_06_LH_KFE', 'POS_LH_KFE'),
+                ('TIME_RAW', 'OBS_RAW_018_dof_pos_angle_deg_07_RF_HAA', 'POS_RF_HAA'),
+                ('TIME_RAW', 'OBS_RAW_019_dof_pos_angle_deg_08_RF_HFE', 'POS_RF_HFE'),
+                ('TIME_RAW', 'OBS_RAW_020_dof_pos_angle_deg_09_RF_KFE', 'POS_RF_KFE'),
+                ('TIME_RAW', 'OBS_RAW_021_dof_pos_angle_deg_10_RH_HAA', 'POS_RH_HAA'),
+                ('TIME_RAW', 'OBS_RAW_022_dof_pos_angle_deg_11_RH_HFE', 'POS_RH_HFE'),
+                ('TIME_RAW', 'OBS_RAW_023_dof_pos_angle_deg_12_RH_KFE', 'POS_RH_KFE'),
+            ],
+            'plot_func': overlay_plot_signal,
+            'fig_width': 6,
+            'fig_height': 1.5,
+            'additional_features': {
+                'draw_perturb_shaded_box': True,
+            },
+        },
+        {
+            'fields_and_nicknames': [
+                ('TIME_RAW', 'FT_Y_RAW_000_LF_body', 'FT_Y_LF'),
+                ('TIME_RAW', 'FT_Y_RAW_001_LH_body', 'FT_Y_LH'),
+                ('TIME_RAW', 'FT_Y_RAW_003_RH_body', 'FT_Y_RH'),
+                ('TIME_RAW', 'FT_Y_RAW_002_RF_body', 'FT_Y_RF'),
+                # ('TIME_RAW', 'COP_Y_body', 'COP_Y'),
+            ],
+            'plot_func': overlay_plot_gait,
+            'fig_width': 6,
+            'fig_height': 2,
+            'additional_features': {
+                'draw_perturb_shaded_box': True,
+                'draw_centerline': True
+            },
+        },
+        {
+            'fields_and_nicknames': [
+                ('TIME_RAW', 'FT_FORCE_RAW_000_LF', 'FT_FORCE_LF'),
+                ('TIME_RAW', 'FT_FORCE_RAW_001_LH', 'FT_FORCE_LH'),
+                ('TIME_RAW', 'FT_FORCE_RAW_003_RH', 'FT_FORCE_RH'),
+                ('TIME_RAW', 'FT_FORCE_RAW_002_RF', 'FT_FORCE_RF'),
+            ],
+            'plot_func': overlay_plot_signal,
+            'fig_width': 6,
+            'fig_height': 3,
+            'additional_features': {
+                'draw_perturb_shaded_box': True,
+            },
+        }
     ]
 
-    # Loop through each group of fields and their associated plotting function
-    for fields_and_nicknames, plot_func, fig_width, fig_height in all_fields_and_nicknames:
-        plot_func(fields_and_nicknames, dfs_collection, segments_collections, colors, fig_width, fig_height)
+    # Loop through each plot configuration
+    for plot_config in all_plot_configurations:
+        fields_and_nicknames = plot_config['fields_and_nicknames']
+        plot_func = plot_config['plot_func']
+        fig_width = plot_config['fig_width']
+        fig_height = plot_config['fig_height']
+        additional_features = plot_config.get('additional_features', {})  # Default to empty dict if not present
 
+        # Call the plot function with the unpacked arguments
+        plot_func(fields_and_nicknames, dfs_collection, segments_collections, colors, fig_width, fig_height, additional_features=additional_features)
         plt.tight_layout()
+
     plt.show()
-
-    # # Determine the total number of subplots needed
-    # total_subplots = sum(len(fields) for fields, plot_funcs, fig_width, fig_height in all_fields_and_nicknames)
-
-    # # Create a figure with the appropriate number of subplots
-    # fig, axs = plt.subplots(total_subplots, 1, figsize=(8, total_subplots * 1.5))
-    # axs = axs.flatten()  # Flatten in case of a single column of subplots
-
-    # # Counter for the current subplot index
-    # subplot_idx = 0
-
-    # # Loop through each group of fields and their associated plotting function
-    # for fields_and_nicknames, plot_func, fig_width, fig_height in all_fields_and_nicknames:
-    #     for field, nickname in fields_and_nicknames:
-    #         ax = axs[subplot_idx]
-    #         subplot_idx += 1
-    #         plot_func(ax, dfs_collection, field, nickname, segments_collections, colors, fig_width, fig_height)
-
-    # plt.tight_layout()
-    # plt.show()
 
     print('hi')
 
 if __name__ == "__main__":
     run_analysis()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def run_analysis():
-        
-#     cfg = load_configuration()
-
-#     dfs_collection = {}
-
-
-#     for idx, (data_path, model_path, output_path) in enumerate(zip(cfg.data_path, cfg.model_path, cfg.output_path)):
-
-#         print(data_path, model_path, output_path)
-
-#         # Load DataFrame
-#         raw_df = pd.read_parquet(data_path + 'RAW_DATA' + '.parquet')
-
-#         # Replace 0's with NaN's
-#         raw_df = raw_df.replace(0, np.nan)
-
-#         # Conver to deg
-#         raw_df['OBS_RAW_012_dof_pos_01'] = 180 / np.pi * (raw_df['OBS_RAW_012_dof_pos_01'])
-#         raw_df['OBS_RAW_013_dof_pos_02'] = 180 / np.pi * (raw_df['OBS_RAW_013_dof_pos_02'])
-#         raw_df['OBS_RAW_014_dof_pos_03'] = 180 / np.pi * (raw_df['OBS_RAW_014_dof_pos_03'])
-#         raw_df['OBS_RAW_015_dof_pos_04'] = 180 / np.pi * (raw_df['OBS_RAW_015_dof_pos_04'])
-#         raw_df['OBS_RAW_016_dof_pos_05'] = 180 / np.pi * (raw_df['OBS_RAW_016_dof_pos_05'])
-#         raw_df['OBS_RAW_017_dof_pos_06'] = 180 / np.pi * (raw_df['OBS_RAW_017_dof_pos_06'])
-#         raw_df['OBS_RAW_018_dof_pos_07'] = 180 / np.pi * (raw_df['OBS_RAW_018_dof_pos_07'])
-#         raw_df['OBS_RAW_019_dof_pos_08'] = 180 / np.pi * (raw_df['OBS_RAW_019_dof_pos_08'])
-#         raw_df['OBS_RAW_020_dof_pos_09'] = 180 / np.pi * (raw_df['OBS_RAW_020_dof_pos_09'])
-#         raw_df['OBS_RAW_021_dof_pos_10'] = 180 / np.pi * (raw_df['OBS_RAW_021_dof_pos_10'])
-#         raw_df['OBS_RAW_022_dof_pos_11'] = 180 / np.pi * (raw_df['OBS_RAW_022_dof_pos_11'])
-#         raw_df['OBS_RAW_023_dof_pos_12'] = 180 / np.pi * (raw_df['OBS_RAW_023_dof_pos_12'])
-
-#         # Compute OBS_RAW_007_theta
-#         raw_df['OBS_RAW_006_phi_proj'] = 180 / np.pi * np.arcsin(raw_df['OBS_RAW_007_theta_proj'])
-#         raw_df['OBS_RAW_007_theta_proj'] = 180 / np.pi * np.arcsin(raw_df['OBS_RAW_006_phi_proj'])
-        
-#         # Find the index where PERTURB == 1 and align the TIME column based on this index
-#         perturb_index = raw_df[raw_df['PERTURB_RAW'] == 1].index[0]
-#         raw_df['TIME_RAW'] -= raw_df.loc[perturb_index, 'TIME_RAW']
-
-#         # Add columns for foot contacts
-#         raw_df['FT_CONTACT_LF'] = np.where(raw_df['FT_FORCE_RAW_000'] > 0, 4, np.nan)
-#         raw_df['FT_CONTACT_LH'] = np.where(raw_df['FT_FORCE_RAW_001'] > 0, 3, np.nan)
-#         raw_df['FT_CONTACT_RH'] = np.where(raw_df['FT_FORCE_RAW_003'] > 0, 2, np.nan)
-#         raw_df['FT_CONTACT_RF'] = np.where(raw_df['FT_FORCE_RAW_002'] > 0, 1, np.nan)
-
-#         # Load additional DataFrames
-#         data_frames = {
-#             'NETWORK_OBS': pd.read_csv(data_path + 'obs.csv', header=None),
-#             'NETWORK_CN_IN': pd.read_csv(data_path + 'cn_in.csv', header=None),
-#             'NETWORK_HN_IN': pd.read_csv(data_path + 'hn_in.csv', header=None),
-#             'NETWORK_HN_OUT': pd.read_csv(data_path + 'hn_out.csv', header=None),
-#             'NETWORK_CN_IN_GRAD': pd.read_csv(data_path + 'cn_in_grad.csv', header=None),
-#             'NETWORK_HN_IN_GRAD': pd.read_csv(data_path + 'hn_in_grad.csv', header=None),
-#             'NETWORK_HN_OUT_GRAD': pd.read_csv(data_path + 'hn_out_grad.csv', header=None)
-#         }
-
-#         data_frames['NETWORK_HN_OUT_GRAD_TIMES_VALUE'] = data_frames['NETWORK_HN_OUT'] * data_frames['NETWORK_HN_OUT_GRAD']
-#         data_frames['NETWORK_HN_IN_GRAD_TIMES_VALUE'] = data_frames['NETWORK_HN_IN'] * data_frames['NETWORK_HN_IN_GRAD']
-#         data_frames['NETWORK_CN_IN_GRAD_TIMES_VALUE'] = data_frames['NETWORK_CN_IN'] * data_frames['NETWORK_CN_IN_GRAD']
-
-#         # Function to generate column names
-#         def generate_column_names(prefix, num_columns):
-#             return [f'{prefix}_{str(i).zfill(3)}' for i in range(num_columns)]
-
-#         # Concatenate all DataFrames column-wise with appropriate column names
-#         for prefix, df in data_frames.items():
-#             num_columns = df.shape[1]
-#             column_names = generate_column_names(prefix, num_columns)
-            
-#             # Ensure the DataFrame to concatenate has the right column names
-#             df.columns = column_names
-            
-#             # Concatenate the DataFrame column-wise
-#             raw_df = pd.concat([raw_df, df], axis=1)
-
-#         dfs_collection[idx] = raw_df
-#         print('hi')
-
-#     def plot_data(dfs_collection, start_time=-1, end_time=1):
-
-#         for idx in dfs_collection:
-#             # Directly update the DataFrame in dfs_collection with the filtered data
-#             dfs_collection[idx] = dfs_collection[idx][(dfs_collection[idx]['TIME_RAW'] >= start_time) & (dfs_collection[idx]['TIME_RAW'] <= end_time)]
-    
-#         colors = ['k', 'b', 'g', 'r']  # Define colors for plotting
-
-#         fields_and_nicknames1 = [
-#             ('OBS_RAW_001_v', 'v [m/s]'),
-#             ('ACT_RAW_009_RH_HAA', 'RH Hip Torque Command [Nm]'),
-#             ('OBS_RAW_021_dof_pos_10', 'RH Hip Position [deg]'),
-#             ('OBS_RAW_006_phi_proj', r'$\phi$ [deg/s]')
-#         ]
-        
-#         fields_and_nicknames2 = [
-#             ('FT_CONTACT_LF', 'LF'),
-#             ('FT_CONTACT_LH', 'LH'),
-#             ('FT_CONTACT_RH', 'RH'),
-#             ('FT_CONTACT_RF', 'RF'),
-#         ]
-
-#         fields_and_nicknames3 = [
-#             ('ACT_RAW_000_LF_HAA', 'ACT_LF_HAA'),
-#             ('ACT_RAW_001_LF_HFE', 'ACT_LF_HFE'),
-#             ('ACT_RAW_002_LF_KFE', 'ACT_LF_KFE'),
-#             ('ACT_RAW_003_LH_HAA', 'ACT_LH_HAA'),
-#             ('ACT_RAW_004_LH_HFE', 'ACT_LH_HFE'),
-#             ('ACT_RAW_005_LH_KFE', 'ACT_LH_KFE'),
-#             ('ACT_RAW_006_RF_HAA', 'ACT_RF_HAA'),
-#             ('ACT_RAW_007_RF_HFE', 'ACT_RF_HFE'),
-#             ('ACT_RAW_008_RF_KFE', 'ACT_RF_KFE'),
-#             ('ACT_RAW_009_RH_HAA', 'ACT_RH_HAA'),
-#             ('ACT_RAW_010_RH_HFE', 'ACT_RH_HFE'),
-#             ('ACT_RAW_011_RH_KFE', 'ACT_RH_KFE')
-#         ]
-
-#         fields_and_nicknames4 = [
-#             ('OBS_RAW_012_dof_pos_01', 'POS_LF_HAA'),
-#             ('OBS_RAW_013_dof_pos_02', 'POS_LF_HFE'),
-#             ('OBS_RAW_014_dof_pos_03', 'POS_LF_KFE'),
-#             ('OBS_RAW_015_dof_pos_04', 'POS_LH_HAA'),
-#             ('OBS_RAW_016_dof_pos_05', 'POS_LH_HFE'),
-#             ('OBS_RAW_017_dof_pos_06', 'POS_LH_KFE'),
-#             ('OBS_RAW_018_dof_pos_07', 'POS_RF_HAA'),
-#             ('OBS_RAW_019_dof_pos_08', 'POS_RF_HFE'),
-#             ('OBS_RAW_020_dof_pos_09', 'POS_RF_KFE'),
-#             ('OBS_RAW_021_dof_pos_10', 'POS_RH_HAA'),
-#             ('OBS_RAW_022_dof_pos_11', 'POS_RH_HFE'),
-#             ('OBS_RAW_023_dof_pos_12', 'POS_RH_KFE')
-#         ]
-
-#         fields_and_nicknames5 = [
-#             ('FT_Y_RAW_000', 'FT_Y_LF'),
-#             ('FT_Y_RAW_001', 'FT_Y_LH'),
-#             ('FT_Y_RAW_003', 'FT_Y_RH'),
-#             ('FT_Y_RAW_002', 'FT_Y_RF'),
-#             ('COM_Y_RAW', 'COM_Y'),
-#         ]
-
-#         # Function to create plots for a given set of fields and nicknames
-#         def overlay_plot_signal(fields_and_nicknames, fig_width=10, fig_height=3):
-#             fig, axs = plt.subplots(len(fields_and_nicknames), 1, figsize=(fig_width, fig_height * len(fields_and_nicknames)), sharex=True)
-#             for field_idx, (field, nickname) in enumerate(fields_and_nicknames):
-#                 for df_idx, df in dfs_collection.items():
-#                     if field in df.columns:                                
-
-#                         # Find the start and end indices of each continuous non-NaN segment
-#                         lh_nan_mask = df['FT_CONTACT_RH'].isna()
-#                         non_nan_starts_ends = df.index[~lh_nan_mask].values
-#                         non_nan_segments = np.split(non_nan_starts_ends, np.where(np.diff(non_nan_starts_ends) != 1)[0]+1)
-
-#                         # Plot each non-NaN segment individually
-#                         for i, segment in enumerate(non_nan_segments):
-#                             if len(segment) > 0:
-#                                 label = nickname if df_idx == 0 and i == 0 else None  # Only label the first segment of the first dataframe
-#                                 axs[field_idx].plot(df.loc[segment, 'TIME_RAW'], df.loc[segment, field], label=label, color=colors[df_idx % len(colors)], linewidth=1.5)
-
-#                         # Find the start and end indices of each continuous NaN segment
-#                         nan_starts_ends = df.index[lh_nan_mask].values
-#                         nan_segments = np.split(nan_starts_ends, np.where(np.diff(nan_starts_ends) != 1)[0]+1)
-
-#                         # Identify NaN segments and expand the window by one step on both ends
-#                         for segment in nan_segments:
-#                             if len(segment) > 0:
-#                                 # Expanding the NaN window: one step earlier for start, one step later for end
-#                                 start_index = max(segment[0] - 1, df.index[0])  # Ensure start index is not less than 0
-#                                 end_index = min(segment[-1] + 1, df.index[-1])  # Ensure end index does not exceed the DataFrame length
-                                
-#                                 label = nickname if df_idx == 0 and i == 0 else None  # Only label the first segment of the first dataframe
-#                                 axs[field_idx].plot(df.loc[start_index:end_index, 'TIME_RAW'], df.loc[start_index:end_index, field], label=label, color=colors[df_idx % len(colors)], linewidth=0.5)
-
-#                         axs[field_idx].set_ylabel(nickname, rotation=0, labelpad=50, fontsize='small')
-                       
-#                     else:
-#                         print(f"Column {field} not in DataFrame {idx}")
-#                 for ax in axs:
-#                     ax.axvspan(-0.02, -0.02+0.02, facecolor='lightgray', alpha=0.5)  # Translucent region
-#                     ax.legend()
-#                     ax.set_xlabel('Time [s]')
-#                 plt.tight_layout()
-
-#         # Function to create plots for a given set of fields and nicknames
-#         def overlay_plot_gait(fields_and_nicknames, fig_width=10, fig_height=3):
-#             fig, axs = plt.subplots(len(fields_and_nicknames), 1, figsize=(fig_width, fig_height * len(fields_and_nicknames)), sharex=True)
-#             for field_idx, (field, nickname) in enumerate(fields_and_nicknames):
-#                 for df_idx, df in dfs_collection.items():
-#                     if field in df.columns:
-#                         axs[df_idx].plot(df['TIME_RAW'], df[field], label=nickname, color=colors[df_idx % len(colors)])
-#                         axs[df_idx].set_ylabel(f'DF{df_idx}', rotation=0, labelpad=50, fontsize='small')
-#                     else:
-#                         print(f"Column {field} not in DataFrame {idx}")
-#                 for ax in axs:
-#                     ax.axvspan(-0.02, -0.02+0.02, facecolor='lightgray', alpha=0.5)  # Translucent region
-#                     ax.legend()
-#                     ax.set_xlabel('Time [s]')
-#                 plt.tight_layout()
-
-#         # Create the first plot
-#         overlay_plot_signal(fields_and_nicknames1, fig_width=8, fig_height=1.5)
-#         overlay_plot_gait(fields_and_nicknames2, fig_width=8, fig_height=1)
-#         overlay_plot_signal(fields_and_nicknames3, fig_width=8, fig_height=1.5)
-#         overlay_plot_signal(fields_and_nicknames4, fig_width=8, fig_height=1.5)
-#         overlay_plot_gait(fields_and_nicknames5, fig_width=8, fig_height=3)
-
-#     # At the end of your run_analysis function, call plot_data
-#     plot_data(dfs_collection, start_time=-1, end_time=1)
-
-#     plt.show()
-
-#     print('hi')
-
-
-
-
-# if __name__ == "__main__":
-#     run_analysis()
-
-#     print('done')

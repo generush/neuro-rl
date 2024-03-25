@@ -162,6 +162,23 @@
                 "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\"]"
             ]
 
+            // TESTING FT/COM
+            "args": [
+                "--config_path=cfg/analyze/analysis.yaml",
+                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_1100_rew_14.392729.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_2200_rew_19.53241.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
+                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_1100_rew_14.392729.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_2200_rew_19.53241.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
+                "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\"]"
+            ]
+            
+            
+            // // TESTING CoRL biomechanics
+            // "args": [
+            //     "--config_path=cfg/analyze/analysis.yaml",
+            //     "--model_path=[\"models/ANYMAL-1.0MASS-LSTM4-CORLDISTTERR/nn/last_AnymalTerrain_ep_6700_rew_20.21499.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth\"]",
+            //     "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM4-CORLDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_6700_rew_20.21499.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_3700_rew_20.14857.pth/\"]",
+            //     "--output_path=[\"data/processed\", \"data/processed\"]"
+            // ]
+
 
             
 
