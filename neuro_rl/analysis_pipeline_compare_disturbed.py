@@ -44,12 +44,14 @@ def overlay_plot_signal(fields_and_nicknames, dfs_collection, segments_collectio
     # Determine the number of subplots needed for the current group
     num_subplots = len(fields_and_nicknames)
 
-    # Define the figure
-    fig = plt.figure(figsize=(fig_width, num_subplots * fig_height), constrained_layout=True)
+    # Create the figure and subplots, sharing the x-axis
+    fig, axes = plt.subplots(num_subplots, 1, sharex=True, figsize=(fig_width, num_subplots * fig_height), constrained_layout=True)
 
-    for field_idx, (x_field, y_field, nickname) in enumerate(fields_and_nicknames):
+    # Ensure 'axes' is an iterable (important if num_subplots is 1)
+    if num_subplots == 1:
+        axes = [axes]
 
-        ax = fig.add_subplot(num_subplots, 1, field_idx + 1)  # Create a new subplot for each DataFrame
+    for ax, (x_field, y_field, nickname) in zip(axes, fields_and_nicknames):
 
         for df_idx, df in dfs_collection.items():
 
@@ -88,11 +90,10 @@ def overlay_plot_signal(fields_and_nicknames, dfs_collection, segments_collectio
         if additional_features and additional_features.get('draw_centerline', False):
             # Draw a centerline
             ax.axhline(y=0, color='gray', linestyle='--', linewidth=1)
-
-        ax.set_xlim([global_min_time, global_max_time])  # Set the same x-axis range for all subplots
-        ax.set_xlabel('Time [s]')
         ax.set_ylabel(nickname, rotation=0)
-        ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
+    axes[-1].set_xlim([global_min_time, global_max_time])  # Set the same x-axis range for all subplots
+    axes[-1].set_xlabel('Time [s]')
+    axes[-1].legend(loc='upper left', bbox_to_anchor=(1, 1))
 
 def overlay_plot_gait(fields_and_nicknames, dfs_collection, segments_collections, colors, fig_width, fig_height, additional_features=None):
     
@@ -103,13 +104,15 @@ def overlay_plot_gait(fields_and_nicknames, dfs_collection, segments_collections
     # Determine the number of subplots needed for the current group
     num_subplots = len(dfs_collection)
 
-    # Define the figure
-    fig = plt.figure(figsize=(fig_width, num_subplots * fig_height), constrained_layout=True)
+    # Create the figure and subplots, sharing the x-axis
+    fig, axes = plt.subplots(num_subplots, 1, sharex=True, figsize=(fig_width, num_subplots * fig_height), constrained_layout=True)
+
+    # Ensure 'axes' is an iterable (important if num_subplots is 1)
+    if num_subplots == 1:
+        axes = [axes]
     
     # Iterate over each DataFrame in the collection
-    for df_idx, (df_key, df) in enumerate(dfs_collection.items()):
-
-        ax = fig.add_subplot(num_subplots, 1, df_idx + 1)  # Create a new subplot for each DataFrame
+    for ax, (df_key, df) in zip(axes, dfs_collection.items()):
 
         # Iterate over each signal field you want to plot for this DataFrame
         for field_idx, (x_field, y_field, nickname) in enumerate(fields_and_nicknames):
@@ -150,27 +153,22 @@ def overlay_plot_gait(fields_and_nicknames, dfs_collection, segments_collections
         if additional_features and additional_features.get('draw_centerline', False):
             # Draw a centerline
             ax.axhline(y=0, color='gray', linestyle='--', linewidth=1)
-
-
-                
-        if x_field == 'TIME_RAW':
-            ax.set_xlim([global_min_time, global_max_time])  # Set the same x-axis range for all subplots
-            ax.set_xlabel('Time [s]')
-        else:
-            ax.set_xlabel(x_field)
-            # Set the aspect ratio to be equal
-            ax.set_aspect('equal', adjustable='box')
-            
         ax.set_ylabel(f'DF{df_key}')
-        ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
+    if x_field == 'TIME_RAW':
+        axes[-1].set_xlim([global_min_time, global_max_time])  # Set the same x-axis range for all subplots
+        axes[-1].set_xlabel('Time [s]')
+    else:
+        axes[-1].set_xlabel(x_field)
+        # Set the aspect ratio to be equal
+        axes[-1].set_aspect('equal', adjustable='box')
+    axes[-1].legend(loc='upper left', bbox_to_anchor=(1, 1))
         
 def run_analysis():
     cfg = load_configuration()
-
     dfs_collection = {}
     segments_collections = {}
     contact_fields = ['LF', 'LH', 'RH', 'RF']
-    colors = ['k', 'r', 'b', 'g', 'm']
+    colors = ['k', 'b', 'g', 'r', 'm']
 
     for idx, (data_path, model_path, output_path) in enumerate(zip(cfg.data_path, cfg.model_path, cfg.output_path)):
 
@@ -287,9 +285,8 @@ def run_analysis():
         dfs_collection[idx] = raw_df
         segments_collections[idx] = precompute_segments(raw_df, contact_fields)
 
-
         # Define the global time window here
-        global_time_window = (-1, 1.5)  # Replace 'start_time' and 'end_time' with actual values or references to cfg
+        global_time_window = (-1, 2.5)  # Replace 'start_time' and 'end_time' with actual values or references to cfg
 
         # Filter each DataFrame in dfs_collection according to the global_time_window
         for idx, df in dfs_collection.items():
@@ -305,11 +302,11 @@ def run_analysis():
                 ('TIME_RAW', 'OBS_RAW_001_v', 'v [m/s]'),
                 ('TIME_RAW', 'ACT_RAW_009_RH_HAA', 'RH Hip Torque Command [Nm]'),
                 ('TIME_RAW', 'OBS_RAW_018_dof_pos_angle_deg_07_RF_HAA', 'RH Hip Position [deg]'),
-                ('TIME_RAW', 'OBS_RAW_007_theta_angle_deg', r'$\phi$ [deg]')
+                ('TIME_RAW', 'OBS_RAW_006_phi_angle_deg', r'$\phi$ [deg]')
             ],
             'plot_func': overlay_plot_signal,
             'fig_width': 6,
-            'fig_height': 1.5,
+            'fig_height': 1.25,
             'additional_features': {
                 'draw_perturb_shaded_box': True,
             },
@@ -323,7 +320,7 @@ def run_analysis():
             ],
             'plot_func': overlay_plot_gait,
             'fig_width': 6,
-            'fig_height': 1.25,
+            'fig_height': 1,
             'additional_features': {
                 'draw_perturb_shaded_box': True,
             },
@@ -345,7 +342,7 @@ def run_analysis():
             ],
             'plot_func': overlay_plot_signal,
             'fig_width': 6,
-            'fig_height': 1.5,
+            'fig_height': 1.25,
             'additional_features': {
                 'draw_perturb_shaded_box': True,
             },
@@ -367,7 +364,7 @@ def run_analysis():
             ],
             'plot_func': overlay_plot_signal,
             'fig_width': 6,
-            'fig_height': 1.5,
+            'fig_height': 1.25,
             'additional_features': {
                 'draw_perturb_shaded_box': True,
             },
@@ -382,7 +379,7 @@ def run_analysis():
             ],
             'plot_func': overlay_plot_gait,
             'fig_width': 6,
-            'fig_height': 2,
+            'fig_height': 1.5,
             'additional_features': {
                 'draw_perturb_shaded_box': True,
                 'draw_centerline': True
@@ -397,7 +394,7 @@ def run_analysis():
             ],
             'plot_func': overlay_plot_signal,
             'fig_width': 6,
-            'fig_height': 3,
+            'fig_height': 2.5,
             'additional_features': {
                 'draw_perturb_shaded_box': True,
             },
