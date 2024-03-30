@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
-a = pd.read_csv('aggregated_data.csv')
+a = pd.read_csv(os.getcwd() + '/../../neuro-rl/neuro_rl/aggregated_data.csv')
 
 # Define the base path that we want to filter by and remove
 base_path = '../../neuro-rl/neuro_rl/data/raw/'
@@ -28,18 +28,19 @@ a.rename(columns={'Subfolder_4':'length_s'}, inplace=True)
 a.rename(columns={'Subfolder_5':'forceY'}, inplace=True)
 a.rename(columns={'Subfolder_6':'model_name'}, inplace=True)
 
-
 # Further filter for rows starting with the base path, if needed
 a = a[a['run_type'] == 'evaluate_robustness_throughout_training']
+# a = a[a['run_type'] == 'robustness_gradients_analysis']
+# a = a[a['run_type'] == 'standing_still_robustness_analysis_gradients']
 
 # Filter out rows where 'model_type' contains 'CORL'
-# a = a[~a['model_type'].str.contains("CORL")]
+a = a[~a['model_type'].str.contains("CORL")]    
 
-# Parse 'model_name' to extract 'episode_number' and 'reward'
+# Parse 'model_name' to extract 'epoch' and 'reward'
 # Make sure 'model_name' is treated as a string column
 # Note: The 'model_name' column might have leading/trailing whitespaces that need to be stripped
-a['model_name'] = a['model_name'].str.strip()# Parse 'model_name' to extract 'episode_number' and handle NaN values by using Pandas Nullable Integer Data Type
-a['episode_number'] = a['model_name'].str.extract(r'ep_(\d+)_')[0].astype('Int64')
+a['model_name'] = a['model_name'].str.strip()# Parse 'model_name' to extract 'epoch' and handle NaN values by using Pandas Nullable Integer Data Type
+a['epoch'] = a['model_name'].str.extract(r'ep_(\d+)_')[0].astype('Int64')
 a['reward'] = a['model_name'].str.extract(r'rew_([-\d.]+)\.pth')[0].astype(float)
 
 # Drop rows where 'reward' is NaN
@@ -65,22 +66,28 @@ import pandas as pd
 
 # Define your array of forceY values for low, mid, and high categories
 low_impulse_forceY = [-0.333, -1, -4]
+midl_impulse_forceY = [-0.5, -1.5, -6]
 mid_impulse_forceY = [-0.667, -2, -8]
+midh_impulse_forceY = [-0.833, -2.5, -10]
 high_impulse_forceY = [-1, -3, -12]
 
 low_impulse_length_s = [0.4, 0.1, 0.02]
+midl_impulse_length_s = [0.4, 0.1, 0.02]
 mid_impulse_length_s = [0.4, 0.1, 0.02]
+midh_impulse_length_s = [0.4, 0.1, 0.02]
 high_impulse_length_s = [0.4, 0.1, 0.02]
 
-# Combine all forceY values and length_s values for ease of use
+# # Combine all forceY values and length_s values for ease of use
 all_forceY = [low_impulse_forceY, mid_impulse_forceY, high_impulse_forceY]
 all_length_s = [low_impulse_length_s, mid_impulse_length_s, high_impulse_length_s]
 forceY_categories = ['Low', 'Mid', 'High']  # For labeling purposes
+# all_forceY = [low_impulse_forceY, midl_impulse_forceY, mid_impulse_forceY, midh_impulse_forceY, high_impulse_forceY]
+# all_length_s = [low_impulse_length_s, midl_impulse_length_s, mid_impulse_length_s, midh_impulse_length_s, high_impulse_length_s]
+# forceY_categories = ['Low', 'MidL', 'Mid', 'MidH', 'High']  # For labeling purposes
 
-
-
-
-
+# all_forceY = [low_impulse_forceY, midl_impulse_forceY, mid_impulse_forceY, midh_impulse_forceY, high_impulse_forceY]
+# all_length_s = [low_impulse_length_s, midl_impulse_length_s, mid_impulse_length_s, midh_impulse_length_s, high_impulse_length_s]
+# forceY_categories = ['Low', 'MidL', 'Mid', 'MidH', 'High']  # For labeling purposes
 
 # Get unique model types from the entire DataFrame
 model_types = sorted(a['model_type'].unique())
@@ -89,7 +96,7 @@ model_types = sorted(a['model_type'].unique())
 colors = ['black', 'red', 'blue']
 
 # Create a figure for the Robustness plot with subplots for each model type and forceY category, plus an additional column for the summary
-fig, axes = plt.subplots(len(model_types), 4, figsize=(20, 6 * len(model_types)), sharex=True, constrained_layout=True)
+fig, axes = plt.subplots(len(model_types), 6, figsize=(20, (len(forceY_categories)+1) * len(model_types)), sharex=True, constrained_layout=True)
 
 # List of markers to cycle through, including an 'o' for unfilled circle
 markers = [('o', 'none'), ('x', None), ('+', None)]
@@ -107,31 +114,32 @@ for i, model_type in enumerate(model_types):
             markerfacecolor = 'none' if facecolor == 'none' else 'auto'
             line_color = colors[j % len(colors)]
 
-            model_df = a[(a['model_type'] == model_type) & (a['forceY'] == forceY) & (a['length_s'] == length_s)].sort_values('episode_number')
+            model_df = a[(a['model_type'] == model_type) & (a['forceY'] == forceY) & (a['length_s'] == length_s)].sort_values('epoch')
 
             ax = axes[i, k]
             
-            ax.plot(model_df['episode_number'], model_df['Robustness'], marker=marker, markersize=2, linestyle='--', color=line_color, markerfacecolor=markerfacecolor, label=disturbance_labels[j])
+            ax.plot(model_df['epoch'], model_df['Robustness'], marker=marker, markersize=8, linestyle='--', color=line_color, markerfacecolor=markerfacecolor, label=disturbance_labels[j])
             
             # Set y-axis limits to 0 to 1 for all subplots
             ax.set_ylim(0, 1)
+    ax.legend()
 
     # Summary plot in the 4th column for each model type
-    summary_ax = axes[i, 3]
+    summary_ax = axes[i, len(forceY_categories)]
     summary_ax.set_title('Summary', pad=1, fontsize=5)
 
     # Example: Aggregating with mean for simplicity. Replace with your weighted aggregation method
-    summary_df = a[a['model_type'] == model_type].groupby('episode_number').mean().reset_index()
+    summary_df = a[a['model_type'] == model_type].groupby('epoch').mean().reset_index()
     
     # Plot the summary line
-    summary_ax.plot(summary_df['episode_number'], summary_df['Robustness'], color='black', linestyle='--', label='Summary')
+    summary_ax.plot(summary_df['epoch'], summary_df['Robustness'], color='black', linestyle='--', label='Summary')
     
     # Add black square markers on all summary points
-    summary_ax.plot(summary_df['episode_number'], summary_df['Robustness'], color='black', markerfacecolor='none')
+    summary_ax.plot(summary_df['epoch'], summary_df['Robustness'], color='black', markerfacecolor='none')
 
     # Find the episode number with maximum summary robustness
     max_robustness_idx = summary_df['Robustness'].idxmax()
-    max_robustness_episode = summary_df.loc[max_robustness_idx, 'episode_number']
+    max_robustness_episode = summary_df.loc[max_robustness_idx, 'epoch']
     max_robustness_value = summary_df.loc[max_robustness_idx, 'Robustness']
 
     # Highlight the maximum robustness point with a filled black square
@@ -159,14 +167,14 @@ for i, model_type in enumerate(model_types):
     model_df = a[a['model_type'] == model_type]
 
     # Aggregate the data (assuming mean for simplicity, replace with your method)
-    summary_df = model_df.groupby('episode_number').mean().reset_index()
+    summary_df = model_df.groupby('epoch').mean().reset_index()
 
     # Find the episode number with the maximum summary robustness
     max_robustness_idx = summary_df['Robustness'].idxmax()
-    max_robustness_episode = summary_df.loc[max_robustness_idx, 'episode_number']
+    max_robustness_episode = summary_df.loc[max_robustness_idx, 'epoch']
 
-    # Find the rows in the original DataFrame that match the model_type and the episode_number of maximum robustness
-    matching_rows = model_df[model_df['episode_number'] == max_robustness_episode]
+    # Find the rows in the original DataFrame that match the model_type and the epoch of maximum robustness
+    matching_rows = model_df[model_df['epoch'] == max_robustness_episode]
 
     # Assuming 'model_name' is available in 'matching_rows', and you want to print all unique model_names for the given condition
     unique_model_names = matching_rows['model_name'].unique()

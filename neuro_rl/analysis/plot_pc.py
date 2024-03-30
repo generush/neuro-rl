@@ -110,4 +110,34 @@ def plot_pc12_speed_axis(df, data_names, export_path):
     
     print('done plotting')
     
+def plot_pc123(df, data_names, c_name, export_path):
 
+    c_min = df.loc[:, df.columns.str.contains(c_name)].values.min()
+    c_max = df.loc[:, df.columns.str.contains(c_name)].values.max()
+
+    # Plot the data for each data_type
+    for idx, data_type in enumerate(data_names):
+
+        pc1 = df.loc[:, df.columns.str.contains(data_type + '_PC_000')].values
+        pc2 = df.loc[:, df.columns.str.contains(data_type + '_PC_001')].values
+        pc3 = df.loc[:, df.columns.str.contains(data_type + '_PC_002')].values
+
+        # PC1, PC2, PC3, Speed
+        plot_data(pc1, pc2, pc3, df[c_name], c_min, c_max, data_type, 'PC 3', 'PC 3', 'Spectral', export_path, save_figs=True)
+
+        # export some data for the paper/suppl matl
+        # pd.DataFrame(pca.explained_variance_ratio_.cumsum()).to_csv(export_path + 'info_' + data_type + '_cumvar.csv')
+        pd.DataFrame(pc1).to_csv(export_path + 'info_' + data_type + '_x_by_speed.csv')
+        pd.DataFrame(pc2).to_csv(export_path + 'info_' + data_type + '_y_by_speed.csv')
+        pd.DataFrame(pc3).to_csv(export_path + 'info_' + data_type + '_z_by_speed.csv')
+        # pd.DataFrame(z2).to_csv(export_path + 'info_' + data_type + '_z2_by_speed.csv')
+        # pd.DataFrame(t).to_csv(export_path + 'info_' + data_type + '_tangling_by_speed.csv')
+        # pd.DataFrame(d_opt).to_csv(export_path + 'info_' + data_type + '_dopt.csv')
+        # export_scl(scl, export_path + 'info_' + data_type +'_SCL' + '.pkl')
+        # export_pca(pca, export_path + 'info_' + data_type +'_PCA' + '.pkl')
+ 
+
+    # crop white space out of pdfs
+    # crop_pdfs_in_folder(export_path)
+    
+    print('done plotting')

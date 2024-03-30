@@ -38,7 +38,7 @@ def constraint(d):
 
 def append_speed_axis(df: pd.DataFrame, data_names: List[str], max_dims: int, norm_type: NormalizationType, export_path: str):
 
-    dt = df['TIME'][1] - df['TIME'][0]
+    dt = df['TIME_RAW'][1] - df['TIME_RAW'][0]
 
     x_data = []
     y_data = []

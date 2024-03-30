@@ -4,6 +4,7 @@ import numpy as np
 import dask.dataframe as dd
 from pathlib import Path
 
+# not used any more, maybe broken since changed TIME -> TIME_RAW and ENV -> ENV_RAW
 def filter_by_column_keywords(df, include_keywords, exclude_keyword):
 
     # Creating a mask for columns to include: columns that contain include_keywords or don't contain exclude_keyword

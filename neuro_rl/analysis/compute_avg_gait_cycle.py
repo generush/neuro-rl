@@ -4,7 +4,7 @@ import pandas as pd
 def compute_avg_gait_cycle(df: pd.DataFrame):
 
     # get dt time step
-    DT = df['TIME'][1] - df['TIME'][0]
+    DT = df['TIME_RAW'][1] - df['TIME_RAW'][0]
 
     # this entry is the first time step of swing phase (this FOOT_FORCE_002 = zero)
     mask_swingf = df['FT_FORCE_RAW_002'] == 0
@@ -13,10 +13,10 @@ def compute_avg_gait_cycle(df: pd.DataFrame):
     mask_swing0 = (df['FT_FORCE_RAW_002'] > 0).shift()
 
     # first time step entry of new condition (env id)
-    mask_new = df['ENV'].diff()
+    mask_new = df['ENV_RAW'].diff()
 
     # create dataframe of all ones
-    mask_ones = df['ENV'] >= 0
+    mask_ones = df['ENV_RAW'] >= 0
 
     # compute the cycle id (when starting swing phase or when new test)
     df.insert(loc=0, column='CYCLE_NUM', value=(mask_swingf & mask_swing0 | mask_new).cumsum())
@@ -54,13 +54,13 @@ def compute_avg_gait_cycle(df: pd.DataFrame):
     avg_sorted_df = avg_df.sort_values(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star', 'CYCLE_TIME'], ascending=[True, True, True, True]).reset_index(drop=True)
 
     # delete unnecessary columns
-    avg_sorted_df = avg_sorted_df.drop('ENV', axis=1)
-    avg_sorted_df = avg_sorted_df.drop('TIME', axis=1)
+    avg_sorted_df = avg_sorted_df.drop('ENV_RAW', axis=1)
+    avg_sorted_df = avg_sorted_df.drop('TIME_RAW', axis=1)
     avg_sorted_df = avg_sorted_df.drop('CYCLE_NUM', axis=1)
     avg_sorted_df = avg_sorted_df.drop('Mode_of_Max_Value', axis=1)
 
     # recompute actual time based on cycle_time
-    avg_sorted_df.insert(loc=0, column='TIME', value=avg_sorted_df['CYCLE_TIME'] * DT)
+    avg_sorted_df.insert(loc=0, column='TIME_RAW', value=avg_sorted_df['CYCLE_TIME'] * DT)
 
     # Calculate the 'CONDITION' values
     condition_values = avg_sorted_df.groupby(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star'], sort=True).ngroup()
@@ -79,13 +79,13 @@ def compute_avg_gait_cycle(df: pd.DataFrame):
     var_sorted_df = var_df.sort_values(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star', 'CYCLE_TIME'], ascending=[True, True, True, True]).reset_index(drop=True)
 
     # delete unnecessary columns
-    var_sorted_df = var_sorted_df.drop('ENV', axis=1)
-    var_sorted_df = var_sorted_df.drop('TIME', axis=1)
+    var_sorted_df = var_sorted_df.drop('ENV_RAW', axis=1)
+    var_sorted_df = var_sorted_df.drop('TIME_RAW', axis=1)
     var_sorted_df = var_sorted_df.drop('CYCLE_NUM', axis=1)
     var_sorted_df = var_sorted_df.drop('Mode_of_Max_Value', axis=1)
 
     # recompute actual time based on cycle_time
-    var_sorted_df.insert(loc=0, column='TIME', value=var_sorted_df['CYCLE_TIME'] * DT)
+    var_sorted_df.insert(loc=0, column='TIME_RAW', value=var_sorted_df['CYCLE_TIME'] * DT)
 
     # The 'CONDITION' column will contain the unique indices based on commands u, v, r
     var_sorted_df['CONDITION'] = var_sorted_df.groupby(['OBS_RAW_009_u_star', 'OBS_RAW_010_v_star', 'OBS_RAW_011_r_star'], sort=True).ngroup()

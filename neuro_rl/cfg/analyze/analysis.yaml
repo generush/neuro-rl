@@ -4,8 +4,8 @@ dataset_names:
     - ACT
     - A_MLP_XX
     - A_LSTM_HC
-    # - A_LSTM_CX
-    # - A_LSTM_HX
+    - A_LSTM_CX
+    - A_LSTM_HX
     # - A_LSTM_C1X
     # - A_LSTM_C2X
     # - C_MLP_XX

@@ -96,13 +96,13 @@
             //     "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.667\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.667\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.667\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-0.667\"]"
             // ]
 
-            // 0.4, -1
-            "args": [
-                "--config_path=cfg/analyze/analysis.yaml",
-                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_1100_rew_14.392729.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_2200_rew_19.53241.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
-                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_1100_rew_14.392729.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_2200_rew_19.53241.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
-                "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1\"]"
-            ]
+            // // 0.4, -1 (FINDINGS: This one is difficult to understand, I think the roll is regulated by making short steps wide right with the RF and RH legs. The other models fail to do this, and fall over)
+            // "args": [
+            //     "--config_path=cfg/analyze/analysis.yaml",
+            //     "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_1100_rew_14.392729.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_2200_rew_19.53241.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
+            //     "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_1100_rew_14.392729.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_2200_rew_19.53241.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
+            //     "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.4/-1\"]"
+            // ]
 
             // // 0.1, -1
             // "args": [
@@ -144,14 +144,14 @@
             //     "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\"]"
             // ]
 
-            // // 0.02, -12 (FINDINGS of 4100 (succeed) vs 4000 (fail): RH_HAA and RF_HAA are basically the same, but RF_HAA gets a longer swing (340ms vs 275ms) because of a smaller roll angle (within first 250ms) so it has more swing time and thereforea wider swing!!)
-            // // lower roll (same at 80s in, lower as early as 120ms) I think because the LH_HAA swings inward, whereas the other models it swings outward. This provides rotational energy. Both LF_HFE and LF_KFE both retract the leg more, but this wouldnt help until the leg lands but its too late then.
-            // "args": [
-            //     "--config_path=cfg/analyze/analysis.yaml",
-            //     "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_1100_rew_14.392729.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_2200_rew_19.53241.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
-            //     "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_1100_rew_14.392729.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_2200_rew_19.53241.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
-            //     "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\"]"
-            // ]
+            // 0.02, -12 (FINDINGS of 4100 (succeed) vs 4000 (fail): RH_HAA and RF_HAA are basically the same, but RF_HAA gets a longer swing (340ms vs 275ms) because of a smaller roll angle (within first 250ms) so it has more swing time and thereforea wider swing!!)
+            // lower roll (same at 80s in, lower as early as 120ms) I think because the LH_HAA swings inward, whereas the other models it swings outward. This provides rotational energy. Both LF_HFE and LF_KFE both retract the leg more, but this wouldnt help until the leg lands but its too late then.
+            "args": [
+                "--config_path=cfg/analyze/analysis.yaml",
+                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_1100_rew_14.392729.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_2200_rew_19.53241.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3800_rew_20.310041.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_4100_rew_20.68903.pth\"]",
+                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_1100_rew_14.392729.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_2200_rew_19.53241.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_3800_rew_20.310041.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02/-12/last_AnymalTerrain_ep_4100_rew_20.68903.pth/\"]",
+                "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\"]"
+            ]
 
             // // TESTING FT/COM 0.02/-12
             // "args": [
@@ -185,7 +185,7 @@
             //     "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSTERR/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDIST/robustness_gradients_analysis/0/0.02\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSBASELINE/robustness_gradients_analysis/0/0.02\"]"
             // ]
             
-            // // TESTING Frontiers biomechanics 0.08/-3 (FINDINGS: RH_HAA saves the day)
+            // TESTING Frontiers biomechanics 0.08/-3 (FINDINGS: RH_HAA saves the day)
             // "args": [
             //     "--config_path=cfg/analyze/analysis.yaml",
             //     "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSBASELINE/nn/last_AnymalTerrain_ep_700_rew_20.361492.pth/\", \"ANYMAL-1.0MASS-LSTM16-FRONTIERSDIST/nn/last_AnymalTerrain_ep_900_rew_20.139568.pth\", \"models/models/ANYMAL-1.0MASS-LSTM16-FRONTIERSTERR/nn/last_AnymalTerrain_ep_2900_rew_20.2482.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth\"]",
@@ -194,9 +194,92 @@
             // ]
             
 
+            // //For thesis, generating gradients for all actuators, to see if I can figure out what the other 5 key cx neurons are driving???
+            // // TESTING Frontiers BASELINE, DIST, TERR, DISTTERR, biomechanics 0.08/-3.5 (FINDINGS: RH_HAA saves the day)
+            // "args": [
+            //     "--config_path=cfg/analyze/analysis.yaml",
+            //     "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSBASELINE/nn/last_AnymalTerrain_ep_700_rew_20.361492.pth/\", \"ANYMAL-1.0MASS-LSTM16-FRONTIERSDIST/nn/last_AnymalTerrain_ep_900_rew_20.139568.pth\", \"models/models/ANYMAL-1.0MASS-LSTM16-FRONTIERSTERR/nn/last_AnymalTerrain_ep_2900_rew_20.2482.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth\"]",
+            //     "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSBASELINE/robustness_gradients_analysis/0/0.08/-3.5/last_AnymalTerrain_ep_700_rew_20.361492.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDIST/robustness_gradients_analysis/0/0.08/-3.5/last_AnymalTerrain_ep_900_rew_20.139568.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSTERR/robustness_gradients_analysis/0/0.08/-3.5/last_AnymalTerrain_ep_2900_rew_20.2482.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.08/-3.5/last_AnymalTerrain_ep_3200_rew_20.145746.pth/\"]",
+            //     "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.08/-3.5/compare_models/\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.08/-3.5/compare_models/\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.08/-3.5/compare_models/\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.08/-3.5/compare_models/\"]"
+            // ]
 
+            //For thesis, generating gradients for all actuators, to see if I can figure out what the other 5 key cx neurons are driving???
+            // TESTING Frontiers BASELINE, DIST, TERR, DISTTERR, biomechanics 0.08/-3.0 (want to see both TERR and DISTTERR succeed)
+            // "args": [
+            //     "--config_path=cfg/analyze/analysis.yaml",
+            //     "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSBASELINE/nn/last_AnymalTerrain_ep_700_rew_20.361492.pth/\", \"ANYMAL-1.0MASS-LSTM16-FRONTIERSDIST/nn/last_AnymalTerrain_ep_900_rew_20.139568.pth\", \"models/models/ANYMAL-1.0MASS-LSTM16-FRONTIERSTERR/nn/last_AnymalTerrain_ep_2900_rew_20.2482.pth\", \"models/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth\"]",
+            //     "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSBASELINE/robustness_gradients_analysis/0/0.08/-2/last_AnymalTerrain_ep_700_rew_20.361492.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDIST/robustness_gradients_analysis/0/0.08/-2/last_AnymalTerrain_ep_900_rew_20.139568.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSTERR/robustness_gradients_analysis/0/0.08/-2/last_AnymalTerrain_ep_2900_rew_20.2482.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.08/-2/last_AnymalTerrain_ep_3200_rew_20.145746.pth/\"]",
+            //     "--output_path=[\"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.08/-2/compare_models/\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.08/-2/compare_models/\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.08/-2/compare_models/\", \"data/processed/ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR/robustness_gradients_analysis/0/0.08/-2/compare_models/\"]"
+            // ]
             
 
+            // // TESTING CoRL biomechanics 0.02/-12 (4 models across training)
+            "args": [
+                "--config_path=cfg/analyze/analysis.yaml",
+                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_200_rew_6.1486754.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_400_rew_10.192444.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_1000_rew_15.300709.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_2000_rew_16.601225.pth\"]",
+                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-12/last_AnymalTerrain_ep_200_rew_6.1486754.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-12/last_AnymalTerrain_ep_400_rew_10.192444.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-12/last_AnymalTerrain_ep_1000_rew_15.300709.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-12/last_AnymalTerrain_ep_2000_rew_16.601225.pth/\"]",
+                "--output_path=[\"data/processed/standing_still_robustness_analysis_gradients/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/\", \"data/processed/standing_still_robustness_analysis_gradients/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/\", \"data/processed/standing_still_robustness_analysis_gradients/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/\", \"data/processed/standing_still_robustness_analysis_gradients/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/\"]"
+            ]
+
+            // // TESTING CoRL biomechanics 0.02/-8 (4 models across training)
+            "args": [
+                "--config_path=cfg/analyze/analysis.yaml",
+                "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_200_rew_6.1486754.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_400_rew_10.192444.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_1000_rew_15.300709.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_2000_rew_16.601225.pth\"]",
+                "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-8/last_AnymalTerrain_ep_200_rew_6.1486754.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-8/last_AnymalTerrain_ep_400_rew_10.192444.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-8/last_AnymalTerrain_ep_1000_rew_15.300709.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-8/last_AnymalTerrain_ep_2000_rew_16.601225.pth/\"]",
+                "--output_path=[\"data/processed/standing_still_robustness_analysis_gradients/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/\", \"data/processed/standing_still_robustness_analysis_gradients/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/\", \"data/processed/standing_still_robustness_analysis_gradients/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/\", \"data/processed/standing_still_robustness_analysis_gradients/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/\"]"
+            ]
+
+            // I need to look at PCA of disturbed trajectories and run the new analyze_pipeline_disturbed_traj file (SINGLE TRAJ)
+           
+            "args": ["--config_path=cfg/analyze/analysis.yaml", 
+            "--model_path=models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_2000_rew_16.601225.pth", 
+            "--data_path=data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-12/last_AnymalTerrain_ep_2000_rew_16.601225.pth/", 
+            "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-12/last_AnymalTerrain_ep_2000_rew_16.601225.pth/"
+            ]
+
+            // I need to look at PCA of disturbed trajectories and run the new analyze_pipeline_disturbed_traj file (4 TRAJ)
+           
+            "args": ["--config_path=cfg/analyze/analysis.yaml", 
+            "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_2000_rew_16.601225.pth\"]",
+            "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-6/last_AnymalTerrain_ep_2000_rew_16.601225.pth/\"]",
+            "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/compare6_to_12/last_AnymalTerrain_ep_2000_rew_16.601225.pth/"
+            ]
+
+            // I need to look at PCA of disturbed trajectories and run the new analyze_pipeline_disturbed_traj file (4 TRAJ) 2000 model
+            // perturb + 0.45s --> nice separation between 4 trajectories, start in same place, end in roughly same place
+            "args": ["--config_path=cfg/analyze/analysis.yaml", 
+            "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_2000_rew_16.601225.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_2000_rew_16.601225.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_2000_rew_16.601225.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_2000_rew_16.601225.pth\"]",
+            "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-6/last_AnymalTerrain_ep_2000_rew_16.601225.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-8/last_AnymalTerrain_ep_2000_rew_16.601225.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-10/last_AnymalTerrain_ep_2000_rew_16.601225.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-12/last_AnymalTerrain_ep_2000_rew_16.601225.pth/\"]",
+            "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/compare6_to_12/last_AnymalTerrain_ep_2000_rew_16.601225.pth/"
+            ]
+
+            // I need to look at PCA of disturbed trajectories and run the new analyze_pipeline_disturbed_traj file (4 TRAJ) try 3700 moel
+            // perturb + 0.45s --> nice separation between 4 trajectories, start in same place, end in roughly same place
+            "args": ["--config_path=cfg/analyze/analysis.yaml", 
+            "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth\"]",
+            "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-6/last_AnymalTerrain_ep_3700_rew_20.14857.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-8/last_AnymalTerrain_ep_3700_rew_20.14857.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-10/last_AnymalTerrain_ep_3700_rew_20.14857.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-10/last_AnymalTerrain_ep_3700_rew_20.14857.pth/\"]",
+            "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/compare6_to_10/last_AnymalTerrain_ep_3700_rew_20.14857.pth/"
+            ]
+
+
+            // I need to look at PCA of disturbed trajectories and run the new analyze_pipeline_disturbed_traj file (2 MODELS) 2000 model vs 3700 model
+            // perturb + 0.45s --> wow they are convergent HX, CX, HC during middle of disturbance! Despite OBS and ACT being different
+            "args": ["--config_path=cfg/analyze/analysis.yaml", 
+            "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_2000_rew_16.601225.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth\"]",
+            "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-10/last_AnymalTerrain_ep_2000_rew_16.601225.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-10/last_AnymalTerrain_ep_3700_rew_20.14857.pth/\"]",
+            "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-10/compare2000vs3700/"
+            ]
+        
+
+            // I need to look at PCA of disturbed trajectories and run the new analyze_pipeline_disturbed_traj file (2 MODELS) 2000 model vs 3700 model
+            // perturb + 0.45s --> nice separation between 4 trajectories, start in same place, end in roughly same place
+            "args": ["--config_path=cfg/analyze/analysis.yaml", 
+            "--model_path=[\"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_2000_rew_16.601225.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_2000_rew_16.601225.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth\", \"models/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth\"]",
+            "--data_path=[\"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-6/last_AnymalTerrain_ep_2000_rew_16.601225.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-10/last_AnymalTerrain_ep_2000_rew_16.601225.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-6/last_AnymalTerrain_ep_3700_rew_20.14857.pth/\", \"data/raw/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/-10/last_AnymalTerrain_ep_3700_rew_20.14857.pth/\"]",
+            "--output_path=data/processed/ANYMAL-1.0MASS-LSTM16-CORLDISTTERR/standing_still_robustness_analysis_gradients/0/0.02/compare6_to_10/compare2000vs3700/"
+            ]
+        
+        
         }
 
     ]

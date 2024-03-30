@@ -8,7 +8,8 @@ def aggregate_data(root_folder):
         found_csv = False  # Flag to track if valid CSV files are found in the directory
 
         for file in files:
-            if file.endswith(".csv"):
+            # Check if the file is exactly 'recoveries.csv' or 'trials.csv'
+            if file.lower() in ['recoveries.csv', 'trials.csv']:
                 file_path = os.path.join(subdir, file)
 
                 try:
@@ -18,17 +19,16 @@ def aggregate_data(root_folder):
                     print(f"Error reading file {file_path}: {e}")
                     continue
 
-                # Check the file type and update the corresponding value
-                if 'recoveries' in file_path.lower() or 'trials' in file_path.lower():
-                    found_csv = True  # Valid CSV found, set the flag
-                    # Initialize directory entry if it doesn't exist
-                    if subdir not in data:
-                        data[subdir] = {'Recoveries': pd.NA, 'Trials': pd.NA}
+                found_csv = True  # Valid CSV found, set the flag
+                # Initialize directory entry if it doesn't exist
+                if subdir not in data:
+                    data[subdir] = {'Recoveries': pd.NA, 'Trials': pd.NA}
 
-                    if 'recoveries' in file_path.lower():
-                        data[subdir]['Recoveries'] = value
-                    elif 'trials' in file_path.lower():
-                        data[subdir]['Trials'] = value
+                # Update the corresponding value based on the file name
+                if file.lower() == 'recoveries.csv':
+                    data[subdir]['Recoveries'] = value
+                elif file.lower() == 'trials.csv':
+                    data[subdir]['Trials'] = value
 
         # If no valid CSV files were found in the directory, don't add an entry
         if not found_csv and subdir in data:

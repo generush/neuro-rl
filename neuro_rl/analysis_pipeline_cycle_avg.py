@@ -4,8 +4,8 @@ from utils.data_processing import filter_by_column_keywords
 from analysis.compute_avg_gait_cycle import compute_avg_gait_cycle
 from analysis.append_pc import append_pc
 from analysis.append_speed_axis import append_speed_axis
-from analysis.compute_interpolation import compute_interpolation
-from analysis.plot_pc12_speed_axis import plot_pc12_speed_axis
+from analysis.compute_interpolation import compute_cyclic_interpolation
+from analysis.plot_pc import plot_pc12_speed_axis
 from analysis.append_tangling import append_tangling
 from analysis.compute_fixed_points import compute_fixed_points
 from plotting.dashboard import run_dashboard
@@ -22,9 +22,6 @@ def run_analysis():
     # Compute cycle-average and variance datasets from raw dataset
     avg_cycle_df, var_cycle_df = compute_avg_gait_cycle(raw_df)
 
-    # Filter DataFrame
-    avg_cycle_df = filter_by_column_keywords(avg_cycle_df, cfg.dataset_names, 'RAW')
-
     # Append pc data
     avg_cycle_df, pca_dict = append_pc(avg_cycle_df, cfg.dataset_names, cfg.max_num_principal_components, cfg.normalization_type, 'PC', cfg.output_path)
     
@@ -35,7 +32,7 @@ def run_analysis():
     avg_cycle_df = append_speed_axis(avg_cycle_df, cfg.dataset_names, cfg.max_num_principal_components, cfg.normalization_type, cfg.output_path)
 
     # Compute interpolated dataset from cycle-average dataset
-    avg_cycle_interp_df = compute_interpolation(avg_cycle_df)
+    avg_cycle_interp_df = compute_cyclic_interpolation(avg_cycle_df)
 
     plot_pc12_speed_axis(avg_cycle_interp_df, ['ACT', 'A_LSTM_HC'], cfg.output_path)
 

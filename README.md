@@ -4,8 +4,11 @@ Comprehensive Exam
 - Training (98% continue --> mean disturbance = 1/.02 * 0.02s = 1s)
 - Testing (0.25s)
 
+NeurIPS
+- Disturbance Training Curriculum Type 1 (DIST1) (velocity perturbations)
+
 CoRL
-- Disturbance Training Curriculum Type 1 (DIST1) (98% continue --> mean disturbance = 1/.02 * 0.02s = 1s)
+- Disturbance Training Curriculum Type 2 (DIST1) (0.959 x BW applied every 1/4, 98% continue --> mean disturbance = 1/.02 * 0.02s = 1s)
 - Disturbance Testing (0.1s, 0.2s)
 
 ANYMAL-1.0MASS-FF-CORLTERR (ANYMAL-1.0MASS-FF-TERR-NODIST) AnymalTerrain_05-12-53-48/nn/AnymalTerrain.pth
@@ -18,8 +21,8 @@ ANYMAL-1.0MASS-LSTM4-CORLDISTTERR (ANYMAL-1.0MASS-LSTM4-TERR-DIST1) AnymalTerrai
 ANYMAL-1.0MASS-LSTM16-CORLDISTTERR (ANYMAL-1.0MASS-LSTM16-TERR-DIST1) AnymalTerrain_04-15-37-26/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth
 
 Frontiers
-- Disturbance Training Curriculum Type 2 (DIST2) (4/4 steps, 98% continue --> mean disturbance = 1/.02 * 0.02s = 1s)
-- Disturbance Testing (0.08s)
+- Disturbance Training Curriculum Type 3 (DIST2) (0.239756 x BW applied every 1/4 steps, 98% continue --> mean disturbance = 1/.02 * 0.02s = 1s)
+- Disturbance Testing (0.08s) (4/4 steps)
 
 Robustness Surface Plots
 ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR (ANYMAL-1.0MASS-LSTM16-TERR-DIST2) AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth
@@ -28,8 +31,8 @@ ANYMAL-1.0MASS-LSTM16-FRONTIERSDIST (ANYMAL-1.0MASS-LSTM16-NOTERR-DIST2) AnymalT
 ANYMAL-1.0MASS-LSTM16-FRONTIERSBASELINE (ANYMAL-1.0MASS-LSTM16-NOTERR-NODIST) 2023-09-13-18-33_AnymalTerrain/nn/last_AnymalTerrain_ep_700_rew_20.361492.pth
 
 Thesis
-- Disturbance Training Curriculum Type 3 (DIST3) (4/4 steps, 96% continue --> mean disturbance = 1/.04 * 0.005s = 0.125s)
-- Disturbance Testing (0.02, 0.1, 0.4s)
+- Disturbance Training Curriculum Type 4 (DIST3) (0.5 x BW 4/4 steps, 96% continue --> mean disturbance = 1/.04 * 0.005s = 0.125s)
+- Disturbance Testing (0.02, 0.1, 0.4s, 4/4 steps)
 
 ANYMAL-1.0MASS-LSTM4-BASELINE (ANYMAL-1.0MASS-LSTM4-NOTERR-NODIST) ANYMAL-1.0MASS-LSTM4-BASELINE-01/nn/last_AnymalTerrain_ep_150_rew_8.168549.pth
 ANYMAL-1.0MASS-LSTM4-TERR (ANYMAL-1.0MASS-LSTM4-TERR-NODIST) ANYMAL-1.0MASS-LSTM4-TERR-01/nn/last_AnymalTerrain_ep_1800_rew_18.174595.pth

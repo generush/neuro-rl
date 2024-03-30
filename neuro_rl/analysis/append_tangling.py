@@ -14,7 +14,7 @@ def append_tangling(df: pd.DataFrame, data_names: List[str], input_data_keyword:
 
         # Select data for tangling analysis
         filt_data = df.loc[:,df.columns.str.contains(data_type + '_' + input_data_keyword)].values
-        time = df['TIME'].values
+        time = df['TIME_RAW'].values
 
         # Compute tangling
         np_tangling = tangling(filt_data, time)

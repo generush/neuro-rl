@@ -11,8 +11,8 @@ models_info=(
     # "AnymalTerrainPPO_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-FF-CORLDISTTERR" # AnymalTerrain_04-01-13-21/nn/last_AnymalTerrain_ep_19250_rew_20.038643.pth
     # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-CORLTERR" # AnymalTerrain_06-17-40-50/nn/last_AnymalTerrain_ep_3300_rew_20.003773.pth
     # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLTERR" # AnymalTerrain_07-03-29-04/nn/last_AnymalTerrain_ep_3800_rew_20.163399.pth
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-CORLDISTTERR" # runs/AnymalTerrain_06-00-14-59/nn/last_AnymalTerrain_ep_6700_rew_20.21499.pth
-    # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLDISTTERR" # runs/AnymalTerrain_04-15-37-26/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth
+    "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-CORLDISTTERR" # runs/AnymalTerrain_06-00-14-59/nn/last_AnymalTerrain_ep_6700_rew_20.21499.pth
+    "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLDISTTERR" # runs/AnymalTerrain_04-15-37-26/nn/last_AnymalTerrain_ep_3700_rew_20.14857.pth
     # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLDISTTERR2" # AnymalTerrain_08-04-24-44/nn/last_AnymalTerrain_ep_4500_rew_20.877975.pth
 
     # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR" # AnymalTerrain_2023-08-24_15-24-12/nn/last_AnymalTerrain_ep_3200_rew_20.145746.pth
@@ -81,24 +81,65 @@ export_path="../../data/raw"
   )
 
   # short disturbance
-  declare -A short_smaller_disturbance=(
+  declare -A short_smaller1_disturbance=(
+    [steps_after_stance_begins]=0
+    [length_s]=0.02
+    [forceY]=-10
+  )
+
+  # medium disturbance
+  declare -A medium_smaller1_disturbance=(
+    [steps_after_stance_begins]=0
+    [length_s]=0.1
+    [forceY]=-2.5
+  )
+
+  # long disturbance
+  declare -A long_smaller1_disturbance=(
+    [steps_after_stance_begins]=0
+    [length_s]=0.4
+    [forceY]=-0.833
+  )
+  # short disturbance
+  declare -A short_smaller2_disturbance=(
     [steps_after_stance_begins]=0
     [length_s]=0.02
     [forceY]=-8
   )
 
   # medium disturbance
-  declare -A medium_smaller_disturbance=(
+  declare -A medium_smaller2_disturbance=(
     [steps_after_stance_begins]=0
     [length_s]=0.1
     [forceY]=-2
   )
 
   # long disturbance
-  declare -A long_smaller_disturbance=(
+  declare -A long_smaller2_disturbance=(
     [steps_after_stance_begins]=0
     [length_s]=0.4
     [forceY]=-0.667
+  )
+
+  # short disturbance
+  declare -A short_smaller3_disturbance=(
+    [steps_after_stance_begins]=0
+    [length_s]=0.02
+    [forceY]=-6
+  )
+
+  # medium disturbance
+  declare -A medium_smaller3_disturbance=(
+    [steps_after_stance_begins]=0
+    [length_s]=0.1
+    [forceY]=-1.5
+  )
+
+  # long disturbance
+  declare -A long_smaller3_disturbance=(
+    [steps_after_stance_begins]=0
+    [length_s]=0.4
+    [forceY]=-0.5
   )
 
   # short disturbance
@@ -120,6 +161,13 @@ export_path="../../data/raw"
     [steps_after_stance_begins]=0
     [length_s]=0.4
     [forceY]=-0.333
+  )
+
+  # long disturbance
+  declare -A frontiers_disturbance=(
+    [steps_after_stance_begins]=0
+    [length_s]=0.08
+    [forceY]=-3.5
   )
 
 # Define a function that takes a file path as an argument
@@ -207,9 +255,9 @@ run_command() {
     done
 }
 
-
 # Array of all runs
-runs=(short_disturbance medium_disturbance long_disturbance short_smaller_disturbance medium_smaller_disturbance long_smaller_disturbance short_smallest_disturbance medium_smallest_disturbance long_smallest_disturbance)
+# runs=(short_disturbance medium_disturbance long_disturbance short_smaller1_disturbance medium_smaller1_disturbance long_smaller1_disturbance short_smaller2_disturbance medium_smaller2_disturbance long_smaller2_disturbance short_smaller3_disturbance medium_smaller3_disturbance long_smaller3_disturbance short_smallest_disturbance medium_smallest_disturbance long_smallest_disturbance frontiers_disturbance)
+runs=(short_smaller1_disturbance medium_smaller1_disturbance long_smaller1_disturbance short_smaller3_disturbance medium_smaller3_disturbance long_smaller3_disturbance frontiers_disturbance)
 # runs=(short_smallest_disturbance medium_smallest_disturbance long_smallest_disturbance)
 # runs=(short_disturbance medium_disturbance long_disturbance)
 
