@@ -38,9 +38,23 @@ def precompute_segments(df, contact_fields):
 
 def overlay_plot_signal(fields_and_nicknames, dfs_collection, segments_collections, colors, fig_width, fig_height, additional_features=None, plot_name="default_plot_name"):
 
+    # Compute global Y-axis limits based on an additional feature, if specified
+    global_min, global_max = float('inf'), float('-inf')
+    if additional_features and additional_features.get('linked_y_axes'):
+        for _, y_field, _ in fields_and_nicknames:
+            for df in dfs_collection.values():
+                if y_field in df['df'].columns:
+                    min_value = df['df'][y_field].min(skipna=True)  # Skip NaNs when computing min
+                    max_value = df['df'][y_field].max(skipna=True)  # Skip NaNs when computing max
+                    if min_value < global_min:
+                        global_min = min_value
+                    if max_value > global_max:
+                        global_max = max_value
+
+
     # Determine the global min and max of the 'TIME_RAW' column across all DataFrames
-    global_min_time = min(df['TIME_RAW'].min() for df in dfs_collection.values())
-    global_max_time = max(df['TIME_RAW'].max() for df in dfs_collection.values())
+    global_min_time = min(df['df']['TIME_RAW'].min() for df in dfs_collection.values())
+    global_max_time = max(df['df']['TIME_RAW'].max() for df in dfs_collection.values())
 
     # Determine the number of subplots needed for the current group
     num_subplots = len(fields_and_nicknames)
@@ -56,33 +70,33 @@ def overlay_plot_signal(fields_and_nicknames, dfs_collection, segments_collectio
 
         for df_idx, df in dfs_collection.items():
 
-            if y_field in df.columns:
+            if y_field in df['df'].columns:
                 if any(key in y_field for key in segments_collections[0].keys()):
-                    ax.plot(df[x_field], df[y_field], label=f'DF{df_idx}', color=colors[df_idx], linewidth=0.5)
+                    ax.plot(df['df'][x_field], df['df'][y_field], label=df['name'], color=colors[df_idx], linewidth=0.5)
 
                     matching_keys = [key for key in segments_collections[df_idx].keys() if key in y_field]
                     if matching_keys:
                         for key in matching_keys:
                             segments_info = segments_collections[df_idx]
                             for start, end in zip(segments_info[key]['starts'], segments_info[key]['ends']):
-                                ax.plot(df.loc[start:end, x_field], df.loc[start:end, y_field], color=colors[df_idx], linewidth=2)
+                                ax.plot(df['df'].loc[start:end, x_field], df['df'].loc[start:end, y_field], color=colors[df_idx], linewidth=2)
                 else:
-                    ax.plot(df[x_field], df[y_field], label=f'DF{df_idx}', color=colors[df_idx], linewidth=1)
+                    ax.plot(df['df'][x_field], df['df'][y_field], label=df['name'], color=colors[df_idx], linewidth=1)
                 
         if additional_features and additional_features.get('draw_perturb_shaded_box', False):
 
             # Find the start and end of the chunk where PERTURB_RAW=1
-            if 'PERTURB_RAW' in df.columns:
-                perturb_start_idx = df.index[df['PERTURB_RAW'] == 1].min()
-                perturb_end_idx = df.index[df['PERTURB_RAW'] == 1].max()
+            if 'PERTURB_RAW' in df['df'].columns:
+                perturb_start_idx = df['df'].index[df['df']['PERTURB_RAW'] == 1].min()
+                perturb_end_idx = df['df'].index[df['df']['PERTURB_RAW'] == 1].max()
 
                 # Extend perturb_end_idx by one step, if it's not the last index
-                if perturb_start_idx > df.index[0]:
+                if perturb_start_idx > df['df'].index[0]:
                     perturb_start_idx -= 1
 
                 # Convert indices back to TIME_RAW values
-                perturb_start = df.loc[perturb_start_idx, 'TIME_RAW']
-                perturb_end = df.loc[perturb_end_idx, 'TIME_RAW']
+                perturb_start = df['df'].loc[perturb_start_idx, 'TIME_RAW']
+                perturb_end = df['df'].loc[perturb_end_idx, 'TIME_RAW']
 
                 # Check if there is a perturb chunk in the DataFrame
                 if pd.notna(perturb_start) and pd.notna(perturb_end):
@@ -91,19 +105,38 @@ def overlay_plot_signal(fields_and_nicknames, dfs_collection, segments_collectio
         if additional_features and additional_features.get('draw_centerline', False):
             # Draw a centerline
             ax.axhline(y=0, color='gray', linestyle='--', linewidth=1)
+
+        # Set the Y-axis limits based on the global minimum and maximum, if the feature was specified
+        if additional_features and additional_features.get('linked_y_axes'):
+            ax.set_ylim([global_min, global_max])
+            
         ax.set_ylabel(nickname, rotation=0)
     axes[-1].set_xlim([global_min_time, global_max_time])  # Set the same x-axis range for all subplots
     axes[-1].set_xlabel('Time [s]')
-    axes[-1].legend(loc='upper left', bbox_to_anchor=(1, 1))
+    axes[-1].legend()
+    # axes[-1].legend(loc='upper left', bbox_to_anchor=(1, 1))
     plt.tight_layout()
 
     fig.savefig(f"{plot_name}.svg", format='svg', dpi=600)
 
 def overlay_plot_gait(fields_and_nicknames, dfs_collection, segments_collections, colors, fig_width, fig_height, additional_features=None, plot_name="default_plot_name"):
     
+    # Compute global Y-axis limits based on an additional feature, if specified
+    global_min, global_max = float('inf'), float('-inf')
+    if additional_features and additional_features.get('y_axis_feature'):
+        for _, y_field, _ in fields_and_nicknames:
+            for df in dfs_collection.values():
+                if y_field in df['df'].columns:
+                    min_value = df['df'][y_field].min(skipna=True)  # Skip NaNs when computing min
+                    max_value = df['df'][y_field].max(skipna=True)  # Skip NaNs when computing max
+                    if min_value < global_min:
+                        global_min = min_value
+                    if max_value > global_max:
+                        global_max = max_value
+
     # Determine the global min and max of the 'TIME_RAW' column across all DataFrames
-    global_min_time = min(df['TIME_RAW'].min() for df in dfs_collection.values())
-    global_max_time = max(df['TIME_RAW'].max() for df in dfs_collection.values())
+    global_min_time = min(df['df']['TIME_RAW'].min() for df in dfs_collection.values())
+    global_max_time = max(df['df']['TIME_RAW'].max() for df in dfs_collection.values())
 
     # Determine the number of subplots needed for the current group
     num_subplots = len(dfs_collection)
@@ -120,9 +153,9 @@ def overlay_plot_gait(fields_and_nicknames, dfs_collection, segments_collections
 
         # Iterate over each signal field you want to plot for this DataFrame
         for field_idx, (x_field, y_field, nickname) in enumerate(fields_and_nicknames):
-            if y_field in df.columns:
+            if y_field in df['df'].columns:
                 if any(key in y_field for key in segments_collections[0].keys()):
-                    ax.plot(df[x_field], df[y_field], label=nickname, color=colors[field_idx], linewidth=0.5)
+                    ax.plot(df['df'][x_field], df['df'][y_field], label=nickname, color=colors[field_idx], linewidth=0.5)
 
                 # Check for matching segment keys
                 matching_keys = [key for key in segments_collections[df_key].keys() if key in y_field]
@@ -131,24 +164,24 @@ def overlay_plot_gait(fields_and_nicknames, dfs_collection, segments_collections
                     for key in matching_keys:
                         segments_info = segments_collections[df_key]
                         for start, end in zip(segments_info[key]['starts'], segments_info[key]['ends']):
-                            ax.plot(df.loc[start:end, x_field], df.loc[start:end, y_field], color=colors[field_idx], linewidth=2)
+                            ax.plot(df['df'].loc[start:end, x_field], df['df'].loc[start:end, y_field], color=colors[field_idx], linewidth=2)
                 else:
-                    ax.plot(df[x_field], df[y_field], label=nickname, color=colors[field_idx], linewidth=1)
+                    ax.plot(df['df'][x_field], df['df'][y_field], label=nickname, color=colors[field_idx], linewidth=1)
 
         if additional_features and additional_features.get('draw_perturb_shaded_box', False):
 
             # Find the start and end of the chunk where PERTURB_RAW=1
-            if 'PERTURB_RAW' in df.columns:
-                perturb_start_idx = df.index[df['PERTURB_RAW'] == 1].min()
-                perturb_end_idx = df.index[df['PERTURB_RAW'] == 1].max()
+            if 'PERTURB_RAW' in df['df'].columns:
+                perturb_start_idx = df['df'].index[df['df']['PERTURB_RAW'] == 1].min()
+                perturb_end_idx = df['df'].index[df['df']['PERTURB_RAW'] == 1].max()
 
                 # Extend perturb_end_idx by one step, if it's not the last index
-                if perturb_start_idx > df.index[0]:
+                if perturb_start_idx > df['df'].index[0]:
                     perturb_start_idx -= 1
 
                 # Convert indices back to TIME_RAW values
-                perturb_start = df.loc[perturb_start_idx, 'TIME_RAW']
-                perturb_end = df.loc[perturb_end_idx, 'TIME_RAW']
+                perturb_start = df['df'].loc[perturb_start_idx, 'TIME_RAW']
+                perturb_end = df['df'].loc[perturb_end_idx, 'TIME_RAW']
 
                 # Check if there is a perturb chunk in the DataFrame
                 if pd.notna(perturb_start) and pd.notna(perturb_end):
@@ -157,7 +190,12 @@ def overlay_plot_gait(fields_and_nicknames, dfs_collection, segments_collections
         if additional_features and additional_features.get('draw_centerline', False):
             # Draw a centerline
             ax.axhline(y=0, color='gray', linestyle='--', linewidth=1)
-        ax.set_ylabel(f'DF{df_key}')
+        
+        # Set the Y-axis limits based on the global minimum and maximum, if the feature was specified
+        if additional_features and additional_features.get('linked_y_axes'):
+            ax.set_ylim([global_min, global_max])
+        
+        ax.set_ylabel(df['name'], rotation=0)
     if x_field == 'TIME_RAW':
         axes[-1].set_xlim([global_min_time, global_max_time])  # Set the same x-axis range for all subplots
         axes[-1].set_xlabel('Time [s]')
@@ -165,7 +203,8 @@ def overlay_plot_gait(fields_and_nicknames, dfs_collection, segments_collections
         axes[-1].set_xlabel(x_field)
         # Set the aspect ratio to be equal
         axes[-1].set_aspect('equal', adjustable='box')
-    axes[-1].legend(loc='upper left', bbox_to_anchor=(1, 1))
+    axes[-1].legend()
+    # axes[-1].legend(loc='upper left', bbox_to_anchor=(1, 1))
     plt.tight_layout()
 
     fig.savefig(f"{plot_name}.svg", format='svg', dpi=600)
@@ -270,19 +309,18 @@ def run_analysis():
     dfs_collection = {}
     segments_collections = {}
     contact_fields = ['LF', 'LH', 'RH', 'RF']
-    colors = [
+    model_colors = [
     'k',  # Black
     'b',  # Blue
     'g',  # Green
     'r',  # Red
+    '#17becf', #Teal
+]
+    gait_colors = [
     'm',  # Magenta
-    '#ff7f0e',  # Safety Orange
-    '#2ca02c',  # Cooked Asparagus Green, different shade from 'g'
-    '#9467bd',  # Muted Purple
-    '#8c564b',  # Chestnut Brown
-    '#e377c2',  # Raspberry Yogurt Pink
-    '#7f7f7f',  # Middle Gray
-    '#17becf',  # Blue-Teal, different shade from 'b'
+    'c',  # Cyan
+    '#FFA500',  # Orange
+    '#556B2F',  # Dark Olive Green
 ]
 
     for idx, (data_path, model_path, output_path) in enumerate(zip(cfg.data_path, cfg.model_path, cfg.output_path)):
@@ -292,6 +330,12 @@ def run_analysis():
         # Load DataFrame
         raw_df = pd.read_parquet(data_path + 'RAW_DATA' + '.parquet')
                 
+        # Determine nickname
+        if cfg.data_name and len(cfg.data_name) > idx:
+            data_name = cfg.data_name[idx]
+        else:
+            data_name = f'DF{idx}'  # Default nickname
+            
         # Find the first index where DONE_RAW == 1
         first_done_index = raw_df['DONE_RAW'].idxmax()
 
@@ -372,49 +416,48 @@ def run_analysis():
         # sin(psi) + cos(psi)
         raw_df['COP_Y_body'] = ( raw_df['FT_Y_RAW_000_LF_body'] * raw_df['FT_FORCE_RAW_000_LF'] + raw_df['FT_Y_RAW_001_LH_body'] * raw_df['FT_FORCE_RAW_001_LH'] + raw_df['FT_Y_RAW_002_RF_body'] * raw_df['FT_FORCE_RAW_002_RF'] + raw_df['FT_Y_RAW_003_RH_body'] * raw_df['FT_FORCE_RAW_003_RH'] ) / (raw_df['FT_FORCE_RAW_000_LF'] + raw_df['FT_FORCE_RAW_001_LH'] + raw_df['FT_FORCE_RAW_002_RF'] + raw_df['FT_FORCE_RAW_003_RH']) 
 
-        # Load additional DataFrames
-        data_frames = {
-            'NETWORK_OBS': pd.read_csv(data_path + 'obs.csv', header=None),
-            'NETWORK_CN_IN': pd.read_csv(data_path + 'cn_in.csv', header=None),
-            'NETWORK_HN_IN': pd.read_csv(data_path + 'hn_in.csv', header=None),
-            'NETWORK_HN_OUT': pd.read_csv(data_path + 'hn_out.csv', header=None),
-            'NETWORK_OBS_GRAD': pd.read_csv(data_path + 'obs_grad.csv', header=None),
-            'NETWORK_CN_IN_GRAD': pd.read_csv(data_path + 'cn_in_grad.csv', header=None),
-            'NETWORK_HN_IN_GRAD': pd.read_csv(data_path + 'hn_in_grad.csv', header=None),
-            'NETWORK_HN_OUT_GRAD': pd.read_csv(data_path + 'hn_out_grad.csv', header=None)
-        }
+        # # # Load additional DataFrames
+        # # data_frames = {
+        # #     'NETWORK_OBS': pd.read_csv(data_path + 'obs.csv', header=None),
+        # #     'NETWORK_CN_IN': pd.read_csv(data_path + 'cn_in.csv', header=None),
+        # #     'NETWORK_HN_IN': pd.read_csv(data_path + 'hn_in.csv', header=None),
+        # #     'NETWORK_HN_OUT': pd.read_csv(data_path + 'hn_out.csv', header=None),
+        # #     'NETWORK_OBS_GRAD': pd.read_csv(data_path + 'obs_grad.csv', header=None),
+        # #     'NETWORK_CN_IN_GRAD': pd.read_csv(data_path + 'cn_in_grad.csv', header=None),
+        # #     'NETWORK_HN_IN_GRAD': pd.read_csv(data_path + 'hn_in_grad.csv', header=None),
+        # #     'NETWORK_HN_OUT_GRAD': pd.read_csv(data_path + 'hn_out_grad.csv', header=None)
+        # # }
 
-        data_frames['NETWORK_OBS_GRAD_TIMES_VALUE'] = np.tile(data_frames['NETWORK_OBS'].values, (1, 12)) * data_frames['NETWORK_OBS_GRAD']
-        data_frames['NETWORK_HN_OUT_GRAD_TIMES_VALUE'] = np.tile(data_frames['NETWORK_HN_OUT'].values, (1, 12)) * data_frames['NETWORK_HN_OUT_GRAD']
-        data_frames['NETWORK_CN_IN_GRAD_TIMES_VALUE'] = np.tile(data_frames['NETWORK_CN_IN'].values, (1, 12)) * data_frames['NETWORK_CN_IN_GRAD']
-        data_frames['NETWORK_HN_IN_GRAD_TIMES_VALUE'] = np.tile(data_frames['NETWORK_HN_IN'].values, (1, 12)) * data_frames['NETWORK_HN_IN_GRAD']
+        # # data_frames['NETWORK_OBS_GRAD_TIMES_VALUE'] = np.tile(data_frames['NETWORK_OBS'].values, (1, 12)) * data_frames['NETWORK_OBS_GRAD']
+        # # data_frames['NETWORK_HN_OUT_GRAD_TIMES_VALUE'] = np.tile(data_frames['NETWORK_HN_OUT'].values, (1, 12)) * data_frames['NETWORK_HN_OUT_GRAD']
+        # # data_frames['NETWORK_CN_IN_GRAD_TIMES_VALUE'] = np.tile(data_frames['NETWORK_CN_IN'].values, (1, 12)) * data_frames['NETWORK_CN_IN_GRAD']
+        # # data_frames['NETWORK_HN_IN_GRAD_TIMES_VALUE'] = np.tile(data_frames['NETWORK_HN_IN'].values, (1, 12)) * data_frames['NETWORK_HN_IN_GRAD']
 
-        # Function to generate column names
-        def generate_column_names(prefix, num_columns):
-            return [f'{prefix}_{str(i).zfill(3)}' for i in range(num_columns)]
+        # # Function to generate column names
+        # def generate_column_names(prefix, num_columns):
+        #     return [f'{prefix}_{str(i).zfill(3)}' for i in range(num_columns)]
 
-        # Concatenate all DataFrames column-wise with appropriate column names
-        for prefix, df in data_frames.items():
-            num_columns = df.shape[1]
-            column_names = generate_column_names(prefix, num_columns)
+        # # Concatenate all DataFrames column-wise with appropriate column names
+        # for prefix, df in data_frames.items():
+        #     num_columns = df.shape[1]
+        #     column_names = generate_column_names(prefix, num_columns)
             
-            # Ensure the DataFrame to concatenate has the right column names
-            df.columns = column_names
+        #     # Ensure the DataFrame to concatenate has the right column names
+        #     df.columns = column_names
             
-            # Concatenate the DataFrame column-wise
-            raw_df = pd.concat([raw_df, df], axis=1)
+        #     # Concatenate the DataFrame column-wise
+        #     raw_df = pd.concat([raw_df, df], axis=1)
 
-        dfs_collection[idx] = raw_df
+        dfs_collection[idx] = {'df': raw_df, 'name': data_name}
         segments_collections[idx] = precompute_segments(raw_df, contact_fields)
 
         # Define the global time window here
-        global_time_window = (-1, 2.5)  # Replace 'start_time' and 'end_time' with actual values or references to cfg
+        global_time_window = (-0.8, 1.6)  # Replace 'start_time' and 'end_time' with actual values or references to cfg
 
         # Filter each DataFrame in dfs_collection according to the global_time_window
         for idx, df in dfs_collection.items():
             # Ensure TIME_RAW is within the global_time_window
-            dfs_collection[idx] = df[(df['TIME_RAW'] >= global_time_window[0]) & (df['TIME_RAW'] <= global_time_window[1])]
-
+            dfs_collection[idx]['df'] = df['df'][(df['df']['TIME_RAW'] >= global_time_window[0]) & (df['df']['TIME_RAW'] <= global_time_window[1])]
 
         print('hi')
 
@@ -423,9 +466,9 @@ def run_analysis():
             'plot_name': 'comparing_key_signals_across_models',
             'fields_and_nicknames': [
                 ('TIME_RAW', 'OBS_RAW_001_v', 'v [m/s]'),
-                ('TIME_RAW', 'ACT_RAW_009_RH_HAA', 'RH Hip Torque Command [Nm]'),
+                ('TIME_RAW', 'ACT_RAW_009_RH_HAA', 'RH Hip Action'),
                 ('TIME_RAW', 'OBS_RAW_021_dof_pos_angle_deg_10_RH_HAA', 'RH Hip Position [deg]'),
-                ('TIME_RAW', 'ACT_RAW_006_RF_HAA', 'RF Hip Torque Command [Nm]'),
+                ('TIME_RAW', 'ACT_RAW_006_RF_HAA', 'RF Hip Action'),
                 ('TIME_RAW', 'OBS_RAW_018_dof_pos_angle_deg_07_RF_HAA', 'RF Hip Position [deg]'),
                 # ('TIME_RAW', 'OBS_RAW_003_p_deg_s', r'$p$ [deg/s]'),
                 # ('TIME_RAW', 'OBS_RAW_004_q_deg_s', r'$q$ [deg/s]'),
@@ -436,6 +479,7 @@ def run_analysis():
             'plot_func': overlay_plot_signal,
             'fig_width': 6,
             'fig_height': 1.25,
+            'colors': model_colors,
             'additional_features': {
                 'draw_perturb_shaded_box': True,
             },
@@ -451,6 +495,7 @@ def run_analysis():
             'plot_func': overlay_plot_gait,
             'fig_width': 6,
             'fig_height': 1,
+            'colors': gait_colors,
             'additional_features': {
                 'draw_perturb_shaded_box': True,
             },
@@ -458,22 +503,23 @@ def run_analysis():
         {
             'plot_name': 'comparing_joint_actuation_across_models',
             'fields_and_nicknames': [
-                ('TIME_RAW', 'ACT_RAW_000_LF_HAA', 'ACT_LF_HAA'),
-                ('TIME_RAW', 'ACT_RAW_001_LF_HFE', 'ACT_LF_HFE'),
-                ('TIME_RAW', 'ACT_RAW_002_LF_KFE', 'ACT_LF_KFE'),
-                ('TIME_RAW', 'ACT_RAW_003_LH_HAA', 'ACT_LH_HAA'),
-                ('TIME_RAW', 'ACT_RAW_004_LH_HFE', 'ACT_LH_HFE'),
-                ('TIME_RAW', 'ACT_RAW_005_LH_KFE', 'ACT_LH_KFE'),
-                ('TIME_RAW', 'ACT_RAW_006_RF_HAA', 'ACT_RF_HAA'),
-                ('TIME_RAW', 'ACT_RAW_007_RF_HFE', 'ACT_RF_HFE'),
-                ('TIME_RAW', 'ACT_RAW_008_RF_KFE', 'ACT_RF_KFE'),
-                ('TIME_RAW', 'ACT_RAW_009_RH_HAA', 'ACT_RH_HAA'),
-                ('TIME_RAW', 'ACT_RAW_010_RH_HFE', 'ACT_RH_HFE'),
-                ('TIME_RAW', 'ACT_RAW_011_RH_KFE', 'ACT_RH_KFE'),
+                ('TIME_RAW', 'ACT_RAW_000_LF_HAA', 'LF Hip Action'),
+                ('TIME_RAW', 'ACT_RAW_001_LF_HFE', 'LF Shoulder Action'),
+                ('TIME_RAW', 'ACT_RAW_002_LF_KFE', 'LF Knee Action'),
+                ('TIME_RAW', 'ACT_RAW_003_LH_HAA', 'LH Hip Action'),
+                ('TIME_RAW', 'ACT_RAW_004_LH_HFE', 'LH Shoulder Action'),
+                ('TIME_RAW', 'ACT_RAW_005_LH_KFE', 'LH Knee Action'),
+                ('TIME_RAW', 'ACT_RAW_006_RF_HAA', 'RF Hip Action'),
+                ('TIME_RAW', 'ACT_RAW_007_RF_HFE', 'RF Shoulder Action'),
+                ('TIME_RAW', 'ACT_RAW_008_RF_KFE', 'RF Knee Action'),
+                ('TIME_RAW', 'ACT_RAW_009_RH_HAA', 'RH Hip Action'),
+                ('TIME_RAW', 'ACT_RAW_010_RH_HFE', 'RH Shoulder Action'),
+                ('TIME_RAW', 'ACT_RAW_011_RH_KFE', 'RH Knee Action'),
             ],
             'plot_func': overlay_plot_signal,
             'fig_width': 6,
             'fig_height': 1.25,
+            'colors': model_colors,
             'additional_features': {
                 'draw_perturb_shaded_box': True,
             },
@@ -481,22 +527,23 @@ def run_analysis():
         {
             'plot_name': 'comparing_joint_pos_across_models',
             'fields_and_nicknames': [
-                ('TIME_RAW', 'OBS_RAW_012_dof_pos_angle_deg_01_LF_HAA', 'POS_LF_HAA'),
-                ('TIME_RAW', 'OBS_RAW_013_dof_pos_angle_deg_02_LF_HFE', 'POS_LF_HFE'),
-                ('TIME_RAW', 'OBS_RAW_014_dof_pos_angle_deg_03_LF_KFE', 'POS_LF_KFE'),
-                ('TIME_RAW', 'OBS_RAW_015_dof_pos_angle_deg_04_LH_HAA', 'POS_LH_HAA'),
-                ('TIME_RAW', 'OBS_RAW_016_dof_pos_angle_deg_05_LH_HFE', 'POS_LH_HFE'),
-                ('TIME_RAW', 'OBS_RAW_017_dof_pos_angle_deg_06_LH_KFE', 'POS_LH_KFE'),
-                ('TIME_RAW', 'OBS_RAW_018_dof_pos_angle_deg_07_RF_HAA', 'POS_RF_HAA'),
-                ('TIME_RAW', 'OBS_RAW_019_dof_pos_angle_deg_08_RF_HFE', 'POS_RF_HFE'),
-                ('TIME_RAW', 'OBS_RAW_020_dof_pos_angle_deg_09_RF_KFE', 'POS_RF_KFE'),
-                ('TIME_RAW', 'OBS_RAW_021_dof_pos_angle_deg_10_RH_HAA', 'POS_RH_HAA'),
-                ('TIME_RAW', 'OBS_RAW_022_dof_pos_angle_deg_11_RH_HFE', 'POS_RH_HFE'),
-                ('TIME_RAW', 'OBS_RAW_023_dof_pos_angle_deg_12_RH_KFE', 'POS_RH_KFE'),
+                ('TIME_RAW', 'OBS_RAW_012_dof_pos_angle_deg_01_LF_HAA', 'LF Hip Angle [deg]'),
+                ('TIME_RAW', 'OBS_RAW_013_dof_pos_angle_deg_02_LF_HFE', 'LF Shoulder Angle [deg]'),
+                ('TIME_RAW', 'OBS_RAW_014_dof_pos_angle_deg_03_LF_KFE', 'LF Knee Angle [deg]'),
+                ('TIME_RAW', 'OBS_RAW_015_dof_pos_angle_deg_04_LH_HAA', 'LH Hip Angle [deg]'),
+                ('TIME_RAW', 'OBS_RAW_016_dof_pos_angle_deg_05_LH_HFE', 'LH Shoulder Angle [deg]'),
+                ('TIME_RAW', 'OBS_RAW_017_dof_pos_angle_deg_06_LH_KFE', 'LH Knee Angle [deg]'),
+                ('TIME_RAW', 'OBS_RAW_018_dof_pos_angle_deg_07_RF_HAA', 'RF Hip Angle [deg]'),
+                ('TIME_RAW', 'OBS_RAW_019_dof_pos_angle_deg_08_RF_HFE', 'RF Shoulder Angle [deg]'),
+                ('TIME_RAW', 'OBS_RAW_020_dof_pos_angle_deg_09_RF_KFE', 'RF Knee Angle [deg]'),
+                ('TIME_RAW', 'OBS_RAW_021_dof_pos_angle_deg_10_RH_HAA', 'RH Hip Angle [deg]'),
+                ('TIME_RAW', 'OBS_RAW_022_dof_pos_angle_deg_11_RH_HFE', 'RH Shoulder Angle [deg]'),
+                ('TIME_RAW', 'OBS_RAW_023_dof_pos_angle_deg_12_RH_KFE', 'RH Knee Angle [deg]'),
             ],
             'plot_func': overlay_plot_signal,
             'fig_width': 6,
             'fig_height': 1.25,
+            'colors': model_colors,
             'additional_features': {
                 'draw_perturb_shaded_box': True,
             },
@@ -504,33 +551,53 @@ def run_analysis():
         {
             'plot_name': 'comparing_foot_placement_relative_to_com_across_diffent_legs',
             'fields_and_nicknames': [
-                ('TIME_RAW', 'FT_Y_RAW_000_LF_body', 'FT_Y_LF'),
-                ('TIME_RAW', 'FT_Y_RAW_001_LH_body', 'FT_Y_LH'),
-                ('TIME_RAW', 'FT_Y_RAW_003_RH_body', 'FT_Y_RH'),
-                ('TIME_RAW', 'FT_Y_RAW_002_RF_body', 'FT_Y_RF'),
+                ('TIME_RAW', 'FT_Y_RAW_000_LF_body', 'LF Foot Torso-Relative Lateral Position [m]'),
+                ('TIME_RAW', 'FT_Y_RAW_001_LH_body', 'LH Foot Torso-Relative Lateral Position [m]'),
+                ('TIME_RAW', 'FT_Y_RAW_003_RH_body', 'RH Foot Torso-Relative Lateral Position [m]'),
+                ('TIME_RAW', 'FT_Y_RAW_002_RF_body', 'RF Foot Torso-Relative Lateral Position [m]'),
                 # ('TIME_RAW', 'COP_Y_body', 'COP_Y'),
             ],
             'plot_func': overlay_plot_gait,
             'fig_width': 6,
             'fig_height': 1.5,
+            'colors': gait_colors,
             'additional_features': {
                 'draw_perturb_shaded_box': True,
                 'draw_centerline': True
             },
         },
         {
-            'plot_name': 'comparing_joint_pos_across_models',
+            'plot_name': 'comparing_foot_forces_across_models',
             'fields_and_nicknames': [
-                ('TIME_RAW', 'FT_FORCE_RAW_000_LF', 'FT_FORCE_LF'),
-                ('TIME_RAW', 'FT_FORCE_RAW_001_LH', 'FT_FORCE_LH'),
-                ('TIME_RAW', 'FT_FORCE_RAW_003_RH', 'FT_FORCE_RH'),
-                ('TIME_RAW', 'FT_FORCE_RAW_002_RF', 'FT_FORCE_RF'),
+                ('TIME_RAW', 'FT_FORCE_RAW_000_LF', 'LF Foot Ground-Reaction Force [N]'),
+                ('TIME_RAW', 'FT_FORCE_RAW_001_LH', 'LH Foot Ground-Reaction Force [N]'),
+                ('TIME_RAW', 'FT_FORCE_RAW_003_RH', 'RH Foot Ground-Reaction Force [N]'),
+                ('TIME_RAW', 'FT_FORCE_RAW_002_RF', 'RF Foot Ground-Reaction Force [N]'),
             ],
             'plot_func': overlay_plot_signal,
             'fig_width': 6,
             'fig_height': 2.5,
+            'colors': model_colors,
             'additional_features': {
                 'draw_perturb_shaded_box': True,
+            },
+        },
+        {
+            'plot_name': 'comparing_foot_placement_relative_to_com_across_diffent_models',
+            'fields_and_nicknames': [
+                ('TIME_RAW', 'FT_Y_RAW_000_LF_body', 'LF Foot Torso-Relative Lateral Position [m]'),
+                ('TIME_RAW', 'FT_Y_RAW_001_LH_body', 'LH Foot Torso-Relative Lateral Position [m]'),
+                ('TIME_RAW', 'FT_Y_RAW_003_RH_body', 'RH Foot Torso-Relative Lateral Position [m]'),
+                ('TIME_RAW', 'FT_Y_RAW_002_RF_body', 'RF Foot Torso-Relative Lateral Position [m]'),
+            ],
+            'plot_func': overlay_plot_signal,
+            'fig_width': 6,
+            'fig_height': 1.31,
+            'colors': model_colors,
+            'additional_features': {
+                'draw_perturb_shaded_box': True,
+                'draw_centerline': True,
+                'linked_y_axes': True,
             },
         },
         # {
@@ -681,6 +748,7 @@ def run_analysis():
             'plot_func': overlay_plot_signal,
             'fig_width': 12,
             'fig_height': 1,
+            'colors': model_colors,
             'additional_features': {
                 'draw_perturb_shaded_box': True,
             },
@@ -800,67 +868,21 @@ def run_analysis():
         #         'draw_perturb_shaded_box': True,
         #     },
         # },
-        {
-            'plot_name': 'comparing_obs_gradients_rel_to_00_LF_HAA_actuation_across_models_plot',
-            'fields_and_nicknames': [
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_000', 'u'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_001', 'v'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_002', 'w'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_003', 'p'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_004', 'q'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_005', 'r'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_006', 'theta_proj'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_007', 'phi_proj'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_008', 'psi_proj'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_009', 'u_star'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_010', 'v_star'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_011', 'r_star'),
-            ],
-            'plot_func': overlay_plot_signal,
-            'fig_width': 12,
-            'fig_height': 1,
-            'additional_features': {
-                'draw_perturb_shaded_box': True,
-            },
-        },
-        {
-            'plot_name': 'comparing_obs_gradients_rel_to_09_RH_HAA_actuation_across_models_plot',
-            'fields_and_nicknames': [
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1692', 'u'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1693', 'v'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1694', 'w'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1695', 'p'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1696', 'q'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1697', 'r'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1698', 'theta_proj'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1699', 'phi_proj'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1700', 'psi_proj'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1701', 'u_star'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1702', 'v_star'),
-                ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1703', 'r_star'),
-            ],
-            'plot_func': overlay_plot_signal,
-            'fig_width': 12,
-            'fig_height': 1,
-            'additional_features': {
-                'draw_perturb_shaded_box': True,
-            },
-        },
         # {
-        #     'plot_name': 'comparing_obs_gradients_rel_to_10_RH_HFE_actuation_across_models_plot',
+        #     'plot_name': 'comparing_obs_gradients_rel_to_00_LF_HAA_actuation_across_models_plot',
         #     'fields_and_nicknames': [
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1880', 'u'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1881', 'v'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1882', 'w'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1883', 'p'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1884', 'q'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1885', 'r'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1886', 'theta_proj'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1887', 'phi_proj'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1888', 'psi_proj'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1889', 'u_star'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1890', 'v_star'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1891', 'r_star'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_000', 'u'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_001', 'v'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_002', 'w'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_003', 'p'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_004', 'q'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_005', 'r'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_006', 'theta_proj'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_007', 'phi_proj'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_008', 'psi_proj'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_009', 'u_star'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_010', 'v_star'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_011', 'r_star'),
         #     ],
         #     'plot_func': overlay_plot_signal,
         #     'fig_width': 12,
@@ -870,30 +892,208 @@ def run_analysis():
         #     },
         # },
         # {
-        #     'plot_name': 'comparing_obs_gradients_rel_to_11_RH_KFE_actuation_across_models_plot',
+        #     'plot_name': 'comparing_obs_gradients_rel_to_09_RH_HAA_actuation_across_models_plot',
         #     'fields_and_nicknames': [
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2068', 'u'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2069', 'v'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2070', 'w'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2071', 'p'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2072', 'q'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2073', 'r'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2074', 'theta_proj'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2075', 'phi_proj'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2076', 'psi_proj'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2077', 'u_star'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2078', 'v_star'),
-        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2079', 'r_star'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1692', 'u'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1693', 'v'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1694', 'w'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1695', 'p'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1696', 'q'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1697', 'r'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1698', 'theta_proj'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1699', 'phi_proj'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1700', 'psi_proj'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1701', 'u_star'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1702', 'v_star'),
+        #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1703', 'r_star'),
         #     ],
         #     'plot_func': overlay_plot_signal,
         #     'fig_width': 12,
         #     'fig_height': 1,
+        #     'additional_features': {
+        #         'draw_perturb_shaded_box': True,
+        #     },
+        # },
+        # # {
+        # #     'plot_name': 'comparing_obs_gradients_rel_to_10_RH_HFE_actuation_across_models_plot',
+        # #     'fields_and_nicknames': [
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1880', 'u'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1881', 'v'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1882', 'w'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1883', 'p'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1884', 'q'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1885', 'r'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1886', 'theta_proj'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1887', 'phi_proj'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1888', 'psi_proj'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1889', 'u_star'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1890', 'v_star'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_1891', 'r_star'),
+        # #     ],
+        # #     'plot_func': overlay_plot_signal,
+        # #     'fig_width': 12,
+        # #     'fig_height': 1,
+        # #     'additional_features': {
+        # #         'draw_perturb_shaded_box': True,
+        # #     },
+        # # },
+        # # {
+        # #     'plot_name': 'comparing_obs_gradients_rel_to_11_RH_KFE_actuation_across_models_plot',
+        # #     'fields_and_nicknames': [
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2068', 'u'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2069', 'v'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2070', 'w'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2071', 'p'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2072', 'q'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2073', 'r'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2074', 'theta_proj'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2075', 'phi_proj'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2076', 'psi_proj'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2077', 'u_star'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2078', 'v_star'),
+        # #         ('TIME_RAW', 'NETWORK_OBS_GRAD_TIMES_VALUE_2079', 'r_star'),
+        # #     ],
+        # #     'plot_func': overlay_plot_signal,
+        # #     'fig_width': 12,
+        # #     'fig_height': 1,
+        # #     'additional_features': {
+        # #         'draw_perturb_shaded_box': True,
+        # #     },
+        # # },
+        # # {
+        # #     'plot_name': 'comparing_cn_in_gradients_rel_to_00_LF_HAA_actuation_across_models_plot_heatmap',
+        # #     'fields_and_nicknames': [
+        # #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(0*128,1*128)  # Example for 5 dimensions
+        # #     ],
+        # #     'plot_func': overlay_plot_gradient_heatmaps,
+        # #     'fig_width': 12,
+        # #     'fig_height': 12,
+        # #     'additional_features': {
+        # #         'draw_perturb_shaded_box': True,
+        # #     },
+        # # },
+        # # {
+        # #     'plot_name': 'comparing_cn_in_gradients_rel_to_01_LF_HFE_actuation_across_models_plot_heatmap',
+        # #     'fields_and_nicknames': [
+        # #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(1*128,2*128)  # Example for 5 dimensions
+        # #     ],
+        # #     'plot_func': overlay_plot_gradient_heatmaps,
+        # #     'fig_width': 12,
+        # #     'fig_height': 12,
+        # #     'additional_features': {
+        # #         'draw_perturb_shaded_box': True,
+        # #     },
+        # # },
+        # # {
+        # #     'plot_name': 'comparing_cn_in_gradients_rel_to_02_LF_KFE_actuation_across_models_plot_heatmap',
+        # #     'fields_and_nicknames': [
+        # #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(2*128,3*128)  # Example for 5 dimensions
+        # #     ],
+        # #     'plot_func': overlay_plot_gradient_heatmaps,
+        # #     'fig_width': 12,
+        # #     'fig_height': 12,
+        # #     'additional_features': {
+        # #         'draw_perturb_shaded_box': True,
+        # #     },
+        # # },
+        # # {
+        # #     'plot_name': 'comparing_cn_in_gradients_rel_to_03_LH_HAA_actuation_across_models_plot_heatmap',
+        # #     'fields_and_nicknames': [
+        # #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(3*128,4*128)  # Example for 5 dimensions
+        # #     ],
+        # #     'plot_func': overlay_plot_gradient_heatmaps,
+        # #     'fig_width': 12,
+        # #     'fig_height': 12,
+        # #     'additional_features': {
+        # #         'draw_perturb_shaded_box': True,
+        # #     },
+        # # },
+        # # {
+        # #     'plot_name': 'comparing_cn_in_gradients_rel_to_04_LH_HFE_actuation_across_models_plot_heatmap',
+        # #     'fields_and_nicknames': [
+        # #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(4*128,5*128)  # Example for 5 dimensions
+        # #     ],
+        # #     'plot_func': overlay_plot_gradient_heatmaps,
+        # #     'fig_width': 12,
+        # #     'fig_height': 12,
+        # #     'additional_features': {
+        # #         'draw_perturb_shaded_box': True,
+        # #     },
+        # # },
+        # # {
+        # #     'plot_name': 'comparing_cn_in_gradients_rel_to_05_LH_KFE_actuation_across_models_plot_heatmap',
+        # #     'fields_and_nicknames': [
+        # #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(5*128,6*128)  # Example for 5 dimensions
+        # #     ],
+        # #     'plot_func': overlay_plot_gradient_heatmaps,
+        # #     'fig_width': 12,
+        # #     'fig_height': 12,
+        # #     'additional_features': {
+        # #         'draw_perturb_shaded_box': True,
+        # #     },
+        # # },
+        # # {
+        # #     'plot_name': 'comparing_cn_in_gradients_rel_to_06_RF_HAA_actuation_across_models_plot_heatmap',
+        # #     'fields_and_nicknames': [
+        # #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(6*128,7*128)  # Example for 5 dimensions
+        # #     ],
+        # #     'plot_func': overlay_plot_gradient_heatmaps,
+        # #     'fig_width': 12,
+        # #     'fig_height': 12,
+        # #     'additional_features': {
+        # #         'draw_perturb_shaded_box': True,
+        # #     },
+        # # },
+        # # {
+        # #     'plot_name': 'comparing_cn_in_gradients_rel_to_07_RF_HFE_actuation_across_models_plot_heatmap',
+        # #     'fields_and_nicknames': [
+        # #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(7*128,8*128)  # Example for 5 dimensions
+        # #     ],
+        # #     'plot_func': overlay_plot_gradient_heatmaps,
+        # #     'fig_width': 12,
+        # #     'fig_height': 12,
+        # #     'additional_features': {
+        # #         'draw_perturb_shaded_box': True,
+        # #     },
+        # # },
+        # # {
+        # #     'plot_name': 'comparing_cn_in_gradients_rel_to_08_RF_KFE_actuation_across_models_plot_heatmap',
+        # #     'fields_and_nicknames': [
+        # #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(8*128,9*128)  # Example for 5 dimensions
+        # #     ],
+        # #     'plot_func': overlay_plot_gradient_heatmaps,
+        # #     'fig_width': 12,
+        # #     'fig_height': 12,
+        # #     'additional_features': {
+        # #         'draw_perturb_shaded_box': True,
+        # #     },
+        # # },
+        # {
+        #     'plot_name': 'comparing_cn_in_values_rel_to_00_LF_HAA_actuation_across_models_plot_heatmap',
+        #     'fields_and_nicknames': [
+        #         ('TIME_RAW', f'NETWORK_CN_IN_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(0,128)  # Example for 5 dimensions
+        #     ],
+        #     'plot_func': overlay_plot_gradient_heatmaps,
+        #     'fig_width': 12,
+        #     'fig_height': 12,
         #     'additional_features': {
         #         'draw_perturb_shaded_box': True,
         #     },
         # },
         # {
         #     'plot_name': 'comparing_cn_in_gradients_rel_to_00_LF_HAA_actuation_across_models_plot_heatmap',
+        #     'fields_and_nicknames': [
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(0*128,1*128)  # Example for 5 dimensions
+        #     ],
+        #     'plot_func': overlay_plot_gradient_heatmaps,
+        #     'fig_width': 12,
+        #     'fig_height': 12,
+        #     'additional_features': {
+        #         'draw_perturb_shaded_box': True,
+        #     },
+        # },
+        # {
+        #     'plot_name': 'comparing_cn_in_gradients_times_value_rel_to_00_LF_HAA_actuation_across_models_plot_heatmap',
         #     'fields_and_nicknames': [
         #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(0*128,1*128)  # Example for 5 dimensions
         #     ],
@@ -905,9 +1105,9 @@ def run_analysis():
         #     },
         # },
         # {
-        #     'plot_name': 'comparing_cn_in_gradients_rel_to_01_LF_HFE_actuation_across_models_plot_heatmap',
+        #     'plot_name': 'comparing_cn_in_values_rel_to_09_RH_HAA_actuation_across_models_plot_heatmap',
         #     'fields_and_nicknames': [
-        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(1*128,2*128)  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(0,128)  # Example for 5 dimensions
         #     ],
         #     'plot_func': overlay_plot_gradient_heatmaps,
         #     'fig_width': 12,
@@ -917,9 +1117,9 @@ def run_analysis():
         #     },
         # },
         # {
-        #     'plot_name': 'comparing_cn_in_gradients_rel_to_02_LF_KFE_actuation_across_models_plot_heatmap',
+        #     'plot_name': 'comparing_cn_in_gradients_rel_to_09_RH_HAA_actuation_across_models_plot_heatmap',
         #     'fields_and_nicknames': [
-        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(2*128,3*128)  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(9*128,10*128)  # Example for 5 dimensions
         #     ],
         #     'plot_func': overlay_plot_gradient_heatmaps,
         #     'fig_width': 12,
@@ -929,11 +1129,58 @@ def run_analysis():
         #     },
         # },
         # {
-        #     'plot_name': 'comparing_cn_in_gradients_rel_to_03_LH_HAA_actuation_across_models_plot_heatmap',
+        #     'plot_name': 'comparing_cn_in_gradients_times_value_rel_to_09_RH_HAA_actuation_across_models_plot_heatmap',
         #     'fields_and_nicknames': [
-        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(3*128,4*128)  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(9*128,10*128)  # Example for 5 dimensions
         #     ],
         #     'plot_func': overlay_plot_gradient_heatmaps,
+        #     'fig_width': 12,
+        #     'fig_height': 12,
+        #     'additional_features': {
+        #         'draw_perturb_shaded_box': True,
+        #     },
+        # },
+        # # {
+        # #     'plot_name': 'comparing_cn_in_gradients_rel_to_10_RH_HFE_actuation_across_models_plot_heatmap',
+        # #     'fields_and_nicknames': [
+        # #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(10*128,11*128)  # Example for 5 dimensions
+        # #     ],
+        # #     'plot_func': overlay_plot_gradient_heatmaps,
+        # #     'fig_width': 12,
+        # #     'fig_height': 12,
+        # #     'additional_features': {
+        # #         'draw_perturb_shaded_box': True,
+        # #     },
+        # # },
+        # # {
+        # #     'plot_name': 'comparing_cn_in_gradients_rel_to_11_RH_KFE_actuation_across_models_plot_heatmap',
+        # #     'fields_and_nicknames': [
+        # #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(11*128,12*128)  # Example for 5 dimensions
+        # #     ],
+        # #     'plot_func': overlay_plot_gradient_heatmaps,
+        # #     'fig_width': 12,
+        # #     'fig_height': 12,
+        # #     'additional_features': {
+        # #         'draw_perturb_shaded_box': True,
+        # #     },
+        # # },
+        # {
+        #     'plot_name': 'comparing_key_cn_in_6_gradients_rel_to_all_actuation_across_models_plot',
+        #     'fields_and_nicknames': [
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(0*128+6).zfill(3)}', 'Gradient-LF_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(1*128+6).zfill(3)}', 'Gradient-LF_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(2*128+6).zfill(3)}', 'Gradient-LF_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(3*128+6).zfill(3)}', 'Gradient-LH_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(4*128+6).zfill(3)}', 'Gradient-LH_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(5*128+6).zfill(3)}', 'Gradient-LH_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(6*128+6).zfill(3)}', 'Gradient-RF_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(7*128+6).zfill(3)}', 'Gradient-RF_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(8*128+6).zfill(3)}', 'Gradient-RF_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(9*128+6).zfill(3)}', 'Gradient-RH_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(10*128+6).zfill(3)}', 'Gradient-RH_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(11*128+6).zfill(3)}', 'Gradient-RH_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #     ],
+        #     'plot_func': overlay_plot_signal,
         #     'fig_width': 12,
         #     'fig_height': 12,
         #     'additional_features': {
@@ -941,11 +1188,22 @@ def run_analysis():
         #     },
         # },
         # {
-        #     'plot_name': 'comparing_cn_in_gradients_rel_to_04_LH_HFE_actuation_across_models_plot_heatmap',
+        #     'plot_name': 'comparing_key_cn_in_gradients_rel_to_all_actuation_across_models_plot',
         #     'fields_and_nicknames': [
-        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(4*128,5*128)  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(0*128+6).zfill(3)}', 'Gradient-LF_HAA Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(1*128+6).zfill(3)}', 'Gradient-LF_HFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(2*128+6).zfill(3)}', 'Gradient-LF_KFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(3*128+6).zfill(3)}', 'Gradient-LH_HAA Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(4*128+6).zfill(3)}', 'Gradient-LH_HFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(5*128+6).zfill(3)}', 'Gradient-LH_KFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(6*128+6).zfill(3)}', 'Gradient-RF_HAA Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(7*128+6).zfill(3)}', 'Gradient-RF_HFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(8*128+6).zfill(3)}', 'Gradient-RF_KFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(9*128+6).zfill(3)}', 'Gradient-RH_HAA Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(10*128+6).zfill(3)}', 'Gradient-RH_HFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(11*128+6).zfill(3)}', 'Gradient-RH_KFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
         #     ],
-        #     'plot_func': overlay_plot_gradient_heatmaps,
+        #     'plot_func': overlay_plot_gait,
         #     'fig_width': 12,
         #     'fig_height': 12,
         #     'additional_features': {
@@ -953,11 +1211,11 @@ def run_analysis():
         #     },
         # },
         # {
-        #     'plot_name': 'comparing_cn_in_gradients_rel_to_05_LH_KFE_actuation_across_models_plot_heatmap',
+        #     'plot_name': 'comparing_key_cn_in_6_across_models_plot',
         #     'fields_and_nicknames': [
-        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(5*128,6*128)  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_{str(0*128+6).zfill(3)}', 'Recurrent Input Neuron 6'),  # Example for 5 dimensions
         #     ],
-        #     'plot_func': overlay_plot_gradient_heatmaps,
+        #     'plot_func': overlay_plot_gait,
         #     'fig_width': 12,
         #     'fig_height': 12,
         #     'additional_features': {
@@ -965,218 +1223,28 @@ def run_analysis():
         #     },
         # },
         # {
-        #     'plot_name': 'comparing_cn_in_gradients_rel_to_06_RF_HAA_actuation_across_models_plot_heatmap',
+        #     'plot_name': 'comparing_key_cn_in_6_gradients_times_val_rel_to_all_actuation_across_models_plot',
         #     'fields_and_nicknames': [
-        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(6*128,7*128)  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(0*128+6).zfill(3)}', 'Gradient-LF_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(1*128+6).zfill(3)}', 'Gradient-LF_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(2*128+6).zfill(3)}', 'Gradient-LF_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(3*128+6).zfill(3)}', 'Gradient-LH_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(4*128+6).zfill(3)}', 'Gradient-LH_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(5*128+6).zfill(3)}', 'Gradient-LH_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(6*128+6).zfill(3)}', 'Gradient-RF_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(7*128+6).zfill(3)}', 'Gradient-RF_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(8*128+6).zfill(3)}', 'Gradient-RF_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(9*128+6).zfill(3)}', 'Gradient-RH_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(10*128+6).zfill(3)}', 'Gradient-RH_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
+        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(11*128+6).zfill(3)}', 'Gradient-RH_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
         #     ],
-        #     'plot_func': overlay_plot_gradient_heatmaps,
+        #     'plot_func': overlay_plot_gait,
         #     'fig_width': 12,
         #     'fig_height': 12,
         #     'additional_features': {
         #         'draw_perturb_shaded_box': True,
         #     },
         # },
-        # {
-        #     'plot_name': 'comparing_cn_in_gradients_rel_to_07_RF_HFE_actuation_across_models_plot_heatmap',
-        #     'fields_and_nicknames': [
-        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(7*128,8*128)  # Example for 5 dimensions
-        #     ],
-        #     'plot_func': overlay_plot_gradient_heatmaps,
-        #     'fig_width': 12,
-        #     'fig_height': 12,
-        #     'additional_features': {
-        #         'draw_perturb_shaded_box': True,
-        #     },
-        # },
-        # {
-        #     'plot_name': 'comparing_cn_in_gradients_rel_to_08_RF_KFE_actuation_across_models_plot_heatmap',
-        #     'fields_and_nicknames': [
-        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(8*128,9*128)  # Example for 5 dimensions
-        #     ],
-        #     'plot_func': overlay_plot_gradient_heatmaps,
-        #     'fig_width': 12,
-        #     'fig_height': 12,
-        #     'additional_features': {
-        #         'draw_perturb_shaded_box': True,
-        #     },
-        # },
-        {
-            'plot_name': 'comparing_cn_in_values_rel_to_00_LF_HAA_actuation_across_models_plot_heatmap',
-            'fields_and_nicknames': [
-                ('TIME_RAW', f'NETWORK_CN_IN_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(0,128)  # Example for 5 dimensions
-            ],
-            'plot_func': overlay_plot_gradient_heatmaps,
-            'fig_width': 12,
-            'fig_height': 12,
-            'additional_features': {
-                'draw_perturb_shaded_box': True,
-            },
-        },
-        {
-            'plot_name': 'comparing_cn_in_gradients_rel_to_00_LF_HAA_actuation_across_models_plot_heatmap',
-            'fields_and_nicknames': [
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(0*128,1*128)  # Example for 5 dimensions
-            ],
-            'plot_func': overlay_plot_gradient_heatmaps,
-            'fig_width': 12,
-            'fig_height': 12,
-            'additional_features': {
-                'draw_perturb_shaded_box': True,
-            },
-        },
-        {
-            'plot_name': 'comparing_cn_in_gradients_times_value_rel_to_00_LF_HAA_actuation_across_models_plot_heatmap',
-            'fields_and_nicknames': [
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(0*128,1*128)  # Example for 5 dimensions
-            ],
-            'plot_func': overlay_plot_gradient_heatmaps,
-            'fig_width': 12,
-            'fig_height': 12,
-            'additional_features': {
-                'draw_perturb_shaded_box': True,
-            },
-        },
-        {
-            'plot_name': 'comparing_cn_in_values_rel_to_09_RH_HAA_actuation_across_models_plot_heatmap',
-            'fields_and_nicknames': [
-                ('TIME_RAW', f'NETWORK_CN_IN_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(0,128)  # Example for 5 dimensions
-            ],
-            'plot_func': overlay_plot_gradient_heatmaps,
-            'fig_width': 12,
-            'fig_height': 12,
-            'additional_features': {
-                'draw_perturb_shaded_box': True,
-            },
-        },
-        {
-            'plot_name': 'comparing_cn_in_gradients_rel_to_09_RH_HAA_actuation_across_models_plot_heatmap',
-            'fields_and_nicknames': [
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(9*128,10*128)  # Example for 5 dimensions
-            ],
-            'plot_func': overlay_plot_gradient_heatmaps,
-            'fig_width': 12,
-            'fig_height': 12,
-            'additional_features': {
-                'draw_perturb_shaded_box': True,
-            },
-        },
-        {
-            'plot_name': 'comparing_cn_in_gradients_times_value_rel_to_09_RH_HAA_actuation_across_models_plot_heatmap',
-            'fields_and_nicknames': [
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(9*128,10*128)  # Example for 5 dimensions
-            ],
-            'plot_func': overlay_plot_gradient_heatmaps,
-            'fig_width': 12,
-            'fig_height': 12,
-            'additional_features': {
-                'draw_perturb_shaded_box': True,
-            },
-        },
-        # {
-        #     'plot_name': 'comparing_cn_in_gradients_rel_to_10_RH_HFE_actuation_across_models_plot_heatmap',
-        #     'fields_and_nicknames': [
-        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(10*128,11*128)  # Example for 5 dimensions
-        #     ],
-        #     'plot_func': overlay_plot_gradient_heatmaps,
-        #     'fig_width': 12,
-        #     'fig_height': 12,
-        #     'additional_features': {
-        #         'draw_perturb_shaded_box': True,
-        #     },
-        # },
-        # {
-        #     'plot_name': 'comparing_cn_in_gradients_rel_to_11_RH_KFE_actuation_across_models_plot_heatmap',
-        #     'fields_and_nicknames': [
-        #         ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(i).zfill(3)}', f'Gradient Heatmap {i}') for i in range(11*128,12*128)  # Example for 5 dimensions
-        #     ],
-        #     'plot_func': overlay_plot_gradient_heatmaps,
-        #     'fig_width': 12,
-        #     'fig_height': 12,
-        #     'additional_features': {
-        #         'draw_perturb_shaded_box': True,
-        #     },
-        # },
-        {
-            'plot_name': 'comparing_key_cn_in_6_gradients_rel_to_all_actuation_across_models_plot',
-            'fields_and_nicknames': [
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(0*128+6).zfill(3)}', 'Gradient-LF_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(1*128+6).zfill(3)}', 'Gradient-LF_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(2*128+6).zfill(3)}', 'Gradient-LF_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(3*128+6).zfill(3)}', 'Gradient-LH_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(4*128+6).zfill(3)}', 'Gradient-LH_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(5*128+6).zfill(3)}', 'Gradient-LH_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(6*128+6).zfill(3)}', 'Gradient-RF_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(7*128+6).zfill(3)}', 'Gradient-RF_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(8*128+6).zfill(3)}', 'Gradient-RF_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(9*128+6).zfill(3)}', 'Gradient-RH_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(10*128+6).zfill(3)}', 'Gradient-RH_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(11*128+6).zfill(3)}', 'Gradient-RH_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-            ],
-            'plot_func': overlay_plot_signal,
-            'fig_width': 12,
-            'fig_height': 12,
-            'additional_features': {
-                'draw_perturb_shaded_box': True,
-            },
-        },
-        {
-            'plot_name': 'comparing_key_cn_in_gradients_rel_to_all_actuation_across_models_plot',
-            'fields_and_nicknames': [
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(0*128+6).zfill(3)}', 'Gradient-LF_HAA Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(1*128+6).zfill(3)}', 'Gradient-LF_HFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(2*128+6).zfill(3)}', 'Gradient-LF_KFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(3*128+6).zfill(3)}', 'Gradient-LH_HAA Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(4*128+6).zfill(3)}', 'Gradient-LH_HFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(5*128+6).zfill(3)}', 'Gradient-LH_KFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(6*128+6).zfill(3)}', 'Gradient-RF_HAA Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(7*128+6).zfill(3)}', 'Gradient-RF_HFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(8*128+6).zfill(3)}', 'Gradient-RF_KFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(9*128+6).zfill(3)}', 'Gradient-RH_HAA Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(10*128+6).zfill(3)}', 'Gradient-RH_HFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_{str(11*128+6).zfill(3)}', 'Gradient-RH_KFE Recurrent Input Neuron 6'),  # Example for 5 dimensions
-            ],
-            'plot_func': overlay_plot_gait,
-            'fig_width': 12,
-            'fig_height': 12,
-            'additional_features': {
-                'draw_perturb_shaded_box': True,
-            },
-        },
-        {
-            'plot_name': 'comparing_key_cn_in_6_across_models_plot',
-            'fields_and_nicknames': [
-                ('TIME_RAW', f'NETWORK_CN_IN_{str(0*128+6).zfill(3)}', 'Recurrent Input Neuron 6'),  # Example for 5 dimensions
-            ],
-            'plot_func': overlay_plot_gait,
-            'fig_width': 12,
-            'fig_height': 12,
-            'additional_features': {
-                'draw_perturb_shaded_box': True,
-            },
-        },
-        {
-            'plot_name': 'comparing_key_cn_in_6_gradients_times_val_rel_to_all_actuation_across_models_plot',
-            'fields_and_nicknames': [
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(0*128+6).zfill(3)}', 'Gradient-LF_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(1*128+6).zfill(3)}', 'Gradient-LF_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(2*128+6).zfill(3)}', 'Gradient-LF_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(3*128+6).zfill(3)}', 'Gradient-LH_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(4*128+6).zfill(3)}', 'Gradient-LH_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(5*128+6).zfill(3)}', 'Gradient-LH_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(6*128+6).zfill(3)}', 'Gradient-RF_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(7*128+6).zfill(3)}', 'Gradient-RF_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(8*128+6).zfill(3)}', 'Gradient-RF_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(9*128+6).zfill(3)}', 'Gradient-RH_HAA-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(10*128+6).zfill(3)}', 'Gradient-RH_HFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-                ('TIME_RAW', f'NETWORK_CN_IN_GRAD_TIMES_VALUE_{str(11*128+6).zfill(3)}', 'Gradient-RH_KFE-times-value Recurrent Input Neuron 6'),  # Example for 5 dimensions
-            ],
-            'plot_func': overlay_plot_gait,
-            'fig_width': 12,
-            'fig_height': 12,
-            'additional_features': {
-                'draw_perturb_shaded_box': True,
-            },
-        },
     ]
 
     # Loop through each plot configuration
@@ -1185,6 +1253,7 @@ def run_analysis():
         plot_func = plot_config['plot_func']
         fig_width = plot_config['fig_width']
         fig_height = plot_config['fig_height']
+        colors = plot_config['colors']
         additional_features = plot_config.get('additional_features', {})  # Default to empty dict if not present
 
         # Create the directory if it doesn't exist

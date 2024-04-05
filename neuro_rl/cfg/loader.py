@@ -13,6 +13,7 @@ def load_configuration():
     parser.add_argument('--config_path', type=str, help='Path to the YAML configuration file')
     parser.add_argument('--model_path', type=str, help='Optional override for the input path')
     parser.add_argument('--data_path', type=str, help='Optional override for the input path')
+    parser.add_argument('--data_name', type=str, help='Optional override for the input path', default=None)
     parser.add_argument('--output_path', type=str, help='Optional override for the output path')
 
     # Parsing arguments
@@ -42,4 +43,8 @@ def load_configuration():
         cfg.output_path = args.output_path
         if cfg.output_path.startswith('['):
             cfg.output_path = json.loads(cfg.output_path)
+    if args.data_name is not None:
+        cfg.data_name = args.data_name
+        if cfg.data_name.startswith('['):
+            cfg.data_name = json.loads(cfg.data_name)
     return cfg

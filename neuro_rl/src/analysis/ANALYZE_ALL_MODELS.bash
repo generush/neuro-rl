@@ -235,6 +235,19 @@ model_run_pairs=(
   # "ANYMAL-1.0MASS-LSTM16-CORLTERR:last_AnymalTerrain_ep_3000_rew_18.42784.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
   # "ANYMAL-1.0MASS-LSTM16-CORLTERR:last_AnymalTerrain_ep_3500_rew_18.885078.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
   # "ANYMAL-1.0MASS-LSTM16-CORLTERR:last_AnymalTerrain_ep_3800_rew_20.163399.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+
+
+  # "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3200_rew_20.145746.pth:u_1_1_1_v_0_0_1_r_0_0_1_n_420"
+  # "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3200_rew_20.145746.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
+  # "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3200_rew_20.145746.pth:u_0.4_1_14_v_0_0_1_r_0_0_1_n_20"
+  # "ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3200_rew_20.145746.pth:u_1_1_1_v_0_0_1_r_0_0_1_n_10"
+    
+  # "AnymalTerrain_25-22-22-32_nolowvel:last_AnymalTerrain_ep_3000_rew__20.28_.pth:u_0.4_1_14_v_0_0_1_r_0_0_1_n_20"
+
+    # "ANYMAL-0.5MASS-LSTM16-TERR-01:last_AnymalTerrain_ep_3200_rew_21.073418.pth:u_1_1_1_v_0_0_1_r_0_0_1_n_10"
+    # "A1-1.0MASS-LSTM16-TERR-01:last_A1Terrain_ep_4600_rew_16.256865.pth:u_1_1_1_v_0_0_1_r_0_0_1_n_10"
+    # "2024-03-31-22-30_AnymalTerrain:last_AnymalTerrain_ep_5000_rew__16.17_.pth:u_1_1_1_v_0_0_1_r_0_0_1_n_10"
+    "2024-03-31-22-30_AnymalTerrain:last_AnymalTerrain_ep_5000_rew__16.17_.pth:u_0.4_1_28_v_0_0_1_r_0_0_1_n_15"
 )
 
 # Loop through the model/run pairs
@@ -245,7 +258,7 @@ for pair in "${model_run_pairs[@]}"; do
     echo "Processing Model Type: $model_type / Model Name: $model_name / Run: $run_name"
 
     # Call the Python script with the current model and run
-    python ../../analysis_pipeline_cycle_avg.py --config_path "../../cfg/analyze/analysis.yaml" --model_path "../../models/$model_type/nn/$model_name" --data_path "../../data/raw/$model_type/$run_name/$model_name/" --output_path "../../data/processed/$model_type/$run_name/$model_name"
+    python ../../analysis_pipeline_cycle_avg.py --config_path "../../cfg/analyze/analysis.yaml" --model_path "../../models/$model_type/nn/$model_name" --data_path "../../data/raw/$model_type/$run_name/$model_name/" --output_path "../../data/processed/$model_type/$run_name/$model_name/"
 done
 
 echo "All scripts have been executed sequentially."

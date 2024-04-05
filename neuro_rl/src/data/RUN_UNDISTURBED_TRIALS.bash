@@ -22,12 +22,14 @@ models_info=(
   # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-DISTTERR-01:last_AnymalTerrain_ep_1200_rew_12.890905.pth"
   
 
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3200_rew_20.145746.pth"
+
   # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_1100_rew_14.392729.pth"
   # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_2200_rew_19.53241.pth"
   # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3800_rew_20.310041.pth"
   # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3800_rew_20.310041.pth"
   # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_3900_rew_20.14785.pth"
-  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4000_rew_20.387749.pth" 
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4000_rew_20.387749.pth"
   # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-FRONTIERSDISTTERR:last_AnymalTerrain_ep_4100_rew_20.68903.pth"
 
   # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM4-CORLDISTTERR:last_AnymalTerrain_ep_200_rew_6.8250656.pth"
@@ -129,6 +131,14 @@ models_info=(
   # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLTERR:last_AnymalTerrain_ep_3500_rew_18.885078.pth"
   # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-1.0MASS-LSTM16-CORLTERR:last_AnymalTerrain_ep_3800_rew_20.163399.pth"
 
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:AnymalTerrain_25-22-22-32_nolowvel:last_AnymalTerrain_ep_3000_rew__20.28_.pth"
+  
+  # "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:ANYMAL-0.5MASS-LSTM16-TERR-01:last_AnymalTerrain_ep_3200_rew_21.073418.pth"
+
+  # "A1Terrain_PPO_LSTM_NeuroRL:A1Terrain_NeuroRL_exp:A1-1.0MASS-LSTM16-TERR-01:last_A1Terrain_ep_4600_rew_16.256865.pth"
+
+  "AnymalTerrain_PPO_LSTM_NeuroRL:AnymalTerrain_NeuroRL_exp:2024-03-31-22-30_AnymalTerrain:last_AnymalTerrain_ep_5000_rew__16.17_.pth" # no low vel
+
 )
 
 export_path="../../data/raw"
@@ -151,6 +161,18 @@ do
   echo "------------------------------"
 
   # Define an associative array for each run with specific parameters
+
+  # positive forward speeds (N=1x420)
+  declare -A u_pos_1x420=(
+    [num_envs]=420
+    [linear_x_range]='[1, 1]'
+    [linear_y_range]='[0, 0]'
+    [yaw_rate_range]='[0, 0]'
+    [linear_x_n]=1
+    [linear_y_n]=1
+    [yaw_rate_n]=1
+    [n_copies]=420
+  )
 
   # positive forward speeds (N=30x15) (A1 only)
   declare -A u_pos_30x15=(
@@ -175,6 +197,31 @@ do
     [yaw_rate_n]=1
     [n_copies]=15
   )
+
+  # positive forward speeds (N=1x10) FRONTIERS FIGURE 10 ablation trials
+  declare -A u_pos_1x10=(
+    [num_envs]=10
+    [linear_x_range]='[1, 1]'
+    [linear_y_range]='[0, 0]'
+    [yaw_rate_range]='[0, 0]'
+    [linear_x_n]=1
+    [linear_y_n]=1
+    [yaw_rate_n]=1
+    [n_copies]=10
+  )
+
+  # positive forward speeds (N=14x20)
+  declare -A u_pos_14x20=(
+    [num_envs]=280
+    [linear_x_range]='[0.4, 1]'
+    [linear_y_range]='[0, 0]'
+    [yaw_rate_range]='[0, 0]'
+    [linear_x_n]=14
+    [linear_y_n]=1
+    [yaw_rate_n]=1
+    [n_copies]=20
+  )
+
 
   # positive forward speeds (N=14x25)
   declare -A u_pos_14x25=(
@@ -314,6 +361,9 @@ do
   # runs=(u_pos_28x15 u_pos_14x25 u_pos_7x50 v_pos_7x50 r_pos_7x50 u_pos_1x100 u_neg_1x100 v_pos_1x100 v_neg_1x100 r_pos_1x100 r_neg_1x100 u_pos_1x1)  # Add more run names as you define them
   # runs=(u_pos_30x15)  # Add more run names as you define them
   runs=(u_pos_28x15)  # Add more run names as you define them
+  # runs=(u_pos_14x20)  # Add more run names as you define them
+  # runs=(u_pos_1x420)
+  # runs=(u_pos_1x10)  # Add more run names as you define them
   
     # Loop over each run
   for run in "${runs[@]}"; do
@@ -352,8 +402,8 @@ do
         test=True \
         capture_video=False \
         capture_video_len=1000 \
-        force_render=False \
-        headless=True \
+        force_render=True \
+        headless=False \
         checkpoint=../../models/${model_type}/nn/$model_name \
         num_envs=${current_run[num_envs]} \
         task.env.specifiedCommandVelocityRanges.linear_x="${current_run[linear_x_range]}" \
